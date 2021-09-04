@@ -1,2 +1,2 @@
-# HIPER-QURE - HIgh Precision and ERror estimator of QUadrature RulEs
+# HIPER-SINK - HIgh Precision quadrature and ERror estimation of SINgular Kernels
 
