@@ -1,4 +1,4 @@
-std::ofstream data("../data/TabulatedErrorValues.csv");
+std::ofstream data("../../data/TabulatedErrorValues.csv");
 
 int num_samples = 15000, prev_j;
 double start = -1, end = 1300;
@@ -62,6 +62,6 @@ for(int n = min_nodes; n <= max_nodes; n++)
 
 data.close();
 
-std::cout << "\n\nComputation completed!\nTabulated data is now available in the 'NQL/monomial_transf/data' subdirectory.\n\nProgram terminated!\n" << std::endl;
+std::cout << "\n\nComputation completed!\nTabulated data is now available in the 'HIPER-SINK/data' subdirectory.\nProgram can now be executed!\n" << std::endl;
 
 return 0;

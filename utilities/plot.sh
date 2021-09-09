@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for sub_dir in ../output/n=$1/*/; do
+for sub_dir in ../../output/n=$1/*/; do
 
 	files=$(ls $sub_dir*.svg 2> /dev/null | wc -l)
 
@@ -17,7 +17,7 @@ for sub_dir in ../output/n=$1/*/; do
 		set logscale y
 		set grid
 		set datafile separator ","
-		plot "../output/n=$1/plot/ExactError.csv" u 1:2 with lines title "Exact estimate" lw 1.5 lt rgb "red", "../output/n=$1/plot/ExactErrorEnv.csv" u 1:2 with lines title "Enveloped estimate" lw 1.5 lt rgb "blue", "../output/n=$1/plot/Epsilon.csv" u 1:2 with lines title "Precision (double-format)" lw 1.5 lt rgb "black" 
+		plot "../../output/n=$1/plot/ExactError.csv" u 1:2 with lines title "Exact estimate" lw 1.5 lt rgb "red", "../../output/n=$1/plot/ExactErrorEnv.csv" u 1:2 with lines title "Enveloped estimate" lw 1.5 lt rgb "blue", "../../output/n=$1/plot/Epsilon.csv" u 1:2 with lines title "Precision (double-format)" lw 1.5 lt rgb "black" 
 
 		EOF
 

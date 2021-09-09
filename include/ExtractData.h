@@ -30,9 +30,12 @@ while(std::getline(datafile, line))
                   << std::setw(11) << "n_min = " + row[0] + ".\n";
         std::cout << std::left 
                   << std::setw(11) << ""
-                  << std::setw(11) << "beta_min = " + row[1] + ".\n";
+                  << std::setw(11)
+                  << std::setprecision(std::numeric_limits<double>::max_digits10)
+                  << "beta_min = " + row[1] + ".\n";
         std::cout << std::left 
                   << std::setw(11) << ""
+                  << std::setprecision(std::numeric_limits<double>::max_digits10)
                   << std::setw(11) << "beta_max = " + row[2] + ".\n";
 
 		break;

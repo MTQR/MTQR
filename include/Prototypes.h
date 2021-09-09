@@ -33,7 +33,7 @@ template<typename type>
 std::vector<type> linspace(const type& start_type, const type& end_type, const int& num_steps);
 
 // Computes and exports the resulting G-L weights and nodes aling with other ouputs
-void export_results(const double& lambda_min, const double& lambda_max, const int& n_min, const double& beta_min, const double& beta_max, const double& r, const std::string& plot_flag);
+void export_results(const double& lambda_min, const double& lambda_max, const int& n_min, const double& beta_min, const double& beta_max, const double& r, const std::string& plot_flag, const std::string& test_flag);
 
 // Plots the exact and enveloped error estimates given the number of quadrature nodes
 void plots(const int& num_nodes, const double& min_exponent, const double& max_exponent);

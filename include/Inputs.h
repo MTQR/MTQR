@@ -58,9 +58,6 @@ std::cout << "\\\\" + dashed_line + "//" << std::endl;
 
 double lambda_max, lambda_min;
 
-// lambda_max = (boost::math::constants::e<double>() + 0.25) = 2.968281828
-// lambda_min = (-boost::math::constants::pi<double>()/4) = -0.785398163
-
 std::cout << "\nInsert lambda_min: ";
 std::cin >> lambda_min;
 
@@ -83,3 +80,5 @@ std::string plot;
 
 std::cout << "\nDo you want to plot the error estimates for your choice [y/n]? : ";
 std::cin >> plot;
+
+std::string test = "n";
