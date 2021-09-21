@@ -1,2 +1,2 @@
-# HIPER-SINK - HIgh Precision quadrature and ERror estimation of SINgular Kernels
+# HIPERquad - HIgh Precision and ERror estimation quadrature library
 
