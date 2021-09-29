@@ -1,0 +1,9 @@
+
+INPUTS:
+        lambda_min = -0.78539816339744828
+        lambda_max = -0.5
+
+RESULTS:
+        transformation order = 49.3259368361888022036509937606751919
+        integral after the transformation = 2.65979236632548763294422774770110148 ,   relative error = 2.31350688499666847514462625706952835e-17
+        integral prior the transformation = 1.60767405778706150371050335799664821 ,   relative error = 0.395564075549224638912692330672844613

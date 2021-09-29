@@ -1,2 +1,2 @@
-# HIPERquad - HIgh Precision and ERror estimation quadrature library
+# QUASIMONT - QUAdrature of SINgular polynomials with MONomial transformations
 

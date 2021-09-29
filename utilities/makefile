@@ -1,8 +1,8 @@
 #------------------------------------------------------------------------------------------------------------------
-# File:      test/makefile
+# File:      utilities/makefile
 #
 # Library:   QUASIMONT - QUAdrature of SIngular polynomials using MONomial Transformations:
-#                        a C++ library for high precision integration of singular polynomials of non-integer degree
+#                        a C++ library for high precision quadrature of singular polynomials of non-integer degree
 #
 # Authors:   Davide Papapicco, Guido Lombardi, PhD
 #
@@ -17,34 +17,23 @@ CXX = g++
 BLDDIR = ../build
 INCDIR = ../include
 SRCDIR = ../src
-UTLDIR = ../utilities
 OBJDIR = $(BLDDIR)/obj
 
-OBJ = $(OBJDIR)/Test1.o $(OBJDIR)/Quasimont.o $(OBJDIR)/VectorManip.o $(OBJDIR)/Plot.o
+OBJ = $(OBJDIR)/VectorManip.o $(OBJDIR)/Plot.o $(OBJDIR)/MonMap.o
 
-CXXOPTIONS = -g #-Wall
-CXXFLAGS = $(CXXOPTIONS) -I $(INCDIR)
-
-LDLIBS = -lm -lgsl -lgslcblas -lgmp -lquadmath
-LDFLAGS = $(LDLIBS)
+CXXOPTIONS = -g
+CXXFLAGS = $(CXXOPTIONS) -I $(INCDIR) 
 
 default: $(OBJ)
-	$(CXX) $(OBJDIR)/*.o -o Quadrature $(LDFLAGS)
-	./Quadrature
 
-$(OBJDIR)/Test1.o: Test1.cpp
-	cd $(BLDDIR) && $(MAKE) clean
+$(OBJDIR)/VectorManip.o: VectorManip.cpp $(INCDIR)/*.h
 	$(CXX) -c $< -o $@ $(CXXFLAGS)
 
-$(OBJDIR)/Quasimont.o:
-	cd $(BLDDIR) && $(MAKE)
+$(OBJDIR)/Plot.o: Plot.cpp $(SRCDIR)/MonMap.cpp $(INCDIR)/*.h
+	$(CXX) -c $< -o $@ $(CXXFLAGS)
 
-$(OBJDIR)/VectorManip.o:
-	cd $(UTLDIR) && $(MAKE) $@
-
-$(OBJDIR)/Plot.o:
-	cd $(UTLDIR) && $(MAKE) $@
+$(OBJDIR)/MonMap.o:
+	cd $(SRCDIR) && $(MAKE)
 
 clean:
-	rm -f $(OBJDIR)/Test1.o Quadrature
-	#rm -r output
+	rm -f $(OBJDIR)/*.o
