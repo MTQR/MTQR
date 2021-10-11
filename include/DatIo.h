@@ -1,16 +1,17 @@
-//------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
 // File:      include/DatIo.h
 //
-// Library:   QUASIMONT - QUAdrature of SIngular polynomials using MONomial Transformations:
-//                        a C++ library for high precision integration of singular polynomials of non-integer degree
+// Library:   QUASIMONT-QUAdrature of SIngular polynomials using MONomial Transformations:
+//                      a C++ library for high precision integration of singular 
+//                      polynomials of non-integer degree
 //
-// Authors:   Davide Papapicco, Guido Lombardi, PhD
+// Authors:   Guido Lombardi, PhD, Davide Papapicco
 //
 // Institute: Politecnico di Torino
 //            C.so Duca degli Abruzzi, 24 - Torino (TO), Italia
 //            Department of Electronics and Telecommunications (DET)
 //            Electromagnetic modelling and applications Research Group
-//------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
 
 #ifndef DATIO_H
 #define DATIO_H
@@ -32,6 +33,6 @@ void degradeData(std::tuple<double, std::vector<float50>, std::vector<float50>, 
 
 // (SEE LINES 335~349 IN 'src/DatIo.cpp') Computes and exports the resulting G-L weights and nodes aling with other ouputs
 template<typename type>
-void exportData(const std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, const std::vector<type>& output_data, const std::vector<double>& collected_data);
+void exportData(const std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, const std::vector<type>& output_data, const std::string& data_type, const std::vector<double>& collected_data);
 
 #endif // DATIO_H

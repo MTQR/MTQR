@@ -1,16 +1,17 @@
-#------------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------
 # File:      test/makefile
 #
-# Library:   QUASIMONT - QUAdrature of SIngular polynomials using MONomial Transformations:
-#                        a C++ library for high precision integration of singular polynomials of non-integer degree
+# Library:   QUASIMONT-QUAdrature of SIngular polynomials using MONomial Transformations:
+#                      a C++ library for high precision integration of singular 
+#                      polynomials of non-integer degree
 #
-# Authors:   Davide Papapicco, Guido Lombardi, PhD
+# Authors:   Guido Lombardi, PhD, Davide Papapicco
 #
 # Institute: Politecnico di Torino
 #            C.so Duca degli Abruzzi, 24 - Torino (TO), Italia
 #            Department of Electronics and Telecommunications (DET)
 #            Electromagnetic modelling and applications Research Group
-#------------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------
 
 CXX = g++
 
@@ -20,7 +21,7 @@ SRCDIR = ../src
 UTLDIR = ../utilities
 OBJDIR = $(BLDDIR)/obj
 
-OBJ = $(OBJDIR)/Test1.o $(OBJDIR)/Quasimont.o $(OBJDIR)/VectorManip.o $(OBJDIR)/Plot.o
+OBJ = $(OBJDIR)/Main.o $(OBJDIR)/Quasimont.o $(OBJDIR)/Utils.o
 
 CXXOPTIONS = -g #-Wall
 CXXFLAGS = $(CXXOPTIONS) -I $(INCDIR)
@@ -29,22 +30,20 @@ LDLIBS = -lm -lgsl -lgslcblas -lgmp -lquadmath
 LDFLAGS = $(LDLIBS)
 
 default: $(OBJ)
-	$(CXX) $(OBJDIR)/*.o -o Quadrature $(LDFLAGS)
-	./Quadrature
+	$(CXX) $(OBJDIR)/*.o -o Test $(LDFLAGS)
+	./Test
 
-$(OBJDIR)/Test1.o: Test1.cpp
-	cd $(BLDDIR) && $(MAKE) clean
+$(OBJDIR)/Main.o: Main.cpp
 	$(CXX) -c $< -o $@ $(CXXFLAGS)
 
 $(OBJDIR)/Quasimont.o:
 	cd $(BLDDIR) && $(MAKE)
 
-$(OBJDIR)/VectorManip.o:
-	cd $(UTLDIR) && $(MAKE) $@
-
-$(OBJDIR)/Plot.o:
+$(OBJDIR)/Utils.o:
 	cd $(UTLDIR) && $(MAKE) $@
 
 clean:
-	rm -f $(OBJDIR)/Test1.o Quadrature
-	#rm -r output
+	rm -f $(OBJDIR)/Main.o Test
+
+allclean:
+	cd $(BLDDIR) && $(MAKE) clean

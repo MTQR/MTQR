@@ -1,23 +1,21 @@
-//------------------------------------------------------------------------------------------------------------------
-// File:      src/Quasimot.cpp
-// 
-// Library:   QUASIMONT - QUAdrature of SIngular polynomials using MONomial Transformations:
-//                        a C++ library for high precision integration of singular polynomials of non-integer degree
+//---------------------------------------------------------------------------------------
+// File:      src/Quasimont.cpp
 //
-// Authors:   Davide Papapicco, Guido Lombardi, PhD
+// Library:   QUASIMONT-QUAdrature of SIngular polynomials using MONomial Transformations:
+//                      a C++ library for high precision integration of singular 
+//                      polynomials of non-integer degree
+//
+// Authors:   Guido Lombardi, PhD, Davide Papapicco
 //
 // Institute: Politecnico di Torino
 //            C.so Duca degli Abruzzi, 24 - Torino (TO), Italia
 //            Department of Electronics and Telecommunications (DET)
 //            Electromagnetic modelling and applications Research Group
-//------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
 
 #include "Quasimont.h"
 
-
-//******************************************************************************************************************
-//******************************************************************************************************************
-//――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+/////////////////////////////////////////////////////////////////////////////////////////
 //
 //       FUNCTION: post_map_integral = quasimont(muntz_sequence, coeff_sequence, I)
 //                
@@ -29,9 +27,11 @@
 //
 //    DESCRIPTION: this routine takes the name of the library itself because it essentially instantiates and
 //                 executes the ordered sequence of functions in it and it's interfaced direclty with the user-inputs.
+//
+/////////////////////////////////////////////////////////////////////////////////////////
 
 
-void quasimont(std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence, std::vector<double>& interval, std::string& plots)
+void quasimont(std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence, std::vector<double>& interval)
 {
 	// CHECK IF TABULATED VALUES EXIST AND COMPUTES THEM IF THEY DON'T
 	std::ifstream datafile;
@@ -64,10 +64,3 @@ void quasimont(std::vector<float128>& muntz_sequence, std::vector<float128>& coe
 	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	std::cin.get();
 }//――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
-
-
-/*
-
-
-
-*/

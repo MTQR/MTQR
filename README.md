@@ -1,2 +1,2 @@
-# QUASIMONT - QUAdrature of SINgular polynomials with MONomial transformations
+# QUASIMONT - QUAdrature of SINgular polynomials using MONomial Transformations
 
