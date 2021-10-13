@@ -453,12 +453,12 @@ template double computeQuadGl<double>(const std::vector<double>& nodes, const st
 template<typename type>
 type computeError(const type& quadrature, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence, std::vector<double>& interval)
 {
-  float128 exact_integral = 0;
-  float128 I_in_a, I_in_b;
+  float1k exact_integral = 0;
+  float1k I_in_a, I_in_b;
 
   for(int k=0; k < muntz_sequence.size(); k++)
   {
-    I_in_b = boost::math::powm1(static_cast<float128>(interval[1]), muntz_sequence[k] + 1) + 1;
+    I_in_b = boost::math::powm1(static_cast<float1k>(interval[1]), muntz_sequence[k] + 1) + 1;
 
     if(interval[0]==0)
     {
@@ -466,10 +466,10 @@ type computeError(const type& quadrature, std::vector<float128>& muntz_sequence,
     }
     else
     {
-      I_in_a = boost::math::powm1(static_cast<float128>(interval[0]), muntz_sequence[k] + 1) + 1;
+      I_in_a = boost::math::powm1(static_cast<float1k>(interval[0]), muntz_sequence[k] + 1) + 1;
     }
 
-    exact_integral += coeff_sequence[k]*(1/(muntz_sequence[k]+1))*(I_in_b - I_in_a);
+    exact_integral += static_cast<float1k>(coeff_sequence[k])*(1/(static_cast<float1k>(muntz_sequence[k]+1)))*(I_in_b - I_in_a);
   }
 
   type error = fabs(static_cast<type>(exact_integral) - quadrature)/fabs(static_cast<type>(exact_integral));

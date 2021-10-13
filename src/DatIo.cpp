@@ -370,7 +370,7 @@ std::vector<double> collectData(const std::vector<double>& interval, const std::
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
-void degradeData(std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence, const std::vector<double>& collected_data)
+void degradeData(std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence, std::vector<double>& collected_data)
 {
 
   std::vector<double> interval = {collected_data[0], collected_data[1]};

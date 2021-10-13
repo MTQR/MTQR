@@ -23,7 +23,7 @@ OBJDIR = $(BLDDIR)/obj
 
 OBJ = $(OBJDIR)/Main.o $(OBJDIR)/Quasimont.o $(OBJDIR)/Utils.o
 
-CXXOPTIONS = -g #-Wall
+CXXOPTIONS = -g
 CXXFLAGS = $(CXXOPTIONS) -I $(INCDIR)
 
 LDLIBS = -lm -lgsl -lgslcblas -lgmp -lquadmath

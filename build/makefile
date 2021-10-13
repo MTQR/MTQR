@@ -21,7 +21,7 @@ OBJDIR = obj
 
 OBJ = $(OBJDIR)/Quasimont.o $(OBJDIR)/DatIo.o $(OBJDIR)/MonMap.o
 
-CXXOPTIONS = -g
+CXXOPTIONS = -g -ansi -std=c++17
 CXXFLAGS = $(CXXOPTIONS) -I $(INCDIR) 
 
 default: $(OBJ)
