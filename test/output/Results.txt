@@ -4,11 +4,11 @@ INPUTS:
         lambda_max = 35
 
 MONOMIAL MAP:
-        beta_min = 8.54130268096923828125
-        beta_max = 23.2002124786376953125
-        transformation order = 0.601150247785780189602178325003478676
+        beta_min = 8.5413026809692383
+        beta_max = 23.200212478637695
+        transformation order = 0.60115024778578019
 
  OUTPUTS:
-         num. of nodes = 12
-        integral after the transformation = 0.083333333333333325939326815805736207 ,   relative error = 8.87280782103311654675619815821351188e-17
-        integral prior the transformation = 0.0833333305995285610123008820799984438 ,   relative error = 3.2805657267852389415040018626141037e-08
+        num. of nodes = 12
+        I_n(f) = 0.083333333333333326, E_n(f) = 8.8728078210331165e-17  (monomial quadrature rule)
+        I_n(f) = 0.083333330599528561, E_n(f) = 3.2805657267852389e-08  (classical G-L rule)

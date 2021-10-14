@@ -233,14 +233,14 @@ double computeOrder(const std::vector<float128>& lambdas, const std::vector<doub
   std::ofstream results;
   results.open(results_file);
 
-  results << std::setprecision(std::numeric_limits<float128>::max_digits10)
+  results << std::setprecision(std::numeric_limits<double>::max_digits10)
           << "\nINPUTS:"
           << "\n        lambda_min = "
           << lambdas[0]
           << "\n        lambda_max = "
           << lambdas[1];
 
-  results << std::setprecision(std::numeric_limits<float128>::max_digits10)
+  results << std::setprecision(std::numeric_limits<double>::max_digits10)
           << "\n\nMONOMIAL MAP:"
           << "\n        beta_min = "
           << betas[0]
@@ -289,7 +289,7 @@ std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float
   results.open("output/Results.txt", std::ios_base::app);
 
   results << "\n\n OUTPUTS:"
-          << "\n         num. of nodes = "
+          << "\n        num. of nodes = "
           << n_min;
 
   results.close();

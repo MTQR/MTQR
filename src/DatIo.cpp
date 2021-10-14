@@ -476,14 +476,16 @@ void exportData(const std::tuple<double, std::vector<float50>, std::vector<float
   results.open("output/Results.txt", std::ios_base::app);
 
   results << std::setprecision(std::numeric_limits<float128>::max_digits10)
-          << "\n        integral after the transformation = "
+          << "\n        I_n(f) = "
           << output_data[0]
-          << " ,   relative error = "
+          << ", E_n(f) = "
           << output_data[1]
-          << "\n        integral prior the transformation = "
+          << "  (monomial quadrature rule)"
+          << "\n        I_n(f) = "
           << output_data[2]
-          << " ,   relative error = "
-          << output_data[3];
+          << ", E_n(f) = "
+          << output_data[3]
+          << "  (classical G-L rule)";
 
     results.close();
 
