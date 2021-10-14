@@ -224,6 +224,33 @@ double computeOrder(const std::vector<float128>& lambdas, const std::vector<doub
   
   std::cout << "\n ** Transformation order = " << std::to_string(transf_order) << " **" << std::endl;
 
+  std::string mkdir = "mkdir -p ";
+  std::string output_dir = "output";
+  std::string results_dir = mkdir + output_dir;
+  system(results_dir.c_str());
+
+  std::string results_file = output_dir + "/Results.txt";
+  std::ofstream results;
+  results.open(results_file);
+
+  results << std::setprecision(std::numeric_limits<float128>::max_digits10)
+          << "\nINPUTS:"
+          << "\n        lambda_min = "
+          << lambdas[0]
+          << "\n        lambda_max = "
+          << lambdas[1];
+
+  results << std::setprecision(std::numeric_limits<float128>::max_digits10)
+          << "\n\nMONOMIAL MAP:"
+          << "\n        beta_min = "
+          << betas[0]
+          << "\n        beta_max = "
+          << betas[1]
+          << "\n        transformation order = "
+          << transf_order;
+
+  results.close();
+
   return transf_order;
 }
 
@@ -258,6 +285,14 @@ double computeOrder(const std::vector<float128>& lambdas, const std::vector<doub
 
 std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>> computeParams(const double& r, const int& n_min, const std::vector<double>& interval)
 {
+  std::ofstream results;
+  results.open("output/Results.txt", std::ios_base::app);
+
+  results << "\n\n OUTPUTS:"
+          << "\n         num. of nodes = "
+          << n_min;
+
+  results.close();
 
   // Compute affine map parameters
 
@@ -451,7 +486,7 @@ template double computeQuadGl<double>(const std::vector<double>& nodes, const st
 
 
 template<typename type>
-type computeError(const type& quadrature, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence, std::vector<double>& interval)
+type computeError(const type& quadrature, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence, const std::vector<double>& interval)
 {
   float1k exact_integral = 0;
   float1k I_in_a, I_in_b;
@@ -486,6 +521,6 @@ type computeError(const type& quadrature, std::vector<float128>& muntz_sequence,
 
   return error;
 }
-template float50 computeError<float50>(const float50& quadrature, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence, std::vector<double>& interval); // Template mock instantiation for non-inline function
-template float128 computeError<float128>(const float128& quadrature, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence, std::vector<double>& interval); // Template mock instantiation for non-inline function
-template double computeError<double>(const double& quadrature, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence, std::vector<double>& interval); // Template mock instantiation for non-inline function
+template float50 computeError<float50>(const float50& quadrature, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence, const std::vector<double>& interval); // Template mock instantiation for non-inline function
+template float128 computeError<float128>(const float128& quadrature, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence, const std::vector<double>& interval); // Template mock instantiation for non-inline function
+template double computeError<double>(const double& quadrature, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence, const std::vector<double>& interval); // Template mock instantiation for non-inline function

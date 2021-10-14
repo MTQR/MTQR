@@ -330,32 +330,6 @@ std::tuple<int, std::vector<double>> retrieveMonData(const int& comp_num_nodes)
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-//       FUNCTION: {quadratures, errors} = degradeData([J, {new_x, new_w, old_x, old_w}],
-//                                                      muntz_sequence, coeff_sequence)
-//                
-//        INPUT: - [J, {new_x, new_w, old_x, old_w}] = output of function 'computeParams'
-//               - muntz_sequence = sequence of real exponents of the polynomial
-//               - coeff_sequence = sequence of real coefficients of the polynomial
-//
-//       OUTPUT: - integrals = output of function 'computeQuadGl' 
-//               - error = output of function 'computeError'
-//
-//    DESCRIPTION: due to the fact that multiple routines across the library share the 
-//                 same inputs, a routine is implemented that collects all different
-//                 data-structures of those inputs and 'packages' it in a std::vector
-//
-/////////////////////////////////////////////////////////////////////////////////////////
-
-std::vector<double> collectData(const std::vector<double>& interval, const std::tuple<int, std::vector<float128>>& input_data, const double& transf_order)
-{
-  std::vector<float128> lambdas = std::get<1>(input_data);
-  std::vector<double> collected_data = {interval[0], interval[1], static_cast<double>(lambdas[0]), static_cast<double>(lambdas[1]), transf_order};;
-
-  return collected_data;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////
-//
 //       FUNCTION: degradeData()
 //                
 //          INPUT: - [J, {new_x, new_w, old_x, old_w}] = output of function
@@ -370,11 +344,8 @@ std::vector<double> collectData(const std::vector<double>& interval, const std::
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
-void degradeData(std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence, std::vector<double>& collected_data)
+void degradeData(std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence, const std::vector<double>& interval)
 {
-
-  std::vector<double> interval = {collected_data[0], collected_data[1]};
-
   // jacobian = std::get<0>(quad_params), new_nodes = std::get<1>(quad_params), new_weights = std::get<2>(quad_params)
   float50 float50_quadrature = std::get<0>(quad_params)*computeQuadGl(std::get<1>(quad_params), std::get<2>(quad_params), muntz_sequence, coeff_sequence);
   float50 float50_error = computeError(float50_quadrature, muntz_sequence, coeff_sequence, interval);
@@ -418,7 +389,7 @@ void degradeData(std::tuple<double, std::vector<float50>, std::vector<float50>, 
           double classical_error = static_cast<double>(computeError(classical_quadrature, muntz_sequence, coeff_sequence, interval));
           
           std::vector<double> output_data = {double_quadrature, double_error, classical_quadrature, classical_error};
-          exportData(quad_params, output_data, data_type, collected_data);
+          exportData(quad_params, output_data, data_type);
         }
         else
         {
@@ -430,7 +401,7 @@ void degradeData(std::tuple<double, std::vector<float50>, std::vector<float50>, 
           float128 classical_error = computeError(classical_quadrature, muntz_sequence, coeff_sequence, interval);
           
           std::vector<float128> output_data = {float128_quadrature, float128_error, classical_quadrature, classical_error};
-          exportData(quad_params, output_data, data_type, collected_data);
+          exportData(quad_params, output_data, data_type);
         }
       }
       else
@@ -440,7 +411,7 @@ void degradeData(std::tuple<double, std::vector<float50>, std::vector<float50>, 
         float50 classical_error = computeError(classical_quadrature, muntz_sequence, coeff_sequence, interval);
 
         std::vector<float50> output_data = {float50_quadrature, float50_error, classical_quadrature, classical_error};
-        exportData(quad_params, output_data, data_type, collected_data);
+        exportData(quad_params, output_data, data_type);
       }
   }
   else
@@ -450,7 +421,7 @@ void degradeData(std::tuple<double, std::vector<float50>, std::vector<float50>, 
     float50 classical_error = computeError(classical_quadrature, muntz_sequence, coeff_sequence, interval);
 
     std::vector<float50> output_data = {float50_quadrature, float50_error, classical_quadrature, classical_error};
-    exportData(quad_params, output_data, data_type, collected_data);
+    exportData(quad_params, output_data, data_type);
   }
 }
 
@@ -480,7 +451,7 @@ void degradeData(std::tuple<double, std::vector<float50>, std::vector<float50>, 
 
 
 template<typename type>
-void exportData(const std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, const std::vector<type>& output_data, const std::string& data_type, const std::vector<double>& collected_data)
+void exportData(const std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, const std::vector<type>& output_data, const std::string& data_type)
 {
   std::cout << " ――――――――――――――――――――――――――――――――――――――――――――――――――"
         << "\n ** Using " << data_type << " format for nodes and weights"
@@ -501,41 +472,24 @@ void exportData(const std::tuple<double, std::vector<float50>, std::vector<float
   castVector(std::get<3>(quad_params), old_nodes);
   castVector(std::get<4>(quad_params), old_weights);
 
-  std::string mkdir = "mkdir -p ";
-  std::string output_dir = "output";
-  std::string results_dir = mkdir + output_dir;
-  system(results_dir.c_str());
-
-  // Export the results of the integration and transformation parameters
-
-  std::string results_file = output_dir + "/Results.txt";
   std::ofstream results;
-  results.open(results_file);
+  results.open("output/Results.txt", std::ios_base::app);
 
-  results << std::setprecision(std::numeric_limits<double>::max_digits10)
-      << "\nINPUTS:"
-      << "\n        lambda_min = "
-      << collected_data[2]
-      << "\n        lambda_max = "
-      << collected_data[3];
-    results << std::setprecision(std::numeric_limits<float128>::max_digits10)
-        << "\n\nRESULTS:"
-        << "\n        transformation order = "
-      << collected_data[4]
-        << "\n        integral after the transformation = "
-        << output_data[0]
-        << " ,   relative error = "
-        << output_data[1]
-        << "\n        integral prior the transformation = "
-        << output_data[2]
-        << " ,   relative error = "
-        << output_data[3];
+  results << std::setprecision(std::numeric_limits<float128>::max_digits10)
+          << "\n        integral after the transformation = "
+          << output_data[0]
+          << " ,   relative error = "
+          << output_data[1]
+          << "\n        integral prior the transformation = "
+          << output_data[2]
+          << " ,   relative error = "
+          << output_data[3];
 
     results.close();
 
     // Export G-L nodes (old and new)
 
-    std::string nodes_file = output_dir + "/Nodes.txt";
+    std::string nodes_file = "output/Nodes.txt";
 
   std::ofstream Nodes;
   Nodes.open(nodes_file);
@@ -570,7 +524,7 @@ void exportData(const std::tuple<double, std::vector<float50>, std::vector<float
 
   // Export G-L weights (old and new)
 
-    std::string weights_file = output_dir + "/Weights.txt";
+    std::string weights_file = "output/Weights.txt";
 
   std::ofstream Weights;
   Weights.open(weights_file);
@@ -603,6 +557,6 @@ void exportData(const std::tuple<double, std::vector<float50>, std::vector<float
 
   Weights.close();
 }
-template void exportData<float50>(const std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, const std::vector<float50>& output_data, const std::string& data_type, const std::vector<double>& collected_data); // Template mock instantiation for non-inline function
-template void exportData<float128>(const std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, const std::vector<float128>& output_data, const std::string& data_type, const std::vector<double>& collected_data); // Template mock instantiation for non-inline function
-template void exportData<double>(const std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, const std::vector<double>& output_data, const std::string& data_type, const std::vector<double>& collected_data); // Template mock instantiation for non-inline function
+template void exportData<float50>(const std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, const std::vector<float50>& output_data, const std::string& data_type); // Template mock instantiation for non-inline function
+template void exportData<float128>(const std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, const std::vector<float128>& output_data, const std::string& data_type); // Template mock instantiation for non-inline function
+template void exportData<double>(const std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, const std::vector<double>& output_data, const std::string& data_type); // Template mock instantiation for non-inline function

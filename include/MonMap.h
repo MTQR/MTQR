@@ -37,6 +37,6 @@ type computeQuadGl(const std::vector<type>& nodes, const std::vector<type>& weig
 
 // (SEE LINES 450~462 IN 'src/MonMap.cpp') Computes the a-posteriori relative error of the G-L quadrature using the new nodes and weights
 template<typename type>
-type computeError(const type& quadrature, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence, std::vector<double>& interval);
+type computeError(const type& quadrature, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence, const std::vector<double>& interval);
 
 #endif // MONMAP_H

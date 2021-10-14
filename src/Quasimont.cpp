@@ -54,13 +54,10 @@ void quasimont(std::vector<float128>& muntz_sequence, std::vector<float128>& coe
 	// COMPUTE AND EXPORT THE NEW G-L NODES & WEIGHTS
 	auto quad_params = computeParams(transf_order, std::get<0>(monomial_data), interval); // n_min = std::get<0>(monomial_data)
 
-	// COLLECT ALL THE OUTPUT DATA NECESSARY
-	std::vector<double> collected_data = collectData(interval, input_data, transf_order);
-
 	// CONVERTS AND EXPORTS NEW NODES AND WEIGHTS IN THE MINIMUM POSSIBLE FLOATING-POINT FORMAT
-	degradeData(quad_params, muntz_sequence, coeff_sequence, collected_data);
+	degradeData(quad_params, muntz_sequence, coeff_sequence, interval);
 
 	std::cout << "\n\nPROGRAM TERMINATED! Results are available in the 'output' subdirectory.\nPress any Key to exit ";
 	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	std::cin.get();
-}//――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+}
