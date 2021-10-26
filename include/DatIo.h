@@ -5,7 +5,7 @@
 //                      a C++ library for high precision integration of singular 
 //                      polynomials of non-integer degree
 //
-// Authors:   Guido Lombardi, PhD, Davide Papapicco
+// Authors:   Guido Lombardi, Davide Papapicco
 //
 // Institute: Politecnico di Torino
 //            C.so Duca degli Abruzzi, 24 - Torino (TO), Italia
@@ -16,20 +16,22 @@
 #ifndef DATIO_H
 #define DATIO_H
 
-// (SEE LINES 22~31 IN 'src/DatIo.cpp') Generate tabulated values for beta_min/beta_max for each even integer number nodes in [10,100]
-void generateTabData();
+// (SEE LINES 22~31 IN 'src/DatIo.cpp') Generates tabulated values for beta_min/beta_max for each even integer number nodes in [10,100]
+void checkTabData();
 
 // (SEE LINES 109~128 IN 'src/DatIo.cpp') Takes user-defined inputs from file
-std::tuple<int, std::vector<float128>> getInputData(std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence);
+template<typename type>
+std::tuple<int, std::vector<float128>> manageData(std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence);
 
 // (SEE LINES 258~271 IN 'src/DatIo.cpp') Extract the values of beta_min and beta_max according to the computed minimum number of nodes
-std::tuple<int, std::vector<double>> retrieveMonData(const int& comp_num_nodes);
+std::tuple<int, std::vector<double>> streamMonMapData(const int& comp_num_nodes);
 
 // (SEE LINES 335~ IN 'src/DatIo.cpp') Degrade the precision of the new G-L nodes and weights to establish minimum data-type for double precision quadrature
-void degradeData(std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence, const std::vector<double>& interval);
+template<typename type>
+void optimiseData(std::tuple<std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence);
 
 // (SEE LINES 335~349 IN 'src/DatIo.cpp') Computes and exports the resulting G-L weights and nodes aling with other ouputs
 template<typename type>
-void exportData(const std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, const std::vector<type>& output_data, const std::string& data_type);
+void exportNewData(const std::vector<type>& nodes, const std::vector<type>& weights, const std::vector<type>& output_data);
 
 #endif // DATIO_H

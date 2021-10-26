@@ -5,7 +5,7 @@
 //                      a C++ library for high precision integration of singular 
 //                      polynomials of non-integer degree
 //
-// Authors:   Guido Lombardi, PhD, Davide Papapicco
+// Authors:   Guido Lombardi, Davide Papapicco
 //
 // Institute: Politecnico di Torino
 //            C.so Duca degli Abruzzi, 24 - Torino (TO), Italia
@@ -17,47 +17,38 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-//       FUNCTION: post_map_integral = quasimont(muntz_sequence, coeff_sequence, I)
+//       FUNCTION: quasimont(muntz_sequence, coeff_sequence)
 //                
-//		    INPUT: - muntz_sequence = sequence of real exponents of the user-input polynomial
-//			       - coeff_sequence = sequence of real coefficients of the user-input polynomial
-//			       - I = [a,b] = interval of integration of the user-input polynomial (a < b)
+//        INPUT: - muntz_sequence = sequence of real exponents of the polynomial
+//             - coeff_sequence = sequence of real coefficients of the polynomial
 //
-//		   OUTPUT: - post_map_integral = output of function 'computeQuadGl'
+//       OUTPUT: - no outputs
 //
-//    DESCRIPTION: this routine takes the name of the library itself because it essentially instantiates and
-//                 executes the ordered sequence of functions in it and it's interfaced direclty with the user-inputs.
+//    DESCRIPTION: focal module of the library where all its methods are instantiated
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-
-void quasimont(std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence, std::vector<double>& interval)
+template <typename type>
+void quasimont(std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence)
 {
-	// CHECK IF TABULATED VALUES EXIST AND COMPUTES THEM IF THEY DON'T
-	std::ifstream datafile;
-	datafile.open("../data/TabulatedErrorValues.csv");
+  // CHECK IF TABULATED VALUES EXIST AND COMPUTES THEM IF THEY DON'T
+  checkTabData();
 
-	if(!datafile)
-	{
-		generateTabData();
-	}
+  // PRINT INITIAL MESSAGE AND SELECTS USER INPUTS
+  auto input_data = manageData(muntz_sequence, coeff_sequence);
 
-	// PRINT INITIAL MESSAGE AND SELECTS USER INPUTS
-	auto input_data = getInputData(muntz_sequence, coeff_sequence);
+  // EXTRACT N_MIN, BETA_MIN AND BETA_MAX
+  auto monomial_data = streamMonMapData(std::get<0>(input_data));
 
-	// EXTRACT N_MIN, BETA_MIN AND BETA_MAX
-	auto monomial_data = retrieveMonData(std::get<0>(input_data)); // n_min = std::get<0>(input_data)
+  // COMPUTE THE MONOMIAL TRANSFORMATION ORDER
+  double transf_order = computeMapOrder(std::get<1>(input_data), std::get<1>(monomial_data));
 
-	// COMPUTE THE MONOMIAL TRANSFORMATION ORDER
-	double transf_order = computeOrder(std::get<1>(input_data), std::get<1>(monomial_data)); // lambdas = std::get<1>(input_data), betas = std::get<1>(monomial_data)
+  // COMPUTE AND EXPORT THE NEW G-L NODES & WEIGHTS
+  auto quad_data = computeParamsGl(transf_order, std::get<0>(monomial_data));
 
-	// COMPUTE AND EXPORT THE NEW G-L NODES & WEIGHTS
-	auto quad_params = computeParams(transf_order, std::get<0>(monomial_data), interval); // n_min = std::get<0>(monomial_data)
-
-	// CONVERTS AND EXPORTS NEW NODES AND WEIGHTS IN THE MINIMUM POSSIBLE FLOATING-POINT FORMAT
-	degradeData(quad_params, muntz_sequence, coeff_sequence, interval);
-
-	std::cout << "\n\nPROGRAM TERMINATED! Results are available in the 'output' subdirectory.\nPress any Key to exit ";
-	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-	std::cin.get();
+  // CONVERTS AND EXPORTS NEW NODES AND WEIGHTS IN THE MOST OPTIMISED FLOATING-POINT FORMAT POSSIBLE
+  optimiseData(quad_data, muntz_sequence, coeff_sequence);
 }
+template void quasimont<float50>(std::vector<float50>& muntz_sequence, std::vector<float50>& coeff_sequence);
+template void quasimont<float128>(std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence);
+template void quasimont<double>(std::vector<double>& muntz_sequence, std::vector<double>& coeff_sequence);

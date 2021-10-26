@@ -5,7 +5,7 @@
 //                      a C++ library for high precision integration of singular 
 //                      polynomials of non-integer degree
 //
-// Authors:   Guido Lombardi, PhD, Davide Papapicco
+// Authors:   Guido Lombardi, Davide Papapicco
 //
 // Institute: Politecnico di Torino
 //            C.so Duca degli Abruzzi, 24 - Torino (TO), Italia
@@ -14,6 +14,7 @@
 //---------------------------------------------------------------------------------------
 
 #include "Quasimont.h"
+
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -32,75 +33,77 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-void generateTabData()
+void checkTabData()
 {
+  std::ifstream datafile;
+  datafile.open("../data/TabulatedErrorValues.csv");
 
-  std::ofstream data("../data/TabulatedErrorValues.csv");
-
-  int num_samples = 15000, prev_j;
-  float128 start = -1, end = 1300;
-  std::vector<float128> lambda = linspace(start, end, num_samples);
-
-  float128 tab_beta_min, tab_beta_max;
-  float1k exact;
-
-  double dp_epsilon = std::numeric_limits<double>::epsilon();
-
-  std::string envelope = "yes";
-
-  std::cout << "\nTabulated values of beta_min/max not found!\nComputing as function of n (number of nodes)\n";
-
-  int min_nodes = 5, max_nodes = 50;
-
-  for(int n = min_nodes; n <= max_nodes; n++)
+  if(datafile)
+  {}// Tabulated data exists ==> Pass 
+  else
   {
+    std::ofstream data("../data/TabulatedErrorValues.csv");
 
-    int nodes = 2*n;
-    std::cout << "\nComputing for n = " << nodes << std::endl;
+    int num_samples = 15000, prev_j;
+    float128 start = -1, end = 1300;
+    std::vector<float128> lambda = linspace(start, end, num_samples);
 
-    for(int k = 0; k < num_samples - 2; k++)
+    float128 tab_beta_min, tab_beta_max;
+    float1k exact;
+
+    std::string envelope = "yes";
+
+    std::cout << "\n ** Tabulated values of beta_min/max not found ** \n ** Computing as function of n (number of nodes) ** \n";
+
+    int min_nodes = 5, max_nodes = 50;
+
+    for(int n = min_nodes; n <= max_nodes; n++)
     {
+      int nodes = 2*n;
+      std::cout << "\nComputing for n = " << nodes << std::endl;
 
-      std::cout << "    beta_min = " << lambda[k+1] << "\r";
-
-      exact = computeEstimate(lambda[k+1], nodes, envelope);
-
-      if(exact <= dp_epsilon)
+      for(int k = 0; k < num_samples - 2; k++)
       {
-        std::cout << std::endl;
-        tab_beta_min = lambda[k+1];
+        std::cout << "    beta_min = " << lambda[k+1] << "\r";
 
-        if(prev_j < k+1)
+        exact = computeErrorEstimate(lambda[k+1], nodes, envelope);
+
+        if(exact <= EPS)
         {
-          prev_j = k+1;
-        }
+          std::cout << std::endl;
+          tab_beta_min = lambda[k+1];
 
-        for(int j = prev_j+1; j < num_samples - 2; j++)
-        {
-          std::cout << "    beta_max = " << lambda[j] << "\r";
-
-          exact = computeEstimate(lambda[j], nodes, envelope);
-
-          if(exact >= dp_epsilon)
+          if(prev_j < k+1)
           {
-            tab_beta_max = lambda[j];
-            prev_j = j;
-
-            break;
+            prev_j = k+1;
           }
+
+          for(int j = prev_j+1; j < num_samples - 2; j++)
+          {
+            std::cout << "    beta_max = " << lambda[j] << "\r";
+
+            exact = computeErrorEstimate(lambda[j], nodes, envelope);
+
+            if(exact >= EPS)
+            {
+              tab_beta_max = lambda[j];
+              prev_j = j;
+
+              break;
+            }
+          }
+
+          break;
         }
-
-        break;
       }
+      data << std::setprecision(std::numeric_limits<float1k>::max_digits10) << nodes << "," << tab_beta_min << "," << tab_beta_max << "\n";
     }
+    data.close();
 
-    data << std::setprecision(std::numeric_limits<float1k>::max_digits10) << nodes << "," << tab_beta_min << "," << tab_beta_max << "\n";
+    std::cout << "\n\n ** Tabulated data is now available in 'QUASIMONT/data' subdirectory **\n ** Proceeding with the application **\n" << std::endl;;
   }
-
-  data.close();
-
-  std::cout << "\n\nComputation completed!\nTabulated data is now available in the 'HIPER-SINK/data' subdirectory.\nProgram can now be executed!\n" << std::endl;
 }
+
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -131,13 +134,14 @@ void generateTabData()
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-std::tuple<int, std::vector<float128>> getInputData(std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence)
+template <typename type>
+std::tuple<int, std::vector<float128>> manageData(std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence)
 {
-
   std::cout << std::endl;
   std::cout << "    |――――――――――――――――――――――――――――――――――|\n"
-        << "    |  ** MONOMIAL QUADRATURE RULE **  |\n"
-        << "    |――――――――――――――――――――――――――――――――――|\n";
+            << "    |          ** QUASIMONT **         |\n"
+            << "    |  ** MONOMIAL QUADRATURE RULE **  |\n"
+            << "    |――――――――――――――――――――――――――――――――――|\n";
 
   if(muntz_sequence.size()==coeff_sequence.size())
   {
@@ -146,16 +150,23 @@ std::tuple<int, std::vector<float128>> getInputData(std::vector<float128>& muntz
     {
       if(coeff_sequence[k]>0)
       {
-        std::cout << "+";
+        std::cout << " +";
+      }
+      else
+      {
+        std::cout << " ";
       }
 
       if(coeff_sequence[k]==1)
       {
-        std::cout << "x^(" << muntz_sequence[k] << ") ";
+        std::cout << std::setprecision(std::numeric_limits<float>::max_digits10)
+                  << "x^("
+                  << muntz_sequence[k] << ") ";
       }
       else
       {
-        std::cout << coeff_sequence[k] << "*x^(" << muntz_sequence[k] << ")";
+        std::cout << std::setprecision(std::numeric_limits<float>::max_digits10)
+                  << coeff_sequence[k] << "*x^(" << muntz_sequence[k] << ")";
       }
     }
 
@@ -164,6 +175,7 @@ std::tuple<int, std::vector<float128>> getInputData(std::vector<float128>& muntz
   else
   {
     std::cout << "\n   ** ERROR ** The number of exponents doesn't match the number of coefficients in the input polynomial\n";
+    exit(1);
   }
 
   int num_nodes, n_min;
@@ -175,18 +187,16 @@ std::tuple<int, std::vector<float128>> getInputData(std::vector<float128>& muntz
       if(muntz_sequence[0] <= -1.0)
       {
         std::cout << "\n   ** ERROR ** Lambda_min has to be (strictly) greater than -1 to be in a Muntz sequence\n";
+        exit(1);
       }
 
       float128 additional_lambda;
 
-      std::cout << "\n   ** WARNING ** Your input is a monomial of non-integer degree"
-            << "\n                 You need at least a binomial to achieve double-precision quadrature"
-                << "\n                 How do you want to proceed?"
-                << "\n   [enter 'nodes' to specify the number of nodes or 'lambda' for the exponent]\n"
-            << "\n                 Input: ";
-
       std::string input;
-
+      std::cout << "\n ** WARNING ** Your input is a monomial of non-integer degree."
+                << "\n               QUASIMONT needs a binomial for double-precision quadrature."
+                << "\n               How do you proceed? ['nodes' for n_min ~ 'lambda' for lambda_max]"
+                << "\n               Input: ";
       std::cin >> input;
 
       if(input.compare("nodes") == 0)
@@ -196,25 +206,32 @@ std::tuple<int, std::vector<float128>> getInputData(std::vector<float128>& muntz
 
         compute_n_min = false;
 
-        additional_lambda = computeLambda(muntz_sequence[0], num_nodes); // lambda_min = muntz_sequence[0]
+        float128 local_lambda_min = static_cast<float128>(muntz_sequence[0]);
+        additional_lambda = computeLambdaMax(local_lambda_min, num_nodes);
       }
-      else
+      else if(input.compare("lambda") == 0)
       {
         std::cout << "\n\nPlease enter the exponent value with '.' separating the decimal digits from the integer part [the more decimal digits the better the precision is]: ";
         std::cin >> additional_lambda;
       }
+      else
+      {
+        std::cout << "\n   ** ERROR ** Your Input must be either 'nodes' or 'lambda'"
+                  << "\n               Please refer to Section 2.4 of doc/UserManual.pdf\n";
+        exit(1);
+      }
 
-      muntz_sequence.push_back(additional_lambda);
+      muntz_sequence.push_back(static_cast<type>(additional_lambda));
       coeff_sequence.push_back(1.0);
     }
 
-  std::vector<float128> loc_muntz_seq = muntz_sequence;
-
+  // Sorting the input Muntz sequance to extract lambda_min and lambda_max
+  std::vector<type> loc_muntz_seq = muntz_sequence;
   sort(loc_muntz_seq.begin(), loc_muntz_seq.end());
-
   if(loc_muntz_seq[0] <= -1.0)
   {
     std::cout << "\n   ** ERROR ** Lambda_min has to be (strictly) greater than -1 to be in a Muntz sequence\n";
+    exit(1);
   }
   
   if(loc_muntz_seq.size()==1)
@@ -222,32 +239,36 @@ std::tuple<int, std::vector<float128>> getInputData(std::vector<float128>& muntz
     if(loc_muntz_seq[0]>0)
     {
       lambda_min = 0;
-      lambda_max = lambda_min = loc_muntz_seq[0];
+      lambda_max = lambda_min = static_cast<float128>(loc_muntz_seq[0]);
     }
     else
     {
-      lambda_min = loc_muntz_seq[0];
+      lambda_min = static_cast<float128>(loc_muntz_seq[0]);
       lambda_max = 0;
     }
   }
   else
   {
-    lambda_min = loc_muntz_seq[0];
-    lambda_max = loc_muntz_seq.back();
+    lambda_min = static_cast<float128>(loc_muntz_seq[0]);
+    lambda_max = static_cast<float128>(loc_muntz_seq.back());
   }
   
+  // Print on-screen the inputs recap information
   std::cout << "\n ** Accepted sequence of exponents ** \n";
-  std::cout << "    {" << muntz_sequence[0];
+  std::cout << std::setprecision(std::numeric_limits<float>::max_digits10)
+            << "    {" << muntz_sequence[0];
   for(int k=1; k < muntz_sequence.size(); k++)
   {
-    std::cout << ", " << muntz_sequence[k];
+    std::cout << std::setprecision(std::numeric_limits<float>::max_digits10)
+              << ", " << muntz_sequence[k];
   }
   std::cout << "}";
-
-  std::cout << "\n ** Lambda_min = " << lambda_min << ", Lambda_max = " << lambda_max << " **" << std::endl;
-
-  std::vector<float128> lambdas = {lambda_min, lambda_max};
-
+  std::cout << std::setprecision(std::numeric_limits<float>::max_digits10)
+            << "\n ** Lambda_min = " << lambda_min 
+            << ", Lambda_max = " << lambda_max << " **"
+            << std::endl;
+  
+  // Compute or stream through the minimum number of quadrature nodes n_min
   if(compute_n_min)
   {
     n_min = computeNumNodes(lambda_min, lambda_max);
@@ -256,9 +277,12 @@ std::tuple<int, std::vector<float128>> getInputData(std::vector<float128>& muntz
   {
     n_min = num_nodes;
   }
-
-  return std::make_tuple(n_min, lambdas);
+  return std::make_tuple(n_min, {lambda_min, lambda_max});
 }
+template std::tuple<int, std::vector<float128>> manageData<float50>(std::vector<float50>& muntz_sequence, std::vector<float50>& coeff_sequence);
+template std::tuple<int, std::vector<float128>> manageData<float128>(std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence);
+template std::tuple<int, std::vector<float128>> manageData<double>(std::vector<double>& muntz_sequence, std::vector<double>& coeff_sequence);
+
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -283,23 +307,19 @@ std::tuple<int, std::vector<float128>> getInputData(std::vector<float128>& muntz
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-std::tuple<int, std::vector<double>> retrieveMonData(const int& comp_num_nodes)
+std::tuple<int, std::vector<double>> streamMonMapData(const int& comp_num_nodes)
 {
   int n_min;
   double beta_min, beta_max;
 
-  std::string line, column;
-
   std::ifstream datafile;
   datafile.open("../data/TabulatedErrorValues.csv");
 
+  std::string line, column;
   while(std::getline(datafile, line))
   {
-    
     std::stringstream column_string(line);
-
     std::vector<std::string> row;
-
     while(std::getline(column_string, column, ','))
     {
       row.push_back(column);
@@ -309,24 +329,22 @@ std::tuple<int, std::vector<double>> retrieveMonData(const int& comp_num_nodes)
 
     if(n_min >= comp_num_nodes)
     {
-
       beta_min = stof(row[1]);
       beta_max = stof(row[2]);
 
       std::cout << " ――――――――――――――――――――――――――――――――――――――――――――――――――"
+                << "\n ** N_min = " << comp_num_nodes
                 << "\n ** Beta_min = " << row[1].substr(0,10)
                 << ", Beta_max = " << row[2].substr(0,10)
                 << " **";
 
       break;
     }
-
   }
 
-  std::vector<double> betas = {beta_min, beta_max};
-
-  return std::make_tuple(n_min, betas);
+  return std::make_tuple(n_min, {beta_min, beta_max});
 }
+
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -343,91 +361,114 @@ std::tuple<int, std::vector<double>> retrieveMonData(const int& comp_num_nodes)
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-
-void degradeData(std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence, const std::vector<double>& interval)
+template <typename type>
+void optimiseData(std::tuple<std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence)
 {
-  // jacobian = std::get<0>(quad_params), new_nodes = std::get<1>(quad_params), new_weights = std::get<2>(quad_params)
-  float50 float50_quadrature = std::get<0>(quad_params)*computeQuadGl(std::get<1>(quad_params), std::get<2>(quad_params), muntz_sequence, coeff_sequence);
-  float50 float50_error = computeError(float50_quadrature, muntz_sequence, coeff_sequence, interval);
+  const double ACC = 7*EPS;
+  std::cout << "\nAccuracy = " << ACC << std::endl;
+  // new_nodes = std::get<0>(quad_params)       // old_nodes = std::get<2>(quad_params)
+  // new_weights = std::get<1>(quad_params)     // old_weights = std::get<3>(quad_params)
+  std::vector<float50> float50_exp, float50_coef;
+  castVector(muntz_sequence, float50_exp);
+  castVector(coeff_sequence, float50_coef);
+  float50 In_50 = computeQuadGl(std::get<0>(quad_params), std::get<1>(quad_params), float50_exp, float50_coef);
+  float50 En_50 = computeExactError(In_50, float50_exp, float50_coef);
 
-  double epsilon = std::numeric_limits<double>::epsilon();
+  std::cout << "\n\nI_n(f) with float50 = "
+            << std::setprecision(std::numeric_limits<float50>::max_digits10)
+            << In_50
+            << "\nE_n(f) with float50 = "
+            << En_50 << std::endl;
 
-  std::string data_type = "float50";
-
-  if(float50_error <= epsilon)
+  if(En_50 <= ACC)
   {
+    // Degrade G-L parameters to float128
+    std::vector<float128> float128_nodes, float128_weights, float128_exp, float128_coef; 
+    castVector(std::get<0>(quad_params), float128_nodes);
+    castVector(std::get<1>(quad_params), float128_weights);
+    castVector(muntz_sequence, float128_exp);
+    castVector(coeff_sequence, float128_coef);
+    // Compute I_n(f) and E_n(f) with float128 G-L parameters
+    float128 In_34 = computeQuadGl(float128_nodes, float128_weights, float128_exp, float128_coef);
+    float128 En_34 = computeExactError(In_34, float128_exp, float128_coef);
 
-    std::vector<float128> float128_nodes, float128_weights; 
-    castVector(std::get<1>(quad_params), float128_nodes);
-    castVector(std::get<2>(quad_params), float128_weights);
+    std::cout << "\nI_n(f) with float128 = "
+              << std::setprecision(std::numeric_limits<float50>::max_digits10)
+              << In_34
+              << "\nE_n(f) with float128 = "
+              << En_34 << std::endl;
+
+    if(En_34 <= ACC && En_34 != 0)
+    {// Nodes and weights succefully optimised float50 -> float128
       
-      float128 float128_quadrature = std::get<0>(quad_params)*computeQuadGl(float128_nodes, float128_weights, muntz_sequence, coeff_sequence);
-      float128 float128_error = computeError(float128_quadrature, muntz_sequence, coeff_sequence, interval);
+      // Degrade G-L parameters to double
+      std::vector<double> double_nodes, double_weights, double_exp, double_coef;
+      castVector(std::get<0>(quad_params), double_nodes); 
+      castVector(std::get<1>(quad_params), double_weights);
+      castVector(muntz_sequence, double_exp);
+      castVector(coeff_sequence, double_coef);
+      // Compute I_n(f) and E_n(f) with double G-L parameters
+      double In_16 = static_cast<double>(computeQuadGl(double_nodes, double_weights, double_exp, double_coef));
+      double En_16 = static_cast<double>(computeExactError(In_16, double_exp, double_coef));
 
-      if(float128_error <= epsilon && float128_error != 0)
-      {
+      std::cout << "\n\nI_n(f) with double = "
+                << std::setprecision(std::numeric_limits<float50>::max_digits10)
+                << In_16
+                << "\nE_n(f) with double = "
+                << En_16 << std::endl;
 
-        data_type = "float128";
-
-        std::vector<double> double_nodes, double_weights;
-        castVector(std::get<1>(quad_params), double_nodes); 
-        castVector(std::get<2>(quad_params), double_weights);
+      if(En_16 <= ACC && En_16 != 0)
+      {// Nodes and weights succesfully optimised float128 -> double
         
-        double double_quadrature = static_cast<double>(std::get<0>(quad_params)*computeQuadGl(double_nodes, double_weights, muntz_sequence, coeff_sequence));
-        double double_error = static_cast<double>(computeError(double_quadrature, muntz_sequence, coeff_sequence, interval));
-
-        if(double_error <= epsilon && double_error != 0)
-        {
-
-          data_type = "double";
-
-          std::vector<double> old_nodes, old_weights;
-          castVector(std::get<3>(quad_params), old_nodes);
-          castVector(std::get<4>(quad_params), old_weights);
-          
-          double classical_quadrature = static_cast<double>(std::get<0>(quad_params)*computeQuadGl(old_nodes, old_weights, muntz_sequence, coeff_sequence));
-          double classical_error = static_cast<double>(computeError(classical_quadrature, muntz_sequence, coeff_sequence, interval));
-          
-          std::vector<double> output_data = {double_quadrature, double_error, classical_quadrature, classical_error};
-          exportData(quad_params, output_data, data_type);
-        }
-        else
-        {
-          std::vector<float128> old_nodes, old_weights;
-          castVector(std::get<3>(quad_params), old_nodes);
-          castVector(std::get<4>(quad_params), old_weights);
-
-          float128 classical_quadrature = std::get<0>(quad_params)*computeQuadGl(old_nodes, old_weights, muntz_sequence, coeff_sequence);
-          float128 classical_error = computeError(classical_quadrature, muntz_sequence, coeff_sequence, interval);
-          
-          std::vector<float128> output_data = {float128_quadrature, float128_error, classical_quadrature, classical_error};
-          exportData(quad_params, output_data, data_type);
-        }
+        // Degrade classical G-L parameters with double format
+        std::vector<double> old_nodes, old_weights;
+        castVector(std::get<2>(quad_params), old_nodes);
+        castVector(std::get<3>(quad_params), old_weights);
+        // Compute classical G-L quadrature with double format parameters
+        double I_16 = static_cast<double>(computeQuadGl(old_nodes, old_weights, double_exp, double_coef));
+        double E_16 = static_cast<double>(computeExactError(I_16, double_exp, double_coef));
+        // Print and export all the results {In, En, I, E} in double
+        std::cout << " ――――――――――――――――――――――――――――――――――――――――――――――――――"
+                  << "\n ** Using double f.p. format for nodes and weights **";
+        exportNewData(double_nodes, double_weights, {In_16, En_16, I_16, E_16});
       }
       else
       {
-        // jacobian = std::get<0>(quad_params), old_nodes = std::get<3>(quad_params), old_weights = std::get<4>(quad_params)
-        float50 classical_quadrature = std::get<0>(quad_params)*computeQuadGl(std::get<3>(quad_params), std::get<4>(quad_params), muntz_sequence, coeff_sequence);
-        float50 classical_error = computeError(classical_quadrature, muntz_sequence, coeff_sequence, interval);
-
-        std::vector<float50> output_data = {float50_quadrature, float50_error, classical_quadrature, classical_error};
-        exportData(quad_params, output_data, data_type);
+        // Degrade classical G-L parameters with float128 format
+        std::vector<float128> old_nodes, old_weights;
+        castVector(std::get<2>(quad_params), old_nodes);
+        castVector(std::get<3>(quad_params), old_weights);
+        // Compute classical G-L quadrature with float128 format parameters
+        float128 I_34 = computeQuadGl(old_nodes, old_weights, float128_exp, float128_coef);
+        float128 E_34 = computeExactError(I_34, float128_exp, float128_coef);
+        // Print and export all the results {In, En, I, E} in float128
+        std::cout << " ――――――――――――――――――――――――――――――――――――――――――――――――――"
+                  << "\n ** Using float128 f.p. format for nodes and weights **";
+        exportNewData(float128_nodes, float128_weights, {In_34, En_34, I_34, E_34});
       }
+    }
   }
   else
   {
-    // jacobian = std::get<0>(quad_params), old_nodes = std::get<3>(quad_params), old_weights = std::get<4>(quad_params)
-    float50 classical_quadrature = std::get<0>(quad_params)*computeQuadGl(std::get<3>(quad_params), std::get<4>(quad_params), muntz_sequence, coeff_sequence);
-    float50 classical_error = computeError(classical_quadrature, muntz_sequence, coeff_sequence, interval);
-
-    std::vector<float50> output_data = {float50_quadrature, float50_error, classical_quadrature, classical_error};
-    exportData(quad_params, output_data, data_type);
+    // Compute classical G-L quadrature with float128 format parameters
+    float50 I_50 = computeQuadGl(std::get<2>(quad_params), std::get<3>(quad_params), float50_exp, float50_coef);
+    float50 E_50 = computeExactError(I_50, float50_exp, float50_coef);
+    // Print and export all the results {In, En, I, E} in float50
+    std::cout << " ――――――――――――――――――――――――――――――――――――――――――――――――――"
+              << "\n ** Using float50 f.p. format for nodes and weights **";
+    exportNewData(std::get<0>(quad_params), std::get<1>(quad_params), {In_50, En_50, I_50, E_50});
   }
+
+  std::cout << "\n\n ** QUASIMONT HAS TERMINATED **\n";
 }
+template void optimiseData<float50>(std::tuple<std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, std::vector<float50>& muntz_sequence, std::vector<float50>& coeff_sequence);
+template void optimiseData<float128>(std::tuple<std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence);
+template void optimiseData<double>(std::tuple<std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, std::vector<double>& muntz_sequence, std::vector<double>& coeff_sequence);
+
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-//       FUNCTION: exportData({lambda_min, lambda_max}, [n_min, {beta_min, beta_max}],
+//       FUNCTION: exportNewData({lambda_min, lambda_max}, [n_min, {beta_min, beta_max}],
 //                            [], {post_map_integral, pre_map_integral}, r)
 //                
 //          INPUT: - {lambda_min, lambda_max} = output of function 'getInputData'
@@ -449,33 +490,21 @@ void degradeData(std::tuple<double, std::vector<float50>, std::vector<float50>, 
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-
 template<typename type>
-void exportData(const std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, const std::vector<type>& output_data, const std::string& data_type)
+void exportNewData(const std::vector<type>& nodes, const std::vector<type>& weights, const std::vector<type>& output_data)
 {
-  std::cout << " ――――――――――――――――――――――――――――――――――――――――――――――――――"
-        << "\n ** Using " << data_type << " format for nodes and weights"
-        << std::setprecision(std::numeric_limits<float128>::max_digits10)
+  // Print on-screen quadrature results
+  std::cout << std::setprecision(std::numeric_limits<float>::max_digits10)
         << "\n ** I_n(p(x)) = "
         << output_data[0]
         << " **\n ** E_n(p(x)) = " 
         << output_data[1]
         << " **" << std::endl;
 
-  // jacobian = std::get<0>(quad_params), classical_nodes = std::get<3>(quad_params), classical_weights = std::get<4>(quad_params);
-
-  std::vector<type> new_nodes, new_weights;
-  castVector(std::get<1>(quad_params), new_nodes);
-  castVector(std::get<2>(quad_params), new_weights);
-  
-  std::vector<type> old_nodes, old_weights;
-  castVector(std::get<3>(quad_params), old_nodes);
-  castVector(std::get<4>(quad_params), old_weights);
-
-  std::ofstream results;
-  results.open("output/Results.txt", std::ios_base::app);
-
-  results << std::setprecision(std::numeric_limits<float128>::max_digits10)
+  // Write Results.txt file containing transformation review and integral outputs
+  std::ofstream Results;
+  Results.open("output/Results.txt", std::ios_base::app);
+  Results << std::setprecision(std::numeric_limits<float128>::max_digits10)
           << "\n        I_n(f) = "
           << output_data[0]
           << ", E_n(f) = "
@@ -486,79 +515,61 @@ void exportData(const std::tuple<double, std::vector<float50>, std::vector<float
           << ", E_n(f) = "
           << output_data[3]
           << "  (classical G-L rule)";
+  Results.close();
 
-    results.close();
-
-    // Export G-L nodes (old and new)
-
-    std::string nodes_file = "output/Nodes.txt";
-
+  // Write Nodes.txt file containing transformed G-L nodes using the monomial map
   std::ofstream Nodes;
-  Nodes.open(nodes_file);
-
-    Nodes << "\nTRANSFORMED G-L NODES (MONOMIAL MAPPED):"; 
-
-  for(int k = 0; k <= new_nodes.size() - 1; k++)
+  Nodes.open("output/Nodes.txt");
+  for(int k = 0; k <= nodes.size() - 1; k++)
   {
-
-    Nodes << std::setprecision(std::numeric_limits<float50>::max_digits10)
-        << "\n        x_"
-        << k
-        << ": "
-        << new_nodes[k];
-
+    Nodes << std::setprecision(std::numeric_limits<type>::max_digits10)
+          << nodes[k] << std::endl;
   }
-
-  Nodes << "\n\nCLASSIC G-L NODES (AFFINE MAPPED):"; 
-
-  for(int k = 0; k <= old_nodes.size() - 1; k++)
-  {
-
-    Nodes << std::setprecision(std::numeric_limits<float50>::max_digits10)
-        << "\n        x_"
-        << k
-        << ": "
-        << old_nodes[k];
-
-  }
-
   Nodes.close();
 
-  // Export G-L weights (old and new)
-
-    std::string weights_file = "output/Weights.txt";
-
+  // Write Weights.txt file containing transformed G-L weights using the monomial map
   std::ofstream Weights;
-  Weights.open(weights_file);
-
-    Weights << "\nTRANSFORMED G-L WEIGHTS (MONOMIAL MAPPED):"; 
-
-  for(int k = 0; k <= new_weights.size() - 1; k++)
+  Weights.open("output/Weights.txt");
+  for(int k = 0; k <= weights.size() - 1; k++)
   {
-
-    Weights << std::setprecision(std::numeric_limits<float50>::max_digits10)
-        << "\n        w_"
-        << k
-        << ": "
-        << new_weights[k];
-
+    Weights << std::setprecision(std::numeric_limits<type>::max_digits10)
+            << weights[k] << std::endl;
   }
-
-  Weights << "\n\nCLASSIC G-L WEIGHTS (AFFINE MAPPED):"; 
-
-  for(int k = 0; k <= old_weights.size() - 1; k++)
-  {
-
-    Weights << std::setprecision(std::numeric_limits<float50>::max_digits10)
-        << "\n        w_"
-        << k
-        << ": "
-        << old_weights[k];
-
-  }
-
   Weights.close();
 }
-template void exportData<float50>(const std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, const std::vector<float50>& output_data, const std::string& data_type); // Template mock instantiation for non-inline function
-template void exportData<float128>(const std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, const std::vector<float128>& output_data, const std::string& data_type); // Template mock instantiation for non-inline function
-template void exportData<double>(const std::tuple<double, std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>>& quad_params, const std::vector<double>& output_data, const std::string& data_type); // Template mock instantiation for non-inline function
+template void exportNewData<float50>(const std::vector<float50>& nodes, const std::vector<float50>& weights, const std::vector<float50>& output_data); // Template mock instantiation for non-inline function
+template void exportNewData<float128>(const std::vector<float128>& nodes, const std::vector<float128>& weights, const std::vector<float128>& output_data); // Template mock instantiation for non-inline function
+template void exportNewData<double>(const std::vector<double>& nodes, const std::vector<double>& weights, const std::vector<double>& output_data); // Template mock instantiation for non-inline function
+
+/*void appendOldData(const std::vector<float50>& GLnodes, const std::vector<float50>& GLweights)
+{
+  // Write second part of Nodes.txt by appending classical G-L nodes after the affine map in [0,1]
+  std::ofstream Nodes;
+  Nodes.open("output/Nodes.txt", std::ios_base::app);
+
+  Nodes << "\n\nOLD G-L NODES IN [0,1]:"; 
+  for(int k = 0; k <= GLnodes.size() - 1; k++)
+  {
+    Nodes << std::setprecision(std::numeric_limits<float50>::max_digits10)
+        << "\n        x_"
+        << k
+        << ": "
+        << GLnodes[k];
+  }
+  Nodes.close();
+
+  // Write second part of Weights.txt by appending classical G-L weights after the affine map in [0,1]
+  std::ofstream Weights;
+  Weights.open("output/Weights.txt", std::ios_base::app);
+
+  Weights << "\n\nOLD G-L WEIGHTS IN [0,1]:"; 
+  for(int k = 0; k <= GLweights.size() - 1; k++)
+  {
+    Weights << std::setprecision(std::numeric_limits<float50>::max_digits10)
+        << "\n        w_"
+        << k
+        << ": "
+        << GLweights[k];
+  }
+  Weights.close();
+}*/

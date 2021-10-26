@@ -5,7 +5,7 @@
 //                      a C++ library for high precision integration of singular 
 //                      polynomials of non-integer degree
 //
-// Authors:   Guido Lombardi, PhD, Davide Papapicco
+// Authors:   Guido Lombardi, Davide Papapicco
 //
 // Institute: Politecnico di Torino
 //            C.so Duca degli Abruzzi, 24 - Torino (TO), Italia
@@ -28,7 +28,6 @@
 #include <math.h>
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/sin_pi.hpp>
-#include <boost/math/special_functions/powm1.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <boost/multiprecision/float128.hpp>
 #include <boost/multiprecision/gmp.hpp>
@@ -42,6 +41,11 @@ typedef boost::multiprecision::mpf_float_1000 float1k; // 1000 decimal digits f.
 #include "DatIo.h"  // includes header file for data I/O functions
 #include "MonMap.h" // includes header file for functions computing the monomial map
 
-void quasimont(std::vector<float128>& muntz_sequence, std::vector<float128>& poly_coeff, std::vector<double>& interval);
+#define EPS std::numeric_limits<double>::epsilon() // sets double machine-epsilon as treshold
+#define PI boost::math::constants::pi<float50>() // defines pi with 50 decimal digits
+#define E boost::math::constants::e<float50>() // defines e with 50 decimal digits
+
+template <typename type>
+void quasimont(std::vector<type>& muntz_sequence, std::vector<type>& poly_coeff);
 
 #endif // QUASIMONT_H

@@ -17,17 +17,25 @@ CXX = g++
 
 INCDIR = ../include
 SRCDIR = ../src
+UTLDIR = ../utilities
 OBJDIR = obj
 
+UTL = $(UTLDIR)/Utils.o
 OBJ = $(OBJDIR)/Quasimont.o $(OBJDIR)/DatIo.o $(OBJDIR)/MonMap.o
 
 CXXOPTIONS = -g -ansi -std=c++17
 CXXFLAGS = $(CXXOPTIONS) -I $(INCDIR) 
 
-default: $(OBJ)
+dafault: $(OBJ)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(INCDIR)/*.h
 	$(CXX) -c $< -o $@ $(CXXFLAGS)
+
+static: $(OBJ) $(OBJDIR)/Utils.o
+	ar rcs libquasimont.a $^
+
+$(OBJDIR)/Utils.o: $(UTLDIR)/Utils.cpp $(INCDIR)/Utils.h
+	cd $(UTLDIR) && $(MAKE)
 
 clean:
 	rm -f $(OBJDIR)/*.o

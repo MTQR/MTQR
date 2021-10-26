@@ -5,7 +5,7 @@
 #                      a C++ library for high precision integration of singular 
 #                      polynomials of non-integer degree
 #
-# Authors:   Guido Lombardi, PhD, Davide Papapicco
+# Authors:   Guido Lombardi, Davide Papapicco
 #
 # Institute: Politecnico di Torino
 #            C.so Duca degli Abruzzi, 24 - Torino (TO), Italia
@@ -23,7 +23,7 @@ OBJDIR = $(BLDDIR)/obj
 
 OBJ = $(OBJDIR)/Main.o $(OBJDIR)/Quasimont.o $(OBJDIR)/Utils.o
 
-CXXOPTIONS = -g
+CXXOPTIONS = -ansi -std=c++17
 CXXFLAGS = $(CXXOPTIONS) -I $(INCDIR)
 
 LDLIBS = -lm -lgsl -lgslcblas -lgmp -lquadmath
