@@ -26,7 +26,7 @@ OBJ = $(OBJDIR)/Main.o $(OBJDIR)/Quasimont.o $(OBJDIR)/Utils.o
 CXXOPTIONS = -ansi -std=c++17
 CXXFLAGS = $(CXXOPTIONS) -I $(INCDIR)
 
-LDLIBS = -lm -lgsl -lgslcblas -lgmp -lquadmath
+LDLIBS = -lm -lquadmath -lgsl -lgslcblas -lmpfr
 LDFLAGS = $(LDLIBS)
 
 default: $(OBJ)

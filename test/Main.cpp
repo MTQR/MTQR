@@ -36,8 +36,8 @@ int main(int argc, char** argv)
   std::cin.get();
 
   //  P_3(x) = x^17 + x^35
-  std::vector<double> coeff_sequence_bench_3 = {1,1};
-  std::vector<double> muntz_sequence_bench_3 = {17,35};
+  std::vector<float50> coeff_sequence_bench_3 = {1,1};
+  std::vector<float50> muntz_sequence_bench_3 = {17,35};
 
   quasimont(muntz_sequence_bench_3, coeff_sequence_bench_3);
   

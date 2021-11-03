@@ -21,10 +21,10 @@ void checkTabData();
 
 // (SEE LINES 109~128 IN 'src/DatIo.cpp') Takes user-defined inputs from file
 template<typename type>
-std::tuple<int, std::vector<float128>> manageData(std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence);
+std::tuple<int, std::vector<float50>> manageData(std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence);
 
 // (SEE LINES 258~271 IN 'src/DatIo.cpp') Extract the values of beta_min and beta_max according to the computed minimum number of nodes
-std::tuple<int, std::vector<double>> streamMonMapData(const int& comp_num_nodes);
+std::tuple<int, std::vector<float50>> streamMonMapData(const int& comp_num_nodes);
 
 // (SEE LINES 335~ IN 'src/DatIo.cpp') Degrade the precision of the new G-L nodes and weights to establish minimum data-type for double precision quadrature
 template<typename type>
@@ -32,6 +32,6 @@ void optimiseData(std::tuple<std::vector<float50>, std::vector<float50>, std::ve
 
 // (SEE LINES 335~349 IN 'src/DatIo.cpp') Computes and exports the resulting G-L weights and nodes aling with other ouputs
 template<typename type>
-void exportNewData(const std::vector<type>& nodes, const std::vector<type>& weights, const std::vector<type>& output_data);
+void exportNewData(const std::vector<type>& nodes, const std::vector<type>& weights, const std::vector<float50>& output_data);
 
 #endif // DATIO_H

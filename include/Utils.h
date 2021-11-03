@@ -17,20 +17,15 @@
 #define UTILS_H
 
 // (SEE LINES 22~31 IN 'utilities/Utils.cpp') Returns the float50 input vector in a type specified by the instatiantiation
-template<typename inputType, typename outputType>
-void castVector(const std::vector<inputType>& input_vector, std::vector<outputType>& output_vector);
+template<typename type>
+std::vector<type> castVector(const std::vector<float50>& input_vector, const type& type_infer);
 
 // (SEE LINES 22~31 IN 'utilities/Utils.cpp') Computes the inner product between two vectors (of the same type) avoiding numerical cancellation
 template<typename type>
-type orderedInnerProduct(const std::vector<type>& f_values, const std::vector<type>& weights);
+float50 orderedInnerProduct(const std::vector<float50>& f_values, const std::vector<type>& weights);
 
 // (SEE LINES 22~31 IN 'utilities/Utils.cpp') Generates n equispaced points between two input real numbers
 template<typename type>
 std::vector<type> linspace(const type& start_type, const type& end_type, const int& num_steps);
-
-// Plots the exact and enveloped error estimates given the number of quadrature nodes
-void plot(const int& num_nodes);//, const double& min_exponent, const double& max_exponent);
-
-void printProgressBar(const int& iter, const int& num_iter);
 
 #endif // UTILS_H

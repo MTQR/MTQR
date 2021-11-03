@@ -20,7 +20,7 @@
 //       FUNCTION: quasimont(muntz_sequence, coeff_sequence)
 //                
 //        INPUT: - muntz_sequence = sequence of real exponents of the polynomial
-//             - coeff_sequence = sequence of real coefficients of the polynomial
+//               - coeff_sequence = sequence of real coefficients of the polynomial
 //
 //       OUTPUT: - no outputs
 //
@@ -28,7 +28,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-template <typename type>
+template<typename type>
 void quasimont(std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence)
 {
   // CHECK IF TABULATED VALUES EXIST AND COMPUTES THEM IF THEY DON'T
@@ -49,6 +49,6 @@ void quasimont(std::vector<type>& muntz_sequence, std::vector<type>& coeff_seque
   // CONVERTS AND EXPORTS NEW NODES AND WEIGHTS IN THE MOST OPTIMISED FLOATING-POINT FORMAT POSSIBLE
   optimiseData(quad_data, muntz_sequence, coeff_sequence);
 }
-template void quasimont<float50>(std::vector<float50>& muntz_sequence, std::vector<float50>& coeff_sequence);
-template void quasimont<float128>(std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence);
-template void quasimont<double>(std::vector<double>& muntz_sequence, std::vector<double>& coeff_sequence);
+template void quasimont(std::vector<float50>& muntz_sequence, std::vector<float50>& coeff_sequence);
+template void quasimont(std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence);
+template void quasimont(std::vector<double>& muntz_sequence, std::vector<double>& coeff_sequence);

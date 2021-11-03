@@ -30,12 +30,15 @@
 #include <boost/math/special_functions/sin_pi.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <boost/multiprecision/float128.hpp>
+#include <boost/multiprecision/mpfr.hpp>
 #include <boost/multiprecision/gmp.hpp>
 #include <gsl/gsl_poly.h>
 
-typedef boost::multiprecision::float128 float128; // quadruple precision f.p. format
-typedef boost::multiprecision::mpf_float_50 float50; // 50 decimal digits f.p. format
-typedef boost::multiprecision::mpf_float_1000 float1k; // 1000 decimal digits f.p. format
+namespace boomp = boost::multiprecision;
+
+typedef boomp::float128 float128; // quadruple precision f.p. format
+// typedef boomp::mpf_float_50 float50; // 50 decimal digits f.p. format
+typedef boomp::number<boomp::mpfr_float_backend<50>> float50; // 50 decimal digits f.p. format
 
 #include "Utils.h"  // includes header file for plotting and other utilities
 #include "DatIo.h"  // includes header file for data I/O functions
@@ -45,7 +48,7 @@ typedef boost::multiprecision::mpf_float_1000 float1k; // 1000 decimal digits f.
 #define PI boost::math::constants::pi<float50>() // defines pi with 50 decimal digits
 #define E boost::math::constants::e<float50>() // defines e with 50 decimal digits
 
-template <typename type>
-void quasimont(std::vector<type>& muntz_sequence, std::vector<type>& poly_coeff);
+template<typename type>
+void quasimont(std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence);
 
 #endif // QUASIMONT_H
