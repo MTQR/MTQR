@@ -21,12 +21,12 @@ SRCDIR = ../src
 UTLDIR = ../utilities
 OBJDIR = $(BLDDIR)/obj
 
-OBJ = $(OBJDIR)/Main.o $(OBJDIR)/Quasimont.o $(OBJDIR)/Utils.o
+OBJ = $(OBJDIR)/Main.o $(OBJDIR)/Quasimont.o $(OBJDIR)/VecOps.o
 
 CXXOPTIONS = -ansi -std=c++17
 CXXFLAGS = $(CXXOPTIONS) -I $(INCDIR)
 
-LDLIBS = -lm -lquadmath -lgsl -lgslcblas -lmpfr
+LDLIBS = -lm -lquadmath -lgsl -lgslcblas
 LDFLAGS = $(LDLIBS)
 
 default: $(OBJ)
@@ -39,7 +39,10 @@ $(OBJDIR)/Main.o: Main.cpp
 $(OBJDIR)/Quasimont.o:
 	cd $(BLDDIR) && $(MAKE)
 
-$(OBJDIR)/Utils.o:
+$(OBJDIR)/VecOps.o:
+	cd $(UTLDIR) && $(MAKE) $@
+
+tools:
 	cd $(UTLDIR) && $(MAKE) $@
 
 clean:

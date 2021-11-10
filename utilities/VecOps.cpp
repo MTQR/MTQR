@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------------------
-// File:      utilities/Utils.cpp
+// File:      utilities/VecOps.cpp
 //
 // Library:   QUASIMONT-QUAdrature of SIngular polynomials using MONomial Transformations:
 //                      a C++ library for high precision integration of singular 
@@ -14,7 +14,6 @@
 //---------------------------------------------------------------------------------------
 
 #include "Quasimont.h"
-
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -31,7 +30,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename type>
-std::vector<type> castVector(const std::vector<float50>& input_vector, const type& type_infer)
+std::vector<type> castVector(const std::vector<float128>& input_vector, const type& type_infer)
 {
   std::vector<type> output_vector;
   for(int k=0; k < input_vector.size(); k++)
@@ -40,10 +39,8 @@ std::vector<type> castVector(const std::vector<float50>& input_vector, const typ
   }
   return output_vector;
 }
-template std::vector<float50> castVector<float50>(const std::vector<float50>& input_vector, const float50& type_infer);
-template std::vector<float128> castVector<float128>(const std::vector<float50>& input_vector, const float128& type_infer);
-template std::vector<double> castVector<double>(const std::vector<float50>& input_vector, const double& type_infer);
-
+template std::vector<float128> castVector<float128>(const std::vector<float128>& input_vector, const float128& type_infer);
+template std::vector<double> castVector<double>(const std::vector<float128>& input_vector, const double& type_infer);
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -65,19 +62,19 @@ template std::vector<double> castVector<double>(const std::vector<float50>& inpu
 /////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename type>
-float50 orderedInnerProduct(const std::vector<float50>& f_values, const std::vector<type>& weights)
+float128 doubleDotProduct(const std::vector<float128>& f_values, const std::vector<type>& weights)
 {
 
   // Create vector storing the values of the projection of one input vector onto the other
-  std::vector<float50> projection;
+  std::vector<float128> projection;
   // Compute the single terms of the projection
   for(int j=0; j < f_values.size(); j++)
   {
-    projection.push_back(f_values[j]*static_cast<float50>(weights[j]));
+    projection.push_back(f_values[j]*static_cast<float128>(weights[j]));
   }
   // Sort the projection vector in ascending order
   sort(projection.begin(), projection.end());
-  float50 inner_product = static_cast<float50>(0.0);
+  float128 inner_product = static_cast<float128>(0.0);
 
   // Compute the inner product by summing the ordered terms of the projection vector
   for(int k=0; k < projection.size(); k++)
@@ -86,57 +83,5 @@ float50 orderedInnerProduct(const std::vector<float50>& f_values, const std::vec
   }
   return inner_product;
 }
-template float50 orderedInnerProduct(const std::vector<float50>& f_values, const std::vector<float50>& weights);
-template float50 orderedInnerProduct(const std::vector<float50>& f_values, const std::vector<float128>& weights);
-template float50 orderedInnerProduct(const std::vector<float50>& f_values, const std::vector<double>& weights);
-
-
-/////////////////////////////////////////////////////////////////////////////////////////
-//
-//       FUNCTION: equispaced_nodes = linspace(x_0, x_m, m)
-//                
-//          INPUT: - x_0 = starting node (infimum)
-//                 - x_m = ending node (supremum)
-//                 - m = number of sub-intervals
-//
-//         OUTPUT: - equispaced_nodes = array of m+1 equispaced <type> between x_0 and x_m 
-//
-//    DESCRIPTION: this method implements the linspace MATLAB function, generating a 
-//                 linearly-spaced vector of nodes between a starting and ending point.
-//
-/////////////////////////////////////////////////////////////////////////////////////////
-
-template<typename type>
-std::vector<type> linspace(const type& start_type, const type& end_type, const int& num_steps)
-{
-
-  std::vector<type> linspaced;
-
-  type start = static_cast<type>(start_type);
-  type end = static_cast<type>(end_type);
-  type steps = static_cast<type>(num_steps);
-
-  if (steps == 0)
-  { 
-    return linspaced;
-  }
-
-  if (steps == 1) 
-  {
-    linspaced.push_back(start);
-    return linspaced;
-  }
-
-  type delta = (end - start) / (steps - 1);
-
-  for(int k = 0; k < steps - 1; k++)
-  {
-    linspaced.push_back(start + delta*k);
-  }
-
-  linspaced.push_back(end);
-  return linspaced;
-}
-template std::vector<float50> linspace<float50>(const float50& start_type, const float50& end_type, const int& num_steps); // Template mock instantiation for non-inline function
-template std::vector<float128> linspace<float128>(const float128& start_type, const float128& end_type, const int& num_steps); // Template mock instantiation for non-inline function
-template std::vector<double> linspace<double>(const double& start_type, const double& end_type, const int& num_steps); // Template mock instantiation for non-inline function
+template float128 doubleDotProduct(const std::vector<float128>& f_values, const std::vector<float128>& weights);
+template float128 doubleDotProduct(const std::vector<float128>& f_values, const std::vector<double>& weights);

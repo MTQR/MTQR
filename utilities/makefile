@@ -20,18 +20,22 @@ INCDIR = ../include
 SRCDIR = ../src
 OBJDIR = $(BLDDIR)/obj
 
-OBJ = $(OBJDIR)/Utils.o $(OBJDIR)/MonMap.o
+OBJ = $(OBJDIR)/VecOps.o $(OBJDIR)/MonMap.o
 
 CXXOPTIONS = -g -ansi -std=c++17
 CXXFLAGS = $(CXXOPTIONS) -I $(INCDIR) 
 
 default: $(OBJ)
 
-$(OBJDIR)/Utils.o: Utils.cpp $(INCDIR)/*.h
+$(OBJDIR)/VecOps.o: VecOps.cpp $(INCDIR)/*.h
 	$(CXX) -c $< -o $@ $(CXXFLAGS)
 
 $(OBJDIR)/MonMap.o:
 	cd $(SRCDIR) && $(MAKE)
+
+tools: ErrTools.cpp $(INCDIR)/Utils.h
+	$(CXX) -o Tools $< -lmpfr -I $(INCDIR)
+	./Tools
 
 clean:
 	rm -f $(OBJDIR)/*.o

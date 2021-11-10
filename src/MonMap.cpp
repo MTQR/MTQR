@@ -15,62 +15,6 @@
 
 #include "Quasimont.h"
 
-
-/////////////////////////////////////////////////////////////////////////////////////////
-//
-//       FUNCTION: E_n = computeEstimate(lambda, n, envelope)
-//                
-//          INPUT: - lambda = see (18) in [1]
-//                 - n = see (18) in [1]
-//                 - envelope = string flag that specifies whether the estimate must be 
-//                              enveloped (to avoid finite arithmetic infinities) or not
-//
-//         OUTPUT: - E_n = exact asymptotic estimate of the G-L quadrature error 
-//                   computed using (13) and (18) in [1]
-//
-//    DESCRIPTION: in order for the library to generate tabulated values for 
-//                 beta_min/beta_max as functions of n the exact estimates of the G-L 
-//                 quadrature error must be computed with high-precision. Such an 
-//                 a-priori estimate is generally known as results of complex analysis
-//                 (see [2]) however in [1] a more accurate form has been devised in
-//                 formulae (13) and (18) which are implemented in this routine to 
-//                 compute the aformentioned error estimate.
-//
-//      REFERENCE: [1] = Lombardi Guido - Design of quadrature rules for Müntz and 
-//                                        Müntz-logarithmic polynomials using monomial
-//                                        transformation,
-//                                        Int. J. Numer. Meth. Engng., 80: 1687-1717,
-//                                        https://doi.org/10.1002/nme.2684.
-//                 [2] = Donaldson J.D., Elliott D. - A unified approach to quadrature
-//                                        rules with asymptotic estimates of their
-//                                        remainders,
-//                                        SIAM Journal on Numerical Analysis 1972;
-//                                        9(4):573–602,
-//                                        https://doi.org/10.1137/0709051
-//
-/////////////////////////////////////////////////////////////////////////////////////////
-
-float50 computeErrorEstimate(const float50& lambda, const int& num_nodes)
-{
-  float50 common_factor = 2*(pow(static_cast<float50>(2.0),-(static_cast<float50>(1.0)+lambda)));
-  float50 denominator = 2*num_nodes + lambda;
-
-  float50 b1 = (boost::math::tgamma(2*lambda)*boost::math::tgamma(2*num_nodes - lambda))/boost::math::tgamma(2*lambda + 2*num_nodes - lambda);
-  float50 b2 = (boost::math::tgamma(2*lambda)*boost::math::tgamma(2 + 2*num_nodes - lambda))/boost::math::tgamma(2*lambda + 2 + 2*num_nodes - lambda);
-
-  float50 exact = common_factor*(pow(static_cast<float50>(2.0), -lambda))*lambda*((b1/denominator) - b2/(2 + denominator));
-  
-  if(lambda + static_cast<float50>(0.5) - 2*num_nodes >= 0)
-  {
-    return fabs(exact*boost::math::sin_pi(lambda));
-  }
-  else
-  {
-    return fabs(exact);
-  }
-}
-
-
 /////////////////////////////////////////////////////////////////////////////////////////
 //
 //       FUNCTION: lambda_max = computeLambda(lambda_min, user_n)
@@ -96,15 +40,15 @@ float50 computeErrorEstimate(const float50& lambda, const int& num_nodes)
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-float50 computeLambdaMax(float50& lambda_min, int num_nodes)
+float128 computeLambdaMax(float128& lambda_min, int num_nodes)
 {
   auto data = streamMonMapData(num_nodes);
   
   int n_max = std::get<0>(data);
-  std::vector<float50> betas = std::get<1>(data);
+  std::vector<float128> betas = std::get<1>(data);
 
-  float50 r_min = (static_cast<float50>(1.0) + betas[0])/(static_cast<float50>(1.0) + static_cast<float50>(lambda_min));
-  float50 lambda_max = (static_cast<float50>(1.0) + betas[1] - r_min)/r_min;
+  float128 r_min = (static_cast<float128>(1.0) + betas[0])/(static_cast<float128>(1.0) + static_cast<float128>(lambda_min));
+  float128 lambda_max = (static_cast<float128>(1.0) + betas[1] - r_min)/r_min;
   
   return lambda_max;
 }
@@ -137,7 +81,7 @@ float50 computeLambdaMax(float50& lambda_min, int num_nodes)
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-int computeNumNodes(const float50& lambda_min, const float50& lambda_max)
+int computeNumNodes(const float128& lambda_min, const float128& lambda_max)
 {
   constexpr double c0 = -0.0040693, c1 = 0.00041296, d0 = 7.8147, d2 = 0.10123;
 
@@ -198,11 +142,11 @@ int computeNumNodes(const float50& lambda_min, const float50& lambda_max)
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-double computeMapOrder(const std::vector<float50>& lambdas, const std::vector<float50>& betas)
+double computeMapOrder(const std::vector<float128>& lambdas, const std::vector<float128>& betas)
 {
   // Compute r as the linear interpolation between r_min and r_max
-  float50 transf_order = ((static_cast<float50>(1.0) + betas[0])/(static_cast<float50>(1.0) + lambdas[0])+
-                         (static_cast<float50>(1.0) + betas[1])/(static_cast<float50>(1.0) + lambdas[1]))/static_cast<float50>(2.0);
+  float128 transf_order = ((static_cast<float128>(1.0) + betas[0])/(static_cast<float128>(1.0) + lambdas[0])+
+                         (static_cast<float128>(1.0) + betas[1])/(static_cast<float128>(1.0) + lambdas[1]))/static_cast<float128>(2.0);
   
   // Print on-screen information
   std::cout << std::setprecision(std::numeric_limits<float>::max_digits10)
@@ -267,7 +211,7 @@ double computeMapOrder(const std::vector<float50>& lambdas, const std::vector<fl
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-std::tuple<std::vector<float50>, std::vector<float50>, std::vector<float50>, std::vector<float50>> computeParamsGl(const double& r, const int& n_min)
+std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, std::vector<float128>> computeParamsGl(const double& r, const int& n_min)
 {
   std::ofstream results;
   results.open("output/Results.txt", std::ios_base::app);
@@ -278,19 +222,19 @@ std::tuple<std::vector<float50>, std::vector<float50>, std::vector<float50>, std
 
   results.close();
 
-  std::vector<float50> new_nodes, new_weights, old_nodes, old_weights;
+  std::vector<float128> new_nodes, new_weights, old_nodes, old_weights;
 
   // Compute affine map [a,b] -> [-1,1] parameters
-  float50 a = 0.0, b = 1.0;
-  float50 alpha = 0.5*(b - a), beta = 0.5*(a + b);
-  float50 jacobian = alpha;
+  float128 a = 0.0, b = 1.0;
+  float128 alpha = 0.5*(b - a), beta = 0.5*(a + b);
+  float128 jacobian = alpha;
 
   // Derive new and old G-L nodes
   std::ifstream nodes_file;
   nodes_file.open("../data/TabulatedGlNodes.csv");
 
   std::string line_nodes, column_nodes;
-  float50 affine_node;
+  float128 affine_node;
   int num_nodes;
 
   // Loop through the rows of TabulatedGlNodes.csv
@@ -313,10 +257,10 @@ std::tuple<std::vector<float50>, std::vector<float50>, std::vector<float50>, std
       for(int k = 1; k <= num_nodes; k++)
       {
         // Map the original G-L node from [-1,1] to [0,1] through affine transformation
-        affine_node = alpha*(static_cast<float50>(static_cast<float50>(static_cast<float50>(row_nodes[k].substr(1, row_nodes[k].size() - 2))))) + beta;
+        affine_node = alpha*(static_cast<float128>(row_nodes[k].substr(1, row_nodes[k].size() - 2))) + beta;
         old_nodes.push_back(affine_node);
         // Compute new G-L node using the monomial transformation
-        new_nodes.push_back(pow(affine_node, static_cast<float50>(r)));
+        new_nodes.push_back(pow(affine_node, static_cast<float128>(r)));
       }
 
       break;
@@ -329,7 +273,7 @@ std::tuple<std::vector<float50>, std::vector<float50>, std::vector<float50>, std
   weights_file.open("../data/TabulatedGlWeights.csv");
 
   std::string line_weights, column_weights;
-  float50 affine_weight;
+  float128 affine_weight;
   int num_weights;
 
   // Loop through the rows of TabulatedGlWeights.csv
@@ -353,10 +297,10 @@ std::tuple<std::vector<float50>, std::vector<float50>, std::vector<float50>, std
       for(int k = 1; k <= num_nodes; k++)
       {
         // Map the original G-L weight from [-1,1] in [0,1] through affine transformation
-        affine_weight = jacobian*(static_cast<float50>(static_cast<float50>(static_cast<float50>(row_weights[k].substr(1, row_weights[k].size() - 2)))));
+        affine_weight = jacobian*(static_cast<float128>(row_weights[k].substr(1, row_weights[k].size() - 2)));
         old_weights.push_back(affine_weight);
         // Compute new G-L weight using the monomial transformation
-        new_weights.push_back(static_cast<float50>(r)*pow(old_nodes.at(k-1), static_cast<float50>(r-1))*affine_weight);
+        new_weights.push_back(static_cast<float128>(r)*pow(old_nodes.at(k-1), static_cast<float128>(r-1))*affine_weight);
       }
 
       break;
@@ -394,34 +338,29 @@ std::tuple<std::vector<float50>, std::vector<float50>, std::vector<float50>, std
 /////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename type1, typename type2>
-float50 computeQuadGl(const std::vector<type1>& nodes,const std::vector<type1>& weights, std::vector<type2>& muntz_sequence, std::vector<type2>& coeff_sequence)
+float128 computeQuadGl(const std::vector<type1>& nodes,const std::vector<type1>& weights, std::vector<type2>& muntz_sequence, std::vector<type2>& coeff_sequence)
 {
   // The G-L quadrature retains the same precision as the input nodes and weights with which it is computed
-  float50 In = static_cast<float50>(0.0);
+  float128 In = static_cast<float128>(0.0);
   // Loop over the monomial terms of the polynomial
   for(int j=0; j < muntz_sequence.size(); j++)
   {
     // Vector containing the single terms of (x_j)^k for each node j=0,...,n_min
-    std::vector<float50> f_values;
+    std::vector<float128> f_values;
     // Loop over G-L nodes
     for(int k = 0; k < nodes.size(); k++)
     {
       // Compute the single term f(x_j) = (x_j)^lambda[k] and store it in the f_values vector
-      f_values.push_back(pow(static_cast<float50>(nodes[k]), static_cast<float50>(muntz_sequence[j])));
+      f_values.push_back(pow(static_cast<float128>(nodes[k]), static_cast<float128>(muntz_sequence[j])));
     }
-    In += static_cast<float50>(coeff_sequence[j])*orderedInnerProduct(f_values, weights);
+    In += static_cast<float128>(coeff_sequence[j])*doubleDotProduct(f_values, weights);
   }
   return In;
 }
-template float50 computeQuadGl<float50, float50>(const std::vector<float50>& nodes, const std::vector<float50>& weights, std::vector<float50>& muntz_sequence, std::vector<float50>& coeff_sequence); // Template mock instantiation for non-inline function
-template float50 computeQuadGl<float50, float128>(const std::vector<float50>& nodes, const std::vector<float50>& weights, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence); // Template mock instantiation for non-inline function
-template float50 computeQuadGl<float50, double>(const std::vector<float50>& nodes, const std::vector<float50>& weights, std::vector<double>& muntz_sequence, std::vector<double>& coeff_sequence); // Template mock instantiation for non-inline function
-template float50 computeQuadGl<float128, float50>(const std::vector<float128>& nodes, const std::vector<float128>& weights, std::vector<float50>& muntz_sequence, std::vector<float50>& coeff_sequence); // Template mock instantiation for non-inline function
-template float50 computeQuadGl<float128, float128>(const std::vector<float128>& nodes, const std::vector<float128>& weights, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence); // Template mock instantiation for non-inline function
-template float50 computeQuadGl<float128, double>(const std::vector<float128>& nodes, const std::vector<float128>& weights, std::vector<double>& muntz_sequence, std::vector<double>& coeff_sequence); // Template mock instantiation for non-inline function
-template float50 computeQuadGl<double, float50>(const std::vector<double>& nodes, const std::vector<double>& weights, std::vector<float50>& muntz_sequence, std::vector<float50>& coeff_sequence); // Template mock instantiation for non-inline function
-template float50 computeQuadGl<double, float128>(const std::vector<double>& nodes, const std::vector<double>& weights, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence); // Template mock instantiation for non-inline function
-template float50 computeQuadGl<double, double>(const std::vector<double>& nodes, const std::vector<double>& weights, std::vector<double>& muntz_sequence, std::vector<double>& coeff_sequence); // Template mock instantiation for non-inline function
+template float128 computeQuadGl<float128, float128>(const std::vector<float128>& nodes, const std::vector<float128>& weights, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence); // Template mock instantiation for non-inline function
+template float128 computeQuadGl<float128, double>(const std::vector<float128>& nodes, const std::vector<float128>& weights, std::vector<double>& muntz_sequence, std::vector<double>& coeff_sequence); // Template mock instantiation for non-inline function
+template float128 computeQuadGl<double, float128>(const std::vector<double>& nodes, const std::vector<double>& weights, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence); // Template mock instantiation for non-inline function
+template float128 computeQuadGl<double, double>(const std::vector<double>& nodes, const std::vector<double>& weights, std::vector<double>& muntz_sequence, std::vector<double>& coeff_sequence); // Template mock instantiation for non-inline function
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -448,20 +387,19 @@ template float50 computeQuadGl<double, double>(const std::vector<double>& nodes,
 /////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename type>
-float50 computeExactError(const float50& In, std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence)
+float128 computeExactError(const float128& In, std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence)
 {
   // The exact integral's precision is defined by the precision of the original G-L parameters and the coefficients and exponents of the input polynomial which is at best float50
-  float50 I = static_cast<float50>(0.0);
+  float128 I = static_cast<float128>(0.0);
   // Computing the definite integral of each monomial in [0,1]
   for(int k=0; k < muntz_sequence.size(); k++)
   {
     // The constant term multiplies the difference (b^{k+1} - a^{k+1}) = 1 (since a=0 and b=1) which is thus omitted
-    I += static_cast<float50>(coeff_sequence[k])/(static_cast<float50>(muntz_sequence[k]) + static_cast<float50>(1.0));
+    I += static_cast<float128>(coeff_sequence[k])/(static_cast<float128>(muntz_sequence[k]) + static_cast<float128>(1.0));
   }
   // Compute and return the exact a-posteriori remainder of the quadrature formula
-  std::cout << "\nI(f) = " << std::setprecision(std::numeric_limits<float50>::max_digits10) << I << std::endl;
+  std::cout << "\nI(f) = " << std::setprecision(std::numeric_limits<float128>::max_digits10) << I << std::endl;
   return fabs(I - In)/fabs(I);
 }
-template float50 computeExactError(const float50& In, std::vector<float50>& muntz_sequence, std::vector<float50>& coeff_sequence);
-template float50 computeExactError(const float50& In, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence);
-template float50 computeExactError(const float50& In, std::vector<double>& muntz_sequence, std::vector<double>& coeff_sequence);
+template float128 computeExactError(const float128& In, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence);
+template float128 computeExactError(const float128& In, std::vector<double>& muntz_sequence, std::vector<double>& coeff_sequence);
