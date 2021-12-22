@@ -387,7 +387,7 @@ template float128 computeQuadGl<double, double>(const std::vector<double>& nodes
 /////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename type>
-float128 computeExactError(const float128& In, std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence)
+float128 computeExactError(const float128& In, std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence, bool& print_primitive)
 {
   // The exact integral's precision is defined by the precision of the original G-L parameters and the coefficients and exponents of the input polynomial which is at best float50
   float128 I = static_cast<float128>(0.0);
@@ -398,8 +398,13 @@ float128 computeExactError(const float128& In, std::vector<type>& muntz_sequence
     I += static_cast<float128>(coeff_sequence[k])/(static_cast<float128>(muntz_sequence[k]) + static_cast<float128>(1.0));
   }
   // Compute and return the exact a-posteriori remainder of the quadrature formula
-  std::cout << "\nI(f) = " << std::setprecision(std::numeric_limits<float128>::max_digits10) << I << std::endl;
+  if(print_primitive)
+  {
+     std::cout << std::setprecision(std::numeric_limits<double>::max_digits10)
+               << " ** I(p(x))   = "
+               << I;
+  }
   return fabs(I - In)/fabs(I);
 }
-template float128 computeExactError(const float128& In, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence);
-template float128 computeExactError(const float128& In, std::vector<double>& muntz_sequence, std::vector<double>& coeff_sequence);
+template float128 computeExactError(const float128& In, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence, bool& print_primitive);
+template float128 computeExactError(const float128& In, std::vector<double>& muntz_sequence, std::vector<double>& coeff_sequence, bool& print_primitive);

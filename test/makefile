@@ -47,6 +47,9 @@ tools:
 
 clean:
 	rm -f $(OBJDIR)/Main.o Test
+	if [ -d "output" ]; then rm -r output; fi 
 
 allclean:
+	$(MAKE) clean
+	cd $(UTLDIR) && $(MAKE) clean
 	cd $(BLDDIR) && $(MAKE) clean

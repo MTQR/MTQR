@@ -115,10 +115,18 @@ std::tuple<int, std::vector<float128>> manageData(std::vector<type>& muntz_seque
       std::cout << "\n\nPlease specify the desired number of quadrature nodes (number must be even): ";
       std::cin >> num_nodes;
 
-      compute_n_min = false;
+      if(num_nodes % 2 == 0)
+      {
+        compute_n_min = false;
 
-      float128 local_lambda_min = static_cast<float128>(muntz_sequence[0]);
-      additional_lambda = computeLambdaMax(local_lambda_min, num_nodes);
+        float128 local_lambda_min = static_cast<float128>(muntz_sequence[0]);
+        additional_lambda = computeLambdaMax(local_lambda_min, num_nodes);
+      }
+      else
+      {
+        std::cout << "\n   ** ERROR ** The number of nodes (n_min) must be even\n";
+        exit(1);
+      }
     }
     else if(input.compare("lambda") == 0)
     {
@@ -278,56 +286,60 @@ template<typename type>
 void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, std::vector<float128>>& quad_params, std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence)
 {
   const double ACC = 1*EPS;
+  bool print_primitive = false;
   
-  float128 In_34 = computeQuadGl(std::get<0>(quad_params), std::get<1>(quad_params), muntz_sequence, coeff_sequence);
-  float128 En_34 = computeExactError(In_34, muntz_sequence, coeff_sequence);
+  float128 I34_new = computeQuadGl(std::get<0>(quad_params), std::get<1>(quad_params), muntz_sequence, coeff_sequence);
+  float128 E34_new = computeExactError(I34_new, muntz_sequence, coeff_sequence, print_primitive);
 
-  std::cout << "\n\nI_n(f) with float128 = "
+  /*std::cout << "\n\nI_n(f) with float128 = "
             << std::setprecision(std::numeric_limits<float128>::max_digits10)
             << In_34
             << "\nE_n(f) with float128 = "
-            << En_34 << std::endl;
+            << En_34 << std::endl;*/
 
-  if(En_34 <= ACC)
+  if(E34_new <= ACC)
   {
     // Degrade G-L parameters to double
     std::vector<double> double_nodes = castVector(std::get<0>(quad_params), std::numeric_limits<double>::epsilon());
     std::vector<double> double_weights = castVector(std::get<1>(quad_params), std::numeric_limits<double>::epsilon());
     // Compute I_n(f) and E_n(f) with double precise G-L parameters
-    float128 In_16 = computeQuadGl(double_nodes, double_weights, muntz_sequence, coeff_sequence);
-    float128 En_16 = computeExactError(In_16, muntz_sequence, coeff_sequence);
+    float128 I16_new = computeQuadGl(double_nodes, double_weights, muntz_sequence, coeff_sequence);
+    float128 E16_new = computeExactError(I16_new, muntz_sequence, coeff_sequence, print_primitive);
 
-    std::cout << "\nI_n(f) with double = "
+    /*std::cout << "\nI_n(f) with double = "
               << std::setprecision(std::numeric_limits<float128>::max_digits10)
               << In_16
               << "\nE_n(f) with double = "
-              << En_16 << std::endl;
+              << En_16 << std::endl;*/
 
-    if(En_16 <= ACC)
+    if(E16_new <= ACC)
     {// Nodes and weights succefully optimised float128 -> double
-      
+      std::cout << " ――――――――――――――――――――――――――――――――――――――――――――――――――"
+                << "\n ** Using double f.p. format for nodes and weights **"
+                << std::endl;
+      print_primitive = true;
       // Degrade classical G-L parameters with double format
       std::vector<double> old_nodes = castVector(std::get<2>(quad_params), std::numeric_limits<double>::epsilon());
       std::vector<double> old_weights = castVector(std::get<3>(quad_params), std::numeric_limits<double>::epsilon());
       // Compute classical G-L quadrature with double format parameters
-      float128 I_16 = computeQuadGl(old_nodes, old_weights, muntz_sequence, coeff_sequence);
-      float128 E_16 = computeExactError(I_16, muntz_sequence, coeff_sequence);
-      // Print and export all the results {In, En, I, E} in double
-      std::cout << " ――――――――――――――――――――――――――――――――――――――――――――――――――"
-                << "\n ** Using double f.p. format for nodes and weights **";
-      exportNewData(double_nodes, double_weights, {In_16, En_16, I_16, E_16});
+      float128 I16_old = computeQuadGl(old_nodes, old_weights, muntz_sequence, coeff_sequence);
+      float128 E16_old = computeExactError(I16_old, muntz_sequence, coeff_sequence, print_primitive);
+      // Export all the results {In, En, I, E} in double
+      exportNewData(double_nodes, double_weights, {I16_new, E16_new, I16_old, E16_old});
       // Print closing message and return
       std::cout << "\n\n ** QUASIMONT HAS TERMINATED **\n";
       return;
     }
   }
-  // Compute classical G-L quadrature with float128 format parameters
-  float128 I_34 = computeQuadGl(std::get<2>(quad_params), std::get<3>(quad_params), muntz_sequence, coeff_sequence);
-  float128 E_34 = computeExactError(I_34, muntz_sequence, coeff_sequence);
-  // Print and export all the results {In, En, I, E} in float50
   std::cout << " ――――――――――――――――――――――――――――――――――――――――――――――――――"
-            << "\n ** Using quadruple f.p. format for nodes and weights **";
-  exportNewData(std::get<0>(quad_params), std::get<1>(quad_params), {In_34, En_34, I_34, E_34});
+            << "\n ** Using quadruple f.p. format for nodes and weights **"
+            << std::endl;
+  print_primitive = true;
+  // Compute classical G-L quadrature with float128 format parameters
+  float128 I34_old = computeQuadGl(std::get<2>(quad_params), std::get<3>(quad_params), muntz_sequence, coeff_sequence);
+  float128 E34_old = computeExactError(I34_old, muntz_sequence, coeff_sequence, print_primitive);
+  // Export all the results {In, En, I, E} in float128
+  exportNewData(std::get<0>(quad_params), std::get<1>(quad_params), {I34_new, E34_new, I34_old, E34_old});
   // Print closing message
   std::cout << "\n\n ** QUASIMONT HAS TERMINATED **\n";
 }
@@ -363,8 +375,8 @@ template<typename type>
 void exportNewData(const std::vector<type>& nodes, const std::vector<type>& weights, const std::vector<float128>& output_data)
 {
   // Print on-screen quadrature results
-  std::cout << std::setprecision(std::numeric_limits<float>::max_digits10)
-        << "\n ** I_n(p(x)) = "
+  std::cout << std::setprecision(std::numeric_limits<double>::max_digits10)
+        << " **\n ** I_n(p(x)) = "
         << output_data[0]
         << " **\n ** E_n(p(x)) = " 
         << output_data[1]

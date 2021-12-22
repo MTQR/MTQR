@@ -38,4 +38,5 @@ tools: ErrTools.cpp $(INCDIR)/Utils.h
 	./Tools
 
 clean:
+	rm -f Tools && if [ -d "estimate" ]; then rm -r estimate; fi
 	rm -f $(OBJDIR)/*.o
