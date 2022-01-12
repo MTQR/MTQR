@@ -17,15 +17,15 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-//       FUNCTION: castVector(input_vector, output_vector)
+//       FUNCTION: output_vector = castVector(input_vector, type_output)
 //                
-//          INPUT: - input_vector = vector of length n of type float50
-//                 - input_vector = vector of length n of type T
+//          INPUT: - input_vector = vector of length n of type of type T1
+//                 - type_output = floating-point data-type T2
 //
-//         OUTPUT: no outputs
+//         OUTPUT: - output_vector = input_vector casted in type T2
 //
-//    DESCRIPTION: this method casts the float50 input vector to the an output vector
-//                 with the same content but type T provided by the user.
+//    DESCRIPTION: this method casts the T1=float128 input vector to the an output vector
+//                 with the same content but type T2 specified by the user.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -44,20 +44,19 @@ template std::vector<double> castVector<double>(const std::vector<float128>& inp
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-//       FUNCTION: inner_product = ordereInnerProduct(input_vector)
+//       FUNCTION: inner_product = doubleDotproduct(x, w)
 //                
-//          INPUT: - input_vector = input vector of type float1k
+//          INPUT: - x = vector containing the quadrature nodes in format float128
+//                 - w = vector containing the quadrature weights in either float128 or 
+//                       double
 //
-//         OUTPUT: - inner_product = 
+//         OUTPUT: - inner_product = precise inner product between x and w avoiding
+//                                   numerical cancellation
 //
-//    DESCRIPTION: in multiple instances throughout the library, addition of terms close
-//                 to the format epsilon is performed (especially when computing the
-//                 quadrature). To avoid numeric cancellation of these terms we must 
-//                 therefore sum those smallest values first in the highest precision
-//                 possible. This method takes as input the terms of the inner product
-//                 of the terms of two vectors of length n, sorts it in ascending order
-//                 and sums along n, thereby assuring that no numerical cancellation
-//                 occurs.
+//    DESCRIPTION: This method takes two input vectors of the same length n, sorts
+//                 their element-wise multiplication in a new vector with cells
+//                 arranged in ascending order and sums them thereby assuring that no 
+//                 numerical cancellation occurs.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 

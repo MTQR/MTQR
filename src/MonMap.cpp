@@ -17,24 +17,22 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-//       FUNCTION: lambda_max = computeLambda(lambda_min, user_n)
+//       FUNCTION: lambda_max = computeLambdaMax(lambda_min, user_n)
 //                
-//          INPUT: - lambda_min = minimum exponent in the "muntz_sequence" input of 
-//                   function 'getInputData'
-//                 - user_n = desired number of (quadrature) nodes defined by the user
+//          INPUT: - lambda_min = minimum (and only) exponent in the input sequence
+//                 - user_n = desired number of (quadrature) nodes provided by the user
 //
-//         OUTPUT: - lambda_max = computed additional exponent of the polynomial
+//         OUTPUT: - lambda_max = additional exponent of the new binomial
 //
-//    DESCRIPTION: the monomial quadrature rule is a pre-processing of the G-L nodes & 
+//    DESCRIPTION: the monomial quadrature rule is a processing of the G-L nodes & 
 //                 weights for those polynomials characterised by an arbitrarly large
 //                 gap between the terms of minimum and maximum degree. There might be
 //                 cases however in which the user wants to integrate singular 
 //                 monomials; in those cases the library will require an additional, 
 //                 non-constant, term to be added to the monomial. It does so by either 
-//                 allowing the user to either manually input the exponent of the 
-//                 additional term from the CLI (see lines 180~184 in the src/DatIo.cpp
-//                 file) or to specify the maximum number of quadrature nodes to use in
-//                 its application. In this last instance the the following function 
+//                 allowing the user to manually input the exponent of the additional
+//                 term from the CLI or to specify the number of nodes to use in
+//                 its application. In this last instance the following function 
 //                 automatically generates the resulting exponent of the additional
 //                 term (lambda_max).
 //
@@ -59,25 +57,20 @@ float128 computeLambdaMax(float128& lambda_min, int num_nodes)
 //       FUNCTION: n = computeNumNodes(lambda_min, lambda_max)
 //                
 //          INPUT: - lambda_min = minimum exponent in the input "muntz_sequence" 
-//                   (strictly greater than -1)
+//                                (strictly greater than -1)
 //                 - lambda_max = maximum exponent in the input "muntz_sequence"
 //
-//         OUTPUT: - n = number of (quadrature) nodes computed as solution of equation
-//                      (62) in [1]
+//         OUTPUT: - n = number of (quadrature) nodes computed as the only real solution
+//                       of equation 1.18 reported in the doc/UserManual.pdf
 //
 //    DESCRIPTION: once the exponents in the terms with minimum and maximum degree in
 //                 the user-input polynomial have been determined, this method 
-//                 implements formula (62) in [1], which is a 7-th degree polynomial in
-//                 n, and extract its only real root whose integer floor will then be 
-//                 the minimum possible number of (quadrature) nodes to be used in G-L
-//                 formula to achieve double precision (the polynomial solver itself
-//                 is a class method implemented in GSL-GNU Scientific Library).
-//
-//      REFERENCE: [1] = Lombardi Guido - Design of quadrature rules for Müntz and 
-//                                        Müntz-logarithmic polynomials using monomial
-//                                        transformation,
-//                                        Int. J. Numer. Meth. Engng., 80: 1687-1717,
-//                                        https://doi.org/10.1002/nme.2684.
+//                 solves equation 1.18, which is a 7-th degree polynomial in
+//                 n derived by a linear regression of n in beta_min/beta_max. 
+//                 It then extracts the only real root whose integer floor will then be 
+//                 the minimum possible number of (quadrature) nodes to be used in the
+//                 new quadrature formula to achieve double precision (the solver itself
+//                 is a class' method implemented in GSL-GNU Scientific Library).
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -123,22 +116,18 @@ int computeNumNodes(const float128& lambda_min, const float128& lambda_max)
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-//       FUNCTION: r = computeOrder({lambda_min, lambda_max}, {beta_min, beta_max})
+//       FUNCTION: r = computeMapOrder({lambda_min, lambda_max}, {beta_min, beta_max})
 //                
-//          INPUT: - {lambda_min, lambda_max} = output of function 'getInputData'
-//                 - {beta_min, beta_max} = output of function 'retrieveMonData'
+//          INPUT: - {lambda_min, lambda_max} = output of function 'manageData'
+//                 - {beta_min, beta_max} = output of function 'streamMonMapData'
 //
-//         OUTPUT: - r = real value of the transformation order of the monomial map
+//         OUTPUT: - r = value of the transformation order of the monomial map (gamma)
 //
-//    DESCRIPTION: the order of the monomial transformation for the new nodes and weight
-//                 of the G-L quadrature formula is computed as a linear interpolation
-//                 beetween r_min and r_max reported in (63) of [1].
-//
-//      REFERENCE: [1] = Lombardi Guido - Design of quadrature rules for Müntz and 
-//                                        Müntz-logarithmic polynomials using monomial
-//                                        transformation,
-//                                        Int. J. Numer. Meth. Engng., 80: 1687-1717,
-//                                        https://doi.org/10.1002/nme.2684.
+//    DESCRIPTION: the order of the monomial transformation that characterises the new
+//                 samples of the quadrature rule obtained starting from those of the
+//                 G-L quadrature formula is computed as a linear interpolation
+//                 beetween the minimum and maximum bound outlined in the inequality
+//                 1.17 of the doc/UserManual.pdf.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -186,28 +175,22 @@ double computeMapOrder(const std::vector<float128>& lambdas, const std::vector<f
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-//       FUNCTION: [J, {new_x, new_w, old_x, old_w}] = computeParams(r, n_min)
+//       FUNCTION: [{new_x, new_w, old_x, old_w}] = computeParamsGl(r, n_min)
 //                
-//          INPUT: - r = output of function 'computeOrder'
-//                 - n_min = output of function 'retrieveMonData'
+//          INPUT: - r = output of function 'computeMapOrder'
+//                 - n_min = output of function 'streamMonMapData'
 //
-//         OUTPUT: - J = jacobian of the affine map phi: [a,b] -> [-1,1] of the G-L 
-//                       quadrature formula
-//                 - {new_x, new_w} = new set of G-L quadrature nodes (x) and
+//         OUTPUT: - {new_x, new_w} = new set of G-L quadrature nodes (x) and
 //                                    weights (w) following the monomial map
 //                 - {old_x, old_w} = classical set of G-L quadrature nodes (x) and
-//                                    weights (w) in [-1, 1]
+//                                    weights (w) following the affine map
 //
 //    DESCRIPTION: once the transformation order is available, the monomial map itself
-//                 is constructed according to (55) in [1]; of course, prior to the 
-//                 monomial map is applied, the G-L nodes and weights have to be mapped
-//                 from the user-input interval I = [a,b] to [-1, 1]. This is 
-//                 implemented in this routine which also carries the jacobian of the
-//                 affine map among the outputs since it is the multiplication
-//                 coefficient of the integral itself (thus needed by the function
-//                 'computeQuadGl'). Furthermorethe classic G-L nodes and weights are
-//                 outputted as well so that comparisons ca be made between the
-//                 traditional G-L quadrature integral and the monomial rule quadrature.
+//                 is applied to the G-L nodes and weights that have been previously
+//                 mapped from [-1,1] to [0,1] via an affine (linear) map. The 
+//                 complete set of new and old nodes and weights (referred to as
+//                 quadrature_parameters) are collected in a tuple and outputted by
+//                 this method.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -314,14 +297,14 @@ std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, 
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-//       FUNCTION: quadrature = computeQuadGl(x, w, muntz_sequence, coeff_sequence)
+//       FUNCTION: In = computeQuadGl(x, w, muntz_sequence, coeff_sequence)
 //                
-//          INPUT: - x = G-L quadrature nodes
-//                 - w = G-L quadrature weights
+//          INPUT: - x = output of function 'computeParamsGl' optimised by 'optimiseData'
+//                 - w = output of function 'computeParamsGl' optimised by 'optimiseData'
 //                 - muntz_sequence = sequence of real exponents of the polynomial
 //                 - coeff_sequence = sequence of real coefficients of the polynomial
 //
-//         OUTPUT: - quadrature = G-L quadrature of user-input polynomial
+//         OUTPUT: - In = value of the numerical approximated integral for the user input
 //
 //    DESCRIPTION: every interpolatory quadrature rule approximates the definite integral
 //                 by means of a weighted sum of the kernel's values on specific points
@@ -332,8 +315,11 @@ std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, 
 //                 quadrature formula with n+1 nodes is a Gaussian formula for which the
 //                 nodes corresponds to the roots of the Legendre n-th degree polynomial
 //                 that is orthogonal to the weight function w(x) = 1 in [-1, 1]. This 
-//                 routine implements the G-L quadrature formula provided classical and
-//                 new G-L nodes and weights.
+//                 routine implements the computation of such weighted sum in a general 
+//                 fashion, i.e. regardless of the quadrature rules, as it only requires
+//                 the specified samples. It is thus re-used multiple times in other
+//                 modules to compute both the classical G-L and the monomial quadrature
+//                 rules.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -365,17 +351,18 @@ template float128 computeQuadGl<double, double>(const std::vector<double>& nodes
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-//       FUNCTION: error = computeError({post_map_quadrature, pre_map_quadrature}, 
-//                                       muntz_sequence, coeff_sequence, I)
+//       FUNCTION: En = computeExactError({post_map_quadrature, pre_map_quadrature}, 
+//                                       muntz_sequence, coeff_sequence, print_flag)
 //                
 //          INPUT: - {post_map_quadrature, pre_map_quadrature} = output of function
 //                                                               'computeQuadGl'
 //                 - muntz_sequence = sequence of real exponents of the polynomial
 //                 - coeff_sequence = sequence of real coefficients of the polynomial
-//                 - I = [a,b] = interval of integration of the user-input polynomial
+//                 - print_flag = boolean parameter to tell the routine wheter or not
+//                                to print the numerical value of the primitive
 //
-//         OUTPUT: - error = relative error of the G-L quadrature computed with the new
-//                           nodes and weights
+//         OUTPUT: - En = relative error of the specified rule computed with the new
+//                        nodes and weights
 //
 //    DESCRIPTION: let I_n be the numerical integral calculated using the G-L quadrature
 //                 rule (outputed by function 'computeQuadGl') and I_ex be the exact

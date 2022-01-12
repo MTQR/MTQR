@@ -17,30 +17,31 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-//       FUNCTION: [n, {lambda_min, lambda_max}] = getInputData(muntz_sequence, 
+//       FUNCTION: [n, {lambda_min, lambda_max}] = manageData(muntz_sequence, 
 //                                                              coeff_sequence)
 //                
 //        INPUT: - muntz_sequence = sequence of real exponents of the polynomial
 //               - coeff_sequence = sequence of real coefficients of the polynomial
 //
-//       OUTPUT: - n = output of function 'computeNumNodes'
+//       OUTPUT: - n = output of function 'computeNumNodes' or input by the user
 //               - lambda_min = minimum exponent in the input "muntz_sequence"
 //               - lambda_max = maximum exponent in the input "muntz_sequence"
 //
 //    DESCRIPTION: the user-input polynomial is provided to the library via Main.cpp; the
-//                 polynomial itself is specified via a unordered sequence of 
+//                 polynomial itself is specified via a unsorted sequence of 
 //                 coefficients and exponents of the various monomials in the polynomial.
 //                 Once those input are read, checks have to be made in order to validate
 //                 the proper functioning of the library; those are:
 //                    - the number of exponents and the number of coefficients coincide;
 //                    - the input polynomial is at least a binomial (otherwise the 
-//                      routine further CLI user-input is required, see lines 86~93 in
-//                      the 'src/MonMap.cpp' file); 
-//                    - lambda_min > -1 (otherwise the program exits);
+//                      further CLI user-input is required, see Section 2.4 in the
+//                      doc/UserManual.pdf; 
+//                    - lambda_min > -1 (otherwise the input sequence of exponents is 
+//                      not a Muntz sequence and thus the program exits);
 //                 Once those checks are ran the exponents' sequence is sorted locally
 //                 and lambda_min/lambda_max are thus identified and outputted alongside
 //                 the associated number of nodes computed by the function 
-//                 'computeNumNodes' (see lines 110~175 in the 'src/MonMap.cpp' file).
+//                 'computeNumNodes' (see lines 57~121 in the 'src/MonMap.cpp' file).
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -197,7 +198,7 @@ std::tuple<int, std::vector<float128>> manageData(std::vector<type>& muntz_seque
     n_min = num_nodes;
   }
 
-  // Return the outputs
+  // Generate and return the outputs
   std::vector<float128> lambdas = {lambda_min, lambda_max};
   return std::make_tuple(n_min, lambdas);
 }
@@ -206,24 +207,21 @@ template std::tuple<int, std::vector<float128>> manageData<double>(std::vector<d
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-//       FUNCTION: [n_min, {beta_min, beta_max}] = retrieveMonData(n)
+//       FUNCTION: [n_min, {beta_min, beta_max}] = streamMonMapData(n)
 //                
-//        INPUT: - n = output of function 'getInputData'
+//          INPUT: - n = output of function 'manageData'
 //
-//       OUTPUT: - n_min = minimum possible (even) number of nodes from the 
-//                         'data/TabulatedErrorValues.csv' file
-//               - beta_min = minimum value for the exponent of the post-map polynomial
-//               - beta_max = maximum value for the exponent of the post-map polynomial
+//         OUTPUT: - n_min = minimum possible number of nodes listed in the 
+//                           'data/TabulatedErrorValues.csv' file to obtain 
+//                           double-precise numerical integration
+//                 - beta_min = minimum value for the exponent of the post-map polynomial
+//                 - beta_max = maximum value for the exponent of the post-map polynomial
 //
 //    DESCRIPTION: the monomial transformation gamma: [0,1] -> [0,1] is uniquely 
 //                 identified by its order r which in turn requires the knowledge of
-//                 beta_min/beta_max, alongside lambda_min/lambda_max, to be computed
-//                 (see lines 178~211 in the 'src/MonMap.cpp' file). This method scans
-//                 the tabulated vales in the 'data/TabulatedErrorValues.csv' file to
-//                 extract the beta_min/beta_max and n_min required by the monomial
-//                 quadrature rule according to the specified number of nodes as either
-//                 computed by the function 'computeNumNodes' (see line 243) or provided
-//                 as user-input (see lines 168~199, 247).
+//                 beta_min/beta_max. This method scans the tabulated vales in the 
+//                 'data/TabulatedErrorValues.csv' file to extract such values
+//                 according to the input n (number of quadrature samples).
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -254,7 +252,7 @@ std::tuple<int, std::vector<float128>> streamMonMapData(const int& comp_num_node
 
       std::cout << std::setprecision(std::numeric_limits<float>::max_digits10)
                 << " ――――――――――――――――――――――――――――――――――――――――――――――――――"
-                << "\n ** N_min = " << comp_num_nodes
+                << "\n ** N_min = " << n_min
                 << "\n ** Beta_min = " << beta_min
                 << ", Beta_max = " << beta_max
                 << " **";
@@ -269,16 +267,27 @@ std::tuple<int, std::vector<float128>> streamMonMapData(const int& comp_num_node
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-//       FUNCTION: degradeData()
+//       FUNCTION: optimiseData(quadrature_parameters, muntz_sequence, coeff_sequence)
 //                
-//          INPUT: - [{new_x, new_w, old_x, old_w}] = output of function
-//                                                       'computeParams'
+//          INPUT: - quadrature_parameters = output of function 'computeParamsGl'
 //                 - muntz_sequence = sequence of real exponents of the polynomial
 //                 - coeff_sequence = sequence of real coefficients of the polynomial
 //
 //         OUTPUT: no outputs
 //
-//    DESCRIPTION: TBA
+//    DESCRIPTION: the declared objective of the library is to exploit the defining
+//                 characteristic of the input singular polynomial to derive an ad-hoc
+//                 quadrature scheme whose new nodes and weights are redistributed to
+//                 better capture the singularity while retaining the lowest possible
+//                 computational complexity. The measure by which the software classifies
+//                 the quadrature's quality is a threshold of accuracy between the
+//                 primitive I and its numerical approximation I_n. Such threshold is set
+//                 to be within the machine-epsilon in double precision by default,
+//                 although more and less stringent constraints can be inserted. Once the
+//                 new set of nodes and weights have been computed, this function has the
+//                 purpose of optimising their floating-point representation to the 
+//                 least precise format possible that still allows to retain such
+//                 amount of final precision in the quadrature.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -291,12 +300,6 @@ void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::
   float128 I34_new = computeQuadGl(std::get<0>(quad_params), std::get<1>(quad_params), muntz_sequence, coeff_sequence);
   float128 E34_new = computeExactError(I34_new, muntz_sequence, coeff_sequence, print_primitive);
 
-  /*std::cout << "\n\nI_n(f) with float128 = "
-            << std::setprecision(std::numeric_limits<float128>::max_digits10)
-            << In_34
-            << "\nE_n(f) with float128 = "
-            << En_34 << std::endl;*/
-
   if(E34_new <= ACC)
   {
     // Degrade G-L parameters to double
@@ -305,12 +308,6 @@ void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::
     // Compute I_n(f) and E_n(f) with double precise G-L parameters
     float128 I16_new = computeQuadGl(double_nodes, double_weights, muntz_sequence, coeff_sequence);
     float128 E16_new = computeExactError(I16_new, muntz_sequence, coeff_sequence, print_primitive);
-
-    /*std::cout << "\nI_n(f) with double = "
-              << std::setprecision(std::numeric_limits<float128>::max_digits10)
-              << In_16
-              << "\nE_n(f) with double = "
-              << En_16 << std::endl;*/
 
     if(E16_new <= ACC)
     {// Nodes and weights succefully optimised float128 -> double
@@ -349,25 +346,30 @@ template void optimiseData(std::tuple<std::vector<float128>, std::vector<float12
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-//       FUNCTION: exportNewData({lambda_min, lambda_max}, [n_min, {beta_min, beta_max}],
-//                            [], {post_map_integral, pre_map_integral}, r)
+//       FUNCTION: exportNewData(optim_nodes, optim_weights, [I_new, E_new, I_old, E_old])
 //                
-//          INPUT: - {lambda_min, lambda_max} = output of function 'getInputData'
-//                 - [n_min, {beta_min, beta_max}] = output of function 'retrieveMonData'
-//                 - [] = output of function 'computeParams'
-//                 - {post_map_integral, pre_map_integral} = output of function
-//                                                           'computeQuadGl'
-//                 - r = output of function 'computeOrder'
+//          INPUT: - optim_nodes = output of function 'computeParamsGl' optimised by
+//                                 'optimiseData'
+//                 - optim_weights = output of function 'computeParamsGl' optimised by
+//                                 'optimiseData'
+//                 - [I_new, E_new, I_old, E_old] = values of the numerical quadrature
+//                                                  (I_new, I_old) and its relative
+//                                                  error (E_new, E_old) obtained with
+//                                                  the new samples provided by the 
+//                                                  monomial rule and by the classical
+//                                                  G-L samples (subscripts 'new' and
+//                                                  'old' respectively)
 //
 //         OUTPUT: no outputs
 //
 //    DESCRIPTION: once the monomial quadrature rule is completed the resulting data is
-//                 streamed in output text files inside the output subdirectory created,
-//                 by this routine, within the calling directory of the executable of 
-//                 this library. The output data is splitted in three files with
-//                 'Results.txt' containing recap informations of the execution 
-//                 (including the resulting integral) and 'Nodes.txt' and 'Weights.txt'
-//                 containg the classic and new G-L nodes and weights respectively.
+//                 streamed in output text files located in the application's dir.
+//                 The output data is organised in three separate files:
+//                    - 'Results.txt' containins recap informations about the monomial
+//                      quadrature rule such as the parameters of the map (gamma), 
+//                      number of quadrature samples (n_min)
+//                    - 'Nodes.txt' listing the new nodes computed by the quadrature rule
+//                    - 'Weights.txt' listing the new weights of the above rule
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 

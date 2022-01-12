@@ -32,15 +32,16 @@ typedef boost::math::policies::policy<
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-//       FUNCTION: equispaced_nodes = linspace(x_0, x_m, m)
+//       FUNCTION: equispaced_nodes = linspacedVector(x_0, x_m, m)
 //                
 //          INPUT: - x_0 = starting node (infimum)
 //                 - x_m = ending node (supremum)
 //                 - m = number of sub-intervals
 //
-//         OUTPUT: - equispaced_nodes = array of m+1 equispaced <type> between x_0 and x_m 
+//         OUTPUT: - equispaced_nodes = array of m+1 equispaced float50 nodes between
+//                                      x_0 and x_m 
 //
-//    DESCRIPTION: this method implements the linspace MATLAB function, generating a 
+//    DESCRIPTION: this method implements MATLAB's 'linspace' function, generating a 
 //                 linearly-spaced vector of nodes between a starting and ending point.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -75,35 +76,16 @@ std::vector<float50> linspacedVector(const float50& start_type, const float50& e
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-//       FUNCTION: E_n = computeEstimate(lambda, n, envelope)
+//       FUNCTION: En = aPrioriAsympEstimate(lambda, n)
 //                
-//          INPUT: - lambda = see (18) in [1]
-//                 - n = see (18) in [1]
-//                 - envelope = string flag that specifies whether the estimate must be 
-//                              enveloped (to avoid finite arithmetic infinities) or not
+//          INPUT: - lambda = real value of the non-integer degree of the monomial
+//                 - n = number of quadrature nodes
 //
-//         OUTPUT: - E_n = exact asymptotic estimate of the G-L quadrature error 
-//                   computed using (13) and (18) in [1]
+//         OUTPUT: - En = exact asymptotic estimate of the G-L quadrature error 
+//                        computed 1.9 and 1.8
 //
-//    DESCRIPTION: in order for the library to generate tabulated values for 
-//                 beta_min/beta_max as functions of n the exact estimates of the G-L 
-//                 quadrature error must be computed with high-precision. Such an 
-//                 a-priori estimate is generally known as results of complex analysis
-//                 (see [2]) however in [1] a more accurate form has been devised in
-//                 formulae (13) and (18) which are implemented in this routine to 
-//                 compute the aformentioned error estimate.
-//
-//      REFERENCE: [1] = Lombardi Guido - Design of quadrature rules for Müntz and 
-//                                        Müntz-logarithmic polynomials using monomial
-//                                        transformation,
-//                                        Int. J. Numer. Meth. Engng., 80: 1687-1717,
-//                                        https://doi.org/10.1002/nme.2684.
-//                 [2] = Donaldson J.D., Elliott D. - A unified approach to quadrature
-//                                        rules with asymptotic estimates of their
-//                                        remainders,
-//                                        SIAM Journal on Numerical Analysis 1972;
-//                                        9(4):573–602,
-//                                        https://doi.org/10.1137/0709051
+//    DESCRIPTION: as a demonstration, this routine computes the values of the error
+//                 estimate for a given value of n and lambda.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -112,12 +94,6 @@ type aPrioriAsympEstimate(const type& lambda, const int& num_nodes)
 {
   type common_factor = 2*(pow(static_cast<type>(2.0),-(static_cast<type>(1.0)+lambda)));
   type denominator = 2*num_nodes + lambda;
-  /*std::cout << "\n"
-            << "2*lambda = " << static_cast<type>(2.0)*lambda << "\n"
-            << "2*n - lambda = " << static_cast<type>(2.0*num_nodes) - lambda << "\n"
-            << "2*n + 2*lambda - lambda = " << static_cast<type>(2.0)*lambda + static_cast<type>(2.0*num_nodes) - lambda << "\n"
-            << "2 + 2*n - lambda = " << static_cast<type>(2.0) + static_cast<type>(2.0*num_nodes) - lambda << "\n"
-            << "2*lambda + 2 + 2*n - lambda = " << static_cast<type>(2.0)*lambda + static_cast<type>(2.0) + static_cast<type>(2.0*num_nodes) - lambda << "\n";*/
 
   type b1 = (boost::math::tgamma(static_cast<type>(2.0)*lambda, gamma_policy())*boost::math::tgamma(static_cast<type>(2.0*num_nodes) - lambda, gamma_policy()))/boost::math::tgamma(static_cast<type>(2.0)*lambda + static_cast<type>(2.0*num_nodes) - lambda, gamma_policy());
   type b2 = (boost::math::tgamma(static_cast<type>(2.0)*lambda, gamma_policy())*boost::math::tgamma(static_cast<type>(2.0) + static_cast<type>(2.0*num_nodes) - lambda, gamma_policy()))/boost::math::tgamma(static_cast<type>(2.0)*lambda + static_cast<type>(2.0) + static_cast<type>(2.0*num_nodes) - lambda, gamma_policy());
@@ -139,15 +115,16 @@ template float50 aPrioriAsympEstimate<float50>(const float50& input_lambda, cons
 //
 //       FUNCTION: plot(num_nodes, beta_min, beta_max)
 //                
-//          INPUT: - num_nodes = value of the incremending integer index in the 'for' loop
-//                 - beta_min = end-value of the iterator in the 'for' loop
-//                 - beta_min = end-value of the iterator in the 'for' loop
+//          INPUT: - num_nodes = number of quadrature nodes
+//                 - beta_min = minimum value of the exponents 
+//                 - beta_max = maximum value of the exponents
 //          
 //         OUTPUT: no outputs
 //
-//    DESCRIPTION: in a traditional for(int k=0; k<num_k; k++) this function prints a 
-//                 progress bar on the terminal line to represent the status of
-//                 completion of the loop.
+//    DESCRIPTION: this method plots the asymptotic behaviour of the error estimate 
+//                 computed in function 'aPrioriAsympEstimate' and for a fixed value of n.
+//                 Several examples of its plots are superimposed in Figure 1.1 of the
+//                 doc/UserManual.pdf. 
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -230,17 +207,10 @@ void printProgressBar(const int& iter, const int& num_iter)
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-//       FUNCTION: plot(num_nodes, beta_min, beta_max)
-//                
-//          INPUT: - num_nodes = value of the incremending integer index in the 'for' loop
-//                 - beta_min = end-value of the iterator in the 'for' loop
-//                 - beta_min = end-value of the iterator in the 'for' loop
-//          
-//         OUTPUT: no outputs
+//       FUNCTION: main(argc, argv)
 //
-//    DESCRIPTION: in a traditional for(int k=0; k<num_k; k++) this function prints a 
-//                 progress bar on the terminal line to represent the status of
-//                 completion of the loop.
+//    DESCRIPTION: a standard C++ main function dictating the sequence of methods to be
+//                 executed by the secondary module of the library.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
