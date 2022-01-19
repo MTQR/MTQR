@@ -1,15 +1,27 @@
+//---------------------------------------------------------------------------------------
+// File:      MyApp/Main.cpp
+//
+// Library:   QUASIMONT-QUAdrature of SIngular polynomials using MONomial Transformations:
+//                      a C++ library for high precision integration of singular 
+//                      polynomials of non-integer degree
+//
+// Authors:   Guido Lombardi, Davide Papapicco
+//
+// Institute: Politecnico di Torino
+//            C.so Duca degli Abruzzi, 24 - Torino (TO), Italia
+//            Department of Electronics and Telecommunications (DET)
+//            Electromagnetic modelling and applications Research Group
+//---------------------------------------------------------------------------------------
+
 #include "Quasimont.h"
 
 int main(int argc, char** argv)
 {
-  std::vector<double> interval = {0, 1};
-  std::vector<float128> coefficients_sequence = {1, 1, 1, 1, 1};
-  std::vector<float128> muntz_sequence = {0,
-                                          1,
-                                          boost::math::constants::pi<float128>()/2,
-                                          boost::math::constants::pi<float128>()/3,
-                                          boost::math::constants::pi<float128>()/6};
-  
-  quasimont(muntz_sequence, coefficients_sequence, interval, plots);
+  //  P(x) = ex^(e+1/4) + 5x^(pi/4) -x^(-1/2) +1 +10x^2
+  std::vector<float128> coeff_sequence = {E, 5.0, -1.0, 1.0, 10.0};
+  std::vector<float128> muntz_sequence = {E + 0.25, -PI/4, -0.5, 0, 2};
+
+  quasimont(muntz_sequence, coeff_sequence);
+
   return 0;
 }

@@ -35,7 +35,7 @@ $(OBJDIR)/VecOps.o: $(UTLDIR)/VecOps.cpp $(INCDIR)/Utils.h
 	cd $(UTLDIR) && $(MAKE)
 
 static: $(OBJ) $(OBJDIR)/VecOps.o
-	ar rcs libquasimont.a $^
+	ar rcs ../static/libquasimont.a $^
 
 clean:
 	rm -f $(OBJDIR)/*.o

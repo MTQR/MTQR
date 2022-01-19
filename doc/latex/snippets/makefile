@@ -1,11 +1,11 @@
 #---------------------------------------------------------------------------------------
-# File:      build/makefile
+# File:      test/makefile
 #
 # Library:   QUASIMONT-QUAdrature of SIngular polynomials using MONomial Transformations:
 #                      a C++ library for high precision integration of singular 
 #                      polynomials of non-integer degree
 #
-# Authors:   Guido Lombardi, PhD, Davide Papapicco
+# Authors:   Guido Lombardi, Davide Papapicco
 #
 # Institute: Politecnico di Torino
 #            C.so Duca degli Abruzzi, 24 - Torino (TO), Italia
@@ -15,27 +15,41 @@
 
 CXX = g++
 
+BLDDIR = ../build
 INCDIR = ../include
 SRCDIR = ../src
 UTLDIR = ../utilities
-OBJDIR = obj
+OBJDIR = $(BLDDIR)/obj
 
-UTL = $(UTLDIR)/VecOps.o
-OBJ = $(OBJDIR)/Quasimont.o $(OBJDIR)/DatIo.o $(OBJDIR)/MonMap.o
+OBJ = $(OBJDIR)/Main.o $(OBJDIR)/Quasimont.o $(OBJDIR)/VecOps.o
 
-CXXOPTIONS = -g -ansi -std=c++17
-CXXFLAGS = $(CXXOPTIONS) -I $(INCDIR) 
+CXXOPTIONS = -ansi -std=c++17
+CXXFLAGS = $(CXXOPTIONS) -I $(INCDIR)
 
-dafault: $(OBJ)
+LDLIBS = -lm -lquadmath -lgsl -lgslcblas
+LDFLAGS = $(LDLIBS)
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(INCDIR)/*.h
+default: $(OBJ)
+	$(CXX) $(OBJDIR)/*.o -o Test $(LDFLAGS)
+	./Test
+
+$(OBJDIR)/Main.o: Main.cpp
 	$(CXX) -c $< -o $@ $(CXXFLAGS)
 
-$(OBJDIR)/VecOps.o: $(UTLDIR)/VecOps.cpp $(INCDIR)/Utils.h
-	cd $(UTLDIR) && $(MAKE)
+$(OBJDIR)/Quasimont.o:
+	cd $(BLDDIR) && $(MAKE)
 
-static: $(OBJ) $(OBJDIR)/VecOps.o
-	ar rcs libquasimont.a $^
+$(OBJDIR)/VecOps.o:
+	cd $(UTLDIR) && $(MAKE) $@
+
+tools:
+	cd $(UTLDIR) && $(MAKE) $@
 
 clean:
-	rm -f $(OBJDIR)/*.o
+	rm -f $(OBJDIR)/Main.o Test
+	if [ -d "output" ]; then rm -r output; fi 
+
+allclean:
+	$(MAKE) clean
+	cd $(UTLDIR) && $(MAKE) clean
+	cd $(BLDDIR) && $(MAKE) clean

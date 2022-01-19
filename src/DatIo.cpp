@@ -300,33 +300,44 @@ void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::
   float128 I34_new = computeQuadGl(std::get<0>(quad_params), std::get<1>(quad_params), muntz_sequence, coeff_sequence);
   float128 E34_new = computeExactError(I34_new, muntz_sequence, coeff_sequence, print_primitive);
 
-  if(E34_new <= ACC)
-  {
-    // Degrade G-L parameters to double
-    std::vector<double> double_nodes = castVector(std::get<0>(quad_params), std::numeric_limits<double>::epsilon());
-    std::vector<double> double_weights = castVector(std::get<1>(quad_params), std::numeric_limits<double>::epsilon());
-    // Compute I_n(f) and E_n(f) with double precise G-L parameters
-    float128 I16_new = computeQuadGl(double_nodes, double_weights, muntz_sequence, coeff_sequence);
-    float128 E16_new = computeExactError(I16_new, muntz_sequence, coeff_sequence, print_primitive);
+  // Degrade G-L parameters to double
+  std::vector<double> double_nodes = castVector(std::get<0>(quad_params), std::numeric_limits<double>::epsilon());
+  std::vector<double> double_weights = castVector(std::get<1>(quad_params), std::numeric_limits<double>::epsilon());
+  // Compute I_n(f) and E_n(f) with double precise G-L parameters
+  float128 I16_new = computeQuadGl(double_nodes, double_weights, muntz_sequence, coeff_sequence);
+  float128 E16_new = computeExactError(I16_new, muntz_sequence, coeff_sequence, print_primitive);
 
-    if(E16_new <= ACC)
-    {// Nodes and weights succefully optimised float128 -> double
-      std::cout << " ――――――――――――――――――――――――――――――――――――――――――――――――――"
-                << "\n ** Using double f.p. format for nodes and weights **"
-                << std::endl;
-      print_primitive = true;
-      // Degrade classical G-L parameters with double format
-      std::vector<double> old_nodes = castVector(std::get<2>(quad_params), std::numeric_limits<double>::epsilon());
-      std::vector<double> old_weights = castVector(std::get<3>(quad_params), std::numeric_limits<double>::epsilon());
-      // Compute classical G-L quadrature with double format parameters
-      float128 I16_old = computeQuadGl(old_nodes, old_weights, muntz_sequence, coeff_sequence);
-      float128 E16_old = computeExactError(I16_old, muntz_sequence, coeff_sequence, print_primitive);
-      // Export all the results {In, En, I, E} in double
-      exportNewData(double_nodes, double_weights, {I16_new, E16_new, I16_old, E16_old});
-      // Print closing message and return
-      std::cout << "\n\n ** QUASIMONT HAS TERMINATED **\n";
-      return;
-    }
+  if(E16_new <= ACC)
+  {// Nodes and weights succefully optimised float128 -> double
+    std::cout << " ――――――――――――――――――――――――――――――――――――――――――――――――――"
+              << "\n ** Using double f.p. format for nodes and weights **"
+              << std::endl;
+    print_primitive = true;
+    // Degrade classical G-L parameters with double format
+    std::vector<double> old_nodes = castVector(std::get<2>(quad_params), std::numeric_limits<double>::epsilon());
+    std::vector<double> old_weights = castVector(std::get<3>(quad_params), std::numeric_limits<double>::epsilon());
+    // Compute classical G-L quadrature with double format parameters
+    float128 I16_old = computeQuadGl(old_nodes, old_weights, muntz_sequence, coeff_sequence);
+    float128 E16_old = computeExactError(I16_old, muntz_sequence, coeff_sequence, print_primitive);
+    // Print on-screen quadrature results
+    std::cout << std::setprecision(std::numeric_limits<double>::max_digits10)
+              << " **\n ** I_n(p(x)) = "
+              << I34_new
+              << "  [with parameters in float128 precision]"
+              << " **\n ** E_n(p(x)) = "
+              << E34_new
+              << "  [with parameters in float128 precision]"
+              << " **\n ** I_n(p(x)) = "
+              << I16_new
+              << "  [with parameters in double precision]"
+              << " **\n ** E_n(p(x)) = " 
+              << E16_new
+              << " [with parameters in double precision] **" << std::endl;
+    // Export all the results {In, En, I, E} in double
+    exportNewData(double_nodes, double_weights, {I16_new, E16_new, I16_old, E16_old});
+    // Print closing message and return
+    std::cout << "\n\n ** QUASIMONT HAS TERMINATED **\n";
+    return;
   }
   std::cout << " ――――――――――――――――――――――――――――――――――――――――――――――――――"
             << "\n ** Using quadruple f.p. format for nodes and weights **"
@@ -335,6 +346,20 @@ void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::
   // Compute classical G-L quadrature with float128 format parameters
   float128 I34_old = computeQuadGl(std::get<2>(quad_params), std::get<3>(quad_params), muntz_sequence, coeff_sequence);
   float128 E34_old = computeExactError(I34_old, muntz_sequence, coeff_sequence, print_primitive);
+  // Print on-screen quadrature results
+  std::cout << std::setprecision(std::numeric_limits<double>::max_digits10)
+            << " **\n ** I_n(p(x)) = "
+            << I34_new
+            << "  [with parameters in float128 precision]"
+            << " **\n ** E_n(p(x)) = "
+            << E34_new
+            << "  [with parameters in float128 precision]"
+            << " **\n ** I_n(p(x)) = "
+            << I16_new
+            << "  [with parameters in double precision]"
+            << " **\n ** E_n(p(x)) = " 
+            << E16_new
+            << " [with parameters in double precision] **" << std::endl;
   // Export all the results {In, En, I, E} in float128
   exportNewData(std::get<0>(quad_params), std::get<1>(quad_params), {I34_new, E34_new, I34_old, E34_old});
   // Print closing message
@@ -376,14 +401,6 @@ template void optimiseData(std::tuple<std::vector<float128>, std::vector<float12
 template<typename type>
 void exportNewData(const std::vector<type>& nodes, const std::vector<type>& weights, const std::vector<float128>& output_data)
 {
-  // Print on-screen quadrature results
-  std::cout << std::setprecision(std::numeric_limits<double>::max_digits10)
-        << " **\n ** I_n(p(x)) = "
-        << output_data[0]
-        << " **\n ** E_n(p(x)) = " 
-        << output_data[1]
-        << " **" << std::endl;
-
   // Write Results.txt file containing transformation review and integral outputs
   std::ofstream Results;
   Results.open("output/Results.txt", std::ios_base::app);

@@ -16,18 +16,18 @@
 #ifndef DATIO_H
 #define DATIO_H
 
-// (SEE LINES 109~128 IN 'src/DatIo.cpp') Takes user-defined inputs from file
+// (SEE LINES 18~46 IN 'src/DatIo.cpp') Takes user-defined inputs from file
 template<typename type>
 std::tuple<int, std::vector<float128>> manageData(std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence);
 
-// (SEE LINES 258~271 IN 'src/DatIo.cpp') Extract the values of beta_min and beta_max according to the computed minimum number of nodes
+// (SEE LINES 208~226 IN 'src/DatIo.cpp') Extract the values of beta_min and beta_max according to the computed minimum number of nodes
 std::tuple<int, std::vector<float128>> streamMonMapData(const int& comp_num_nodes);
 
-// (SEE LINES 335~ IN 'src/DatIo.cpp') Degrade the precision of the new G-L nodes and weights to establish minimum data-type for double precision quadrature
+// (SEE LINES 268~292 IN 'src/DatIo.cpp') Degrade the precision of the new G-L nodes and weights to establish minimum data-type for double precision quadrature
 template<typename type>
 void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, std::vector<float128>>& quad_params, std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence);
 
-// (SEE LINES 335~349 IN 'src/DatIo.cpp') Computes and exports the resulting G-L weights and nodes aling with other ouputs
+// (SEE LINES 372~399 IN 'src/DatIo.cpp') Computes and exports the resulting G-L weights and nodes aling with other ouputs
 template<typename type>
 void exportNewData(const std::vector<type>& nodes, const std::vector<type>& weights, const std::vector<float128>& output_data);
 

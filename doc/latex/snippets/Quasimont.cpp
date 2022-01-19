@@ -19,13 +19,14 @@
 //
 //       FUNCTION: quasimont(muntz_sequence, coeff_sequence)
 //                
-//        INPUT: - muntz_sequence = sequence of real exponents of the polynomial
-//               - coeff_sequence = sequence of real coefficients of the polynomial
+//          INPUT: - muntz_sequence = sequence of real exponents of the polynomial
+//                 - coeff_sequence = sequence of real coefficients of the polynomial
 //
-//       OUTPUT: - no outputs
+//         OUTPUT: - no outputs
 //
-//    DESCRIPTION: access point of the focal module of the library where all the
-//                 primary methods are instantiated according to the user's input
+//    DESCRIPTION: access point of the primary module of the library where all the
+//                 methods concerning the computation of the monomial nodes and weights
+//                 are instantiated according to the user's input.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
