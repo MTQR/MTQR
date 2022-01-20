@@ -24,7 +24,7 @@
 //
 //         OUTPUT: - lambda_max = additional exponent of the new binomial
 //
-//    DESCRIPTION: the monomial quadrature rule is a processing of the G-L nodes & 
+//    DESCRIPTION: the monomial transformation quadrature rule processes the G-L nodes & 
 //                 weights for those polynomials characterised by an arbitrarly large
 //                 gap between the terms of minimum and maximum degree. There might be
 //                 cases however in which the user wants to integrate singular 
@@ -318,8 +318,8 @@ std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, 
 //                 routine implements the computation of such weighted sum in a general 
 //                 fashion, i.e. regardless of the quadrature rules, as it only requires
 //                 the specified samples. It is thus re-used multiple times in other
-//                 modules to compute both the classical G-L and the monomial quadrature
-//                 rules.
+//                 modules to compute both the classical G-L and the monomial transfor-
+//                 mation quadrature rules.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 

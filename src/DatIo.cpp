@@ -50,10 +50,10 @@ std::tuple<int, std::vector<float128>> manageData(std::vector<type>& muntz_seque
 {
   // Print initial message and input polynomial
   std::cout << std::endl;
-  std::cout << "    |――――――――――――――――――――――――――――――――――|\n"
-            << "    |          ** QUASIMONT **         |\n"
-            << "    |  ** MONOMIAL QUADRATURE RULE **  |\n"
-            << "    |――――――――――――――――――――――――――――――――――|\n";
+  std::cout << "    |―――――――――――――――――――――――――――――――――――――――――――――――――|\n"
+            << "    |                 ** QUASIMONT **                 |\n"
+            << "    |  ** MONOMIAL TRANSFORMATION QUADRATURE RULE **  |\n"
+            << "    |―――――――――――――――――――――――――――――――――――――――――――――――――|\n";
 
   if(muntz_sequence.size()==coeff_sequence.size())
   {
@@ -294,7 +294,7 @@ std::tuple<int, std::vector<float128>> streamMonMapData(const int& comp_num_node
 template<typename type>
 void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, std::vector<float128>>& quad_params, std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence)
 {
-  const double ACC = 1*EPS;
+  const double ACC = 2*EPS;
   bool print_primitive = false;
   
   float128 I34_new = computeQuadGl(std::get<0>(quad_params), std::get<1>(quad_params), muntz_sequence, coeff_sequence);
@@ -307,7 +307,7 @@ void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::
   float128 I16_new = computeQuadGl(double_nodes, double_weights, muntz_sequence, coeff_sequence);
   float128 E16_new = computeExactError(I16_new, muntz_sequence, coeff_sequence, print_primitive);
 
-  if(E16_new <= ACC)
+  if(fabs(E34_new - E16_new) <= ACC)
   {// Nodes and weights succefully optimised float128 -> double
     std::cout << " ――――――――――――――――――――――――――――――――――――――――――――――――――"
               << "\n ** Using double f.p. format for nodes and weights **"
@@ -333,6 +333,11 @@ void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::
               << " **\n ** E_n(p(x)) = " 
               << E16_new
               << " [with parameters in double precision] **" << std::endl;
+    // Check on asbolute accuracy of the relative error
+    if(E16_new >= 1e1*ACC)
+    {
+      std::cout << "\n ** WARNING: the input polynomial is integrated with less than double-precision **" << std::endl;
+    }
     // Export all the results {In, En, I, E} in double
     exportNewData(double_nodes, double_weights, {I16_new, E16_new, I16_old, E16_old});
     // Print closing message and return
@@ -360,6 +365,11 @@ void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::
             << " **\n ** E_n(p(x)) = " 
             << E16_new
             << " [with parameters in double precision] **" << std::endl;
+  // Check on asbolute accuracy of the relative error
+  if(E16_new <= 1e2*ACC)
+  {
+    std::cout << "\n ** WARNING: the input polynomial is integrated with less than double-precision **" << std::endl;
+  }
   // Export all the results {In, En, I, E} in float128
   exportNewData(std::get<0>(quad_params), std::get<1>(quad_params), {I34_new, E34_new, I34_old, E34_old});
   // Print closing message
@@ -381,18 +391,19 @@ template void optimiseData(std::tuple<std::vector<float128>, std::vector<float12
 //                                                  (I_new, I_old) and its relative
 //                                                  error (E_new, E_old) obtained with
 //                                                  the new samples provided by the 
-//                                                  monomial rule and by the classical
-//                                                  G-L samples (subscripts 'new' and
+//                                                  monomial transformation quadrature 
+//                                                  rule and by the classical G-L 
+//                                                  samples (subscripts 'new' and
 //                                                  'old' respectively)
 //
 //         OUTPUT: no outputs
 //
-//    DESCRIPTION: once the monomial quadrature rule is completed the resulting data is
+//    DESCRIPTION: once the monomial transformation quadrature rule is completed data is
 //                 streamed in output text files located in the application's dir.
 //                 The output data is organised in three separate files:
 //                    - 'Results.txt' containins recap informations about the monomial
-//                      quadrature rule such as the parameters of the map (gamma), 
-//                      number of quadrature samples (n_min)
+//                      transformation quadrature rule such as the parameters of the map
+//                      (gamma), number of quadrature samples (n_min), etc...
 //                    - 'Nodes.txt' listing the new nodes computed by the quadrature rule
 //                    - 'Weights.txt' listing the new weights of the above rule
 //
@@ -409,12 +420,12 @@ void exportNewData(const std::vector<type>& nodes, const std::vector<type>& weig
           << output_data[0]
           << ", E_n(f) = "
           << output_data[1]
-          << "  (monomial quadrature rule)"
+          << "  (monomial transformation quadrature rule)"
           << "\n        I_n(f) = "
           << output_data[2]
           << ", E_n(f) = "
           << output_data[3]
-          << "  (classical G-L rule)";
+          << "  (classical G-L quadrature rule)";
   Results.close();
 
   // Write Nodes.txt file containing transformed G-L nodes using the monomial map

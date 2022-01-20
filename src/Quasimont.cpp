@@ -25,8 +25,8 @@
 //         OUTPUT: - no outputs
 //
 //    DESCRIPTION: access point of the primary module of the library where all the
-//                 methods concerning the computation of the monomial nodes and weights
-//                 are instantiated according to the user's input.
+//                 methods concerning the computation of the monomial transformation 
+//                 quadrature rule's params are instantiated according to user's input.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
