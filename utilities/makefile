@@ -22,7 +22,7 @@ OBJDIR = $(BLDDIR)/obj
 
 OBJ = $(OBJDIR)/VecOps.o $(OBJDIR)/MonMap.o
 
-CXXOPTIONS = -g -ansi -std=c++17
+CXXOPTIONS = -g -ansi -std=c++17 #-fext-numeric-literals
 CXXFLAGS = $(CXXOPTIONS) -I $(INCDIR) 
 
 default: $(OBJ)

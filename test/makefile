@@ -23,7 +23,7 @@ OBJDIR = $(BLDDIR)/obj
 
 OBJ = $(OBJDIR)/Main.o $(OBJDIR)/Quasimont.o $(OBJDIR)/VecOps.o
 
-CXXOPTIONS = -ansi -std=c++17
+CXXOPTIONS = -ansi -std=c++17 #-fext-numeric-literals
 CXXFLAGS = $(CXXOPTIONS) -I $(INCDIR)
 
 LDLIBS = -lm -lquadmath -lgsl -lgslcblas

@@ -23,7 +23,7 @@ OBJDIR = obj
 UTL = $(UTLDIR)/VecOps.o
 OBJ = $(OBJDIR)/Quasimont.o $(OBJDIR)/DatIo.o $(OBJDIR)/MonMap.o
 
-CXXOPTIONS = -g -ansi -std=c++17
+CXXOPTIONS = -g -ansi -std=c++17 #-fext-numeric-literals
 CXXFLAGS = $(CXXOPTIONS) -I $(INCDIR) 
 
 dafault: $(OBJ)
