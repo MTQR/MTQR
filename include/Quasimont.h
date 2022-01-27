@@ -2,7 +2,7 @@
 // File:      include/Quasimont.h
 //
 // Library:   QUASIMONT-QUAdrature of SIngular polynomials using MONomial Transformations:
-//                      a C++ library for high precision integration of singular 
+//                      a C++ library for high precision integration of generalised 
 //                      polynomials of non-integer degree
 //
 // Authors:   Guido Lombardi, Davide Papapicco

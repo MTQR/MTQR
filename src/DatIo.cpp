@@ -2,7 +2,7 @@
 // File:      src/DatIo.cpp
 //
 // Library:   QUASIMONT-QUAdrature of SIngular polynomials using MONomial Transformations:
-//                      a C++ library for high precision integration of singular 
+//                      a C++ library for high precision integration of generalised 
 //                      polynomials of non-integer degree
 //
 // Authors:   Guido Lombardi, Davide Papapicco
@@ -27,21 +27,17 @@
 //               - lambda_min = minimum exponent in the input "muntz_sequence"
 //               - lambda_max = maximum exponent in the input "muntz_sequence"
 //
-//    DESCRIPTION: the user-input polynomial is provided to the library via Main.cpp; the
-//                 polynomial itself is specified via a unsorted sequence of 
-//                 coefficients and exponents of the various monomials in the polynomial.
-//                 Once those input are read, checks have to be made in order to validate
-//                 the proper functioning of the library; those are:
+//    DESCRIPTION: the user-input polynomial is provided to the library, via Main.cpp, by.
+//                 two unique lists of coefficients and exponents. This method first 
+//                 checks the proper form of those inputs. In particular:
 //                    - the number of exponents and the number of coefficients coincide;
 //                    - the input polynomial is at least a binomial (otherwise the 
-//                      further CLI user-input is required, see Section 2.4 in the
-//                      doc/UserManual.pdf; 
+//                      further user-input as reported in doc/UserManual.pdf);
 //                    - lambda_min > -1 (otherwise the input sequence of exponents is 
-//                      not a Muntz sequence and thus the program exits);
-//                 Once those checks are ran the exponents' sequence is sorted locally
-//                 and lambda_min/lambda_max are thus identified and outputted alongside
-//                 the associated number of nodes computed by the function 
-//                 'computeNumNodes' (see lines 57~121 in the 'src/MonMap.cpp' file).
+//                      not a Muntz sequence and the polynomial is not L1);
+//                 Following the checks the exponents' sequence is then sorted locally
+//                 to identify and return lambda_min/lambda_max at global level alongside
+//                 the associated minimum number of nodes computed n_min.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -217,7 +213,7 @@ template std::tuple<int, std::vector<float128>> manageData<double>(std::vector<d
 //                 - beta_min = minimum value for the exponent of the post-map polynomial
 //                 - beta_max = maximum value for the exponent of the post-map polynomial
 //
-//    DESCRIPTION: the monomial transformation gamma: [0,1] -> [0,1] is uniquely 
+//    DESCRIPTION: the monomial transformation gamma: (0,1) -> (0,1) is uniquely 
 //                 identified by its order r which in turn requires the knowledge of
 //                 beta_min/beta_max. This method scans the tabulated vales in the 
 //                 'data/TabulatedErrorValues.csv' file to extract such values
@@ -269,25 +265,21 @@ std::tuple<int, std::vector<float128>> streamMonMapData(const int& comp_num_node
 //
 //       FUNCTION: optimiseData(quadrature_parameters, muntz_sequence, coeff_sequence)
 //                
-//          INPUT: - quadrature_parameters = output of function 'computeParamsGl'
+//          INPUT: - quadrature_parameters = output of function 'computeQuadParams'
 //                 - muntz_sequence = sequence of real exponents of the polynomial
 //                 - coeff_sequence = sequence of real coefficients of the polynomial
 //
 //         OUTPUT: no outputs
 //
-//    DESCRIPTION: the declared objective of the library is to exploit the defining
-//                 characteristic of the input singular polynomial to derive an ad-hoc
-//                 quadrature scheme whose new nodes and weights are redistributed to
-//                 better capture the singularity while retaining the lowest possible
-//                 computational complexity. The measure by which the software classifies
-//                 the quadrature's quality is a threshold of accuracy between the
-//                 primitive I and its numerical approximation I_n. Such threshold is set
-//                 to be within the machine-epsilon in double precision by default,
-//                 although more and less stringent constraints can be inserted. Once the
-//                 new set of nodes and weights have been computed, this function has the
-//                 purpose of optimising their floating-point representation to the 
-//                 least precise format possible that still allows to retain such
-//                 amount of final precision in the quadrature.
+//    DESCRIPTION: the method automatically selects the most optimised format possible
+//                 (between double and float128) to export the output results, i.e. the
+//                 transformed (new) quadrature nodes and weights, to reach the 
+//                 prescribed relative precision for the integration (e.g. double 
+//                 precision). The optimality here is meant as the f.p. format with lowest
+//                 precision that still allows to retain a machine-epsilon accuracy (we 
+//                 specified double-precision however the procedure is easily generalised
+//                 using the method's templatisation) for the relative error of the
+//                 integral computed using the monomial transformation quadrature rule.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -297,14 +289,14 @@ void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::
   const double ACC = 2*EPS;
   bool print_primitive = false;
   
-  float128 I34_new = computeQuadGl(std::get<0>(quad_params), std::get<1>(quad_params), muntz_sequence, coeff_sequence);
+  float128 I34_new = computeQuadRule(std::get<0>(quad_params), std::get<1>(quad_params), muntz_sequence, coeff_sequence);
   float128 E34_new = computeExactError(I34_new, muntz_sequence, coeff_sequence, print_primitive);
 
-  // Degrade G-L parameters to double
+  // Degrade quadrature parameters to double
   std::vector<double> double_nodes = castVector(std::get<0>(quad_params), std::numeric_limits<double>::epsilon());
   std::vector<double> double_weights = castVector(std::get<1>(quad_params), std::numeric_limits<double>::epsilon());
-  // Compute I_n(f) and E_n(f) with double precise G-L parameters
-  float128 I16_new = computeQuadGl(double_nodes, double_weights, muntz_sequence, coeff_sequence);
+  // Compute I_n(f) and E_n(f) with double precise quadrature parameters
+  float128 I16_new = computeQuadRule(double_nodes, double_weights, muntz_sequence, coeff_sequence);
   float128 E16_new = computeExactError(I16_new, muntz_sequence, coeff_sequence, print_primitive);
 
   if(fabs(E34_new - E16_new) <= ACC)
@@ -317,7 +309,7 @@ void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::
     std::vector<double> old_nodes = castVector(std::get<2>(quad_params), std::numeric_limits<double>::epsilon());
     std::vector<double> old_weights = castVector(std::get<3>(quad_params), std::numeric_limits<double>::epsilon());
     // Compute classical G-L quadrature with double format parameters
-    float128 I16_old = computeQuadGl(old_nodes, old_weights, muntz_sequence, coeff_sequence);
+    float128 I16_old = computeQuadRule(old_nodes, old_weights, muntz_sequence, coeff_sequence);
     float128 E16_old = computeExactError(I16_old, muntz_sequence, coeff_sequence, print_primitive);
     // Print on-screen quadrature results
     std::cout << std::setprecision(std::numeric_limits<double>::max_digits10)
@@ -349,7 +341,7 @@ void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::
             << std::endl;
   print_primitive = true;
   // Compute classical G-L quadrature with float128 format parameters
-  float128 I34_old = computeQuadGl(std::get<2>(quad_params), std::get<3>(quad_params), muntz_sequence, coeff_sequence);
+  float128 I34_old = computeQuadRule(std::get<2>(quad_params), std::get<3>(quad_params), muntz_sequence, coeff_sequence);
   float128 E34_old = computeExactError(I34_old, muntz_sequence, coeff_sequence, print_primitive);
   // Print on-screen quadrature results
   std::cout << std::setprecision(std::numeric_limits<double>::max_digits10)
@@ -383,24 +375,21 @@ template void optimiseData(std::tuple<std::vector<float128>, std::vector<float12
 //
 //       FUNCTION: exportNewData(optim_nodes, optim_weights, [I_new, E_new, I_old, E_old])
 //                
-//          INPUT: - optim_nodes = output of function 'computeParamsGl' optimised by
+//          INPUT: - optim_nodes = output of function 'computeQuadParams' optimised by
 //                                 'optimiseData'
-//                 - optim_weights = output of function 'computeParamsGl' optimised by
+//                 - optim_weights = output of function 'computeQuadParams' optimised by
 //                                 'optimiseData'
-//                 - [I_new, E_new, I_old, E_old] = values of the numerical quadrature
-//                                                  (I_new, I_old) and its relative
-//                                                  error (E_new, E_old) obtained with
-//                                                  the new samples provided by the 
-//                                                  monomial transformation quadrature 
-//                                                  rule and by the classical G-L 
-//                                                  samples (subscripts 'new' and
-//                                                  'old' respectively)
+//                 - [I_new, E_new, I_old, E_old] = values of the numerical quadratures
+//                                  (I_new, I_old) and relative errors (E_new, E_old)
+//                                  obtained using the nodes and weights provided 
+//                                  by the monomial transformation and classical G-L
+//                                  quadrature rules respectively.
 //
 //         OUTPUT: no outputs
 //
-//    DESCRIPTION: once the monomial transformation quadrature rule is completed data is
-//                 streamed in output text files located in the application's dir.
-//                 The output data is organised in three separate files:
+//    DESCRIPTION: once the monomial transformation quadrature rule is completed, data is
+//                 streamed in output and written to the appropriate text files. The data
+//                 is organised in three separate files:
 //                    - 'Results.txt' containins recap informations about the monomial
 //                      transformation quadrature rule such as the parameters of the map
 //                      (gamma), number of quadrature samples (n_min), etc...
@@ -428,7 +417,7 @@ void exportNewData(const std::vector<type>& nodes, const std::vector<type>& weig
           << "  (classical G-L quadrature rule)";
   Results.close();
 
-  // Write Nodes.txt file containing transformed G-L nodes using the monomial map
+  // Write Nodes.txt file containing the monomial transformation quadrature rule's nodes
   std::ofstream Nodes;
   Nodes.open("output/Nodes.txt");
   for(int k = 0; k <= nodes.size() - 1; k++)
@@ -438,7 +427,7 @@ void exportNewData(const std::vector<type>& nodes, const std::vector<type>& weig
   }
   Nodes.close();
 
-  // Write Weights.txt file containing transformed G-L weights using the monomial map
+  // Write Weights.txt file containing the monomial transformation quadrature rule's weights
   std::ofstream Weights;
   Weights.open("output/Weights.txt");
   for(int k = 0; k <= weights.size() - 1; k++)

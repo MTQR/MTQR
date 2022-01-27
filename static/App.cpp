@@ -24,8 +24,7 @@ int main()
     weights.push_back(loaded_value);
   }
   weights_txt.close();
-
-  // COMPUTE QUADRATURE LOADED NODES AND WEIGHTS
+  // COMPUTE QUADRATURE FROM LOADED NODES AND WEIGHTS
   float128 In = 0;
   for(int k=0; k < muntz_sequence.size(); k++)
   {

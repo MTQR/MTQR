@@ -31,7 +31,7 @@ $(OBJDIR)/VecOps.o: VecOps.cpp $(INCDIR)/*.h
 	$(CXX) -c $< -o $@ $(CXXFLAGS)
 
 $(OBJDIR)/MonMap.o:
-	cd $(SRCDIR) && $(MAKE)
+	cd $(BLDDIR) && $(MAKE)
 
 tools: ErrTools.cpp $(INCDIR)/Utils.h
 	$(CXX) -o Tools $< -lmpfr -I $(INCDIR)

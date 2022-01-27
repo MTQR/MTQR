@@ -2,7 +2,7 @@
 // File:      include/Utils.h
 //
 // Library:   QUASIMONT-QUAdrature of SIngular polynomials using MONomial Transformations:
-//                      a C++ library for high precision integration of singular 
+//                      a C++ library for high precision integration of generalised 
 //                      polynomials of non-integer degree
 //
 // Authors:   Guido Lombardi, Davide Papapicco
@@ -16,7 +16,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-// (SEE LINES 18~30 IN 'utilities/VecOps.cpp') Returns the float128 input vector in a type specified by the instatiantiation
+// (SEE LINES 18~30 IN 'utilities/VecOps.cpp') Returns the float128 input vector in a type specified by the instantiation
 template<typename type>
 std::vector<type> castVector(const std::vector<float128>& input_vector, const type& type_infer);
 

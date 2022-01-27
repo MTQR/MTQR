@@ -55,8 +55,8 @@ template std::vector<double> castVector<double>(const std::vector<float128>& inp
 //
 //    DESCRIPTION: This method takes two input vectors of the same length n, sorts
 //                 their element-wise multiplication in a new vector with cells
-//                 arranged in ascending order and sums them thereby assuring that no 
-//                 numerical cancellation occurs.
+//                 arranged in ascending order and sums them thereby limiting numerical
+//                 cancellation errors.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 

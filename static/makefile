@@ -3,4 +3,4 @@ default: App.o
 	./App
 
 App.o: App.cpp
-	g++  -c App.cpp -o App.o -ansi -std=c++17 -I../include
+	g++  -c App.cpp -o App.o -ansi -std=c++17 -I../include #-fext-numeric-literals
