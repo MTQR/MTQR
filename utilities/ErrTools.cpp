@@ -89,18 +89,18 @@ std::vector<float50> linspacedVector(const float50& start_type, const float50& e
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-template<typename type>
-type aPrioriAsympEstimate(const type& lambda, const int& num_nodes)
+template<typename T>
+T aPrioriAsympEstimate(const T& lambda, const int& num_nodes)
 {
-  type common_factor = 2*(pow(static_cast<type>(2.0),-(static_cast<type>(1.0)+lambda)));
-  type denominator = 2*num_nodes + lambda;
+  T common_factor = 2*(pow(static_cast<T>(2.0),-(static_cast<T>(1.0)+lambda)));
+  T denominator = 2*num_nodes + lambda;
 
-  type b1 = (boost::math::tgamma(static_cast<type>(2.0)*lambda, gamma_policy())*boost::math::tgamma(static_cast<type>(2.0*num_nodes) - lambda, gamma_policy()))/boost::math::tgamma(static_cast<type>(2.0)*lambda + static_cast<type>(2.0*num_nodes) - lambda, gamma_policy());
-  type b2 = (boost::math::tgamma(static_cast<type>(2.0)*lambda, gamma_policy())*boost::math::tgamma(static_cast<type>(2.0) + static_cast<type>(2.0*num_nodes) - lambda, gamma_policy()))/boost::math::tgamma(static_cast<type>(2.0)*lambda + static_cast<type>(2.0) + static_cast<type>(2.0*num_nodes) - lambda, gamma_policy());
+  T b1 = (boost::math::tgamma(static_cast<T>(2.0)*lambda, gamma_policy())*boost::math::tgamma(static_cast<T>(2.0*num_nodes) - lambda, gamma_policy()))/boost::math::tgamma(static_cast<T>(2.0)*lambda + static_cast<T>(2.0*num_nodes) - lambda, gamma_policy());
+  T b2 = (boost::math::tgamma(static_cast<T>(2.0)*lambda, gamma_policy())*boost::math::tgamma(static_cast<T>(2.0) + static_cast<T>(2.0*num_nodes) - lambda, gamma_policy()))/boost::math::tgamma(static_cast<T>(2.0)*lambda + static_cast<T>(2.0) + static_cast<T>(2.0*num_nodes) - lambda, gamma_policy());
 
-  type exact = common_factor*(pow(static_cast<type>(2.0), -lambda))*lambda*((b1/denominator) - b2/(2 + denominator));
+  T exact = common_factor*(pow(static_cast<T>(2.0), -lambda))*lambda*((b1/denominator) - b2/(2 + denominator));
   
-  if(lambda + static_cast<type>(0.5) - 2*num_nodes >= 0)
+  if(lambda + static_cast<T>(0.5) - 2*num_nodes >= 0)
   {
     return fabs(exact*boost::math::sin_pi(lambda));
   }
@@ -128,8 +128,8 @@ template float50 aPrioriAsympEstimate<float50>(const float50& input_lambda, cons
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-template<typename type>
-void plot(const int& num_nodes, const type& beta_min, const type& beta_max)
+template<typename T>
+void plot(const int& num_nodes, const T& beta_min, const T& beta_max)
 {
   std::cout << "\n\n *** Plotting the a-priori asymptotic error estimate with N=" << num_nodes << " ***" << std::endl;
   
@@ -139,7 +139,7 @@ void plot(const int& num_nodes, const type& beta_min, const type& beta_max)
   std::ofstream epsilon;
   std::string epsilon_file = "./estimate/Epsilon.csv";
   epsilon.open(epsilon_file.c_str());
-  epsilon << std::setprecision(std::numeric_limits<type>::max_digits10) << print_startpoint << "," << EPS << "\n" << print_endopoint << "," << EPS;
+  epsilon << std::setprecision(std::numeric_limits<T>::max_digits10) << print_startpoint << "," << EPS << "\n" << print_endopoint << "," << EPS;
   epsilon.close();
 
   std::string csv = ".csv";
@@ -148,11 +148,11 @@ void plot(const int& num_nodes, const type& beta_min, const type& beta_max)
   error.open(error_file);
 
   int n_samples = (beta_max - beta_min)*100;
-  std::vector<type> lambda = linspacedVector(static_cast<type>(print_startpoint), static_cast<type>(print_endopoint), n_samples);
+  std::vector<T> lambda = linspacedVector(static_cast<T>(print_startpoint), static_cast<T>(print_endopoint), n_samples);
 
   for(int k = 0; k < n_samples - 2; k++)
   {
-    error << std::setprecision(std::numeric_limits<type>::max_digits10) << lambda[k+1] << "," << aPrioriAsympEstimate(lambda[k+1], num_nodes) << "\n";
+    error << std::setprecision(std::numeric_limits<T>::max_digits10) << lambda[k+1] << "," << aPrioriAsympEstimate(lambda[k+1], num_nodes) << "\n";
     printProgressBar(k, n_samples - 2);
   }
 

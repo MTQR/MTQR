@@ -19,23 +19,23 @@
 //
 //       FUNCTION: output_vector = castVector(input_vector, type_output)
 //                
-//          INPUT: - input_vector = vector of length n of type of type T1
-//                 - type_output = floating-point data-type T2
+//          INPUT: - input_vector = vector of length n of type of type float128
+//                 - type_output = floating-point templatised type T
 //
-//         OUTPUT: - output_vector = input_vector casted in type T2
+//         OUTPUT: - output_vector = input_vector casted in type T
 //
-//    DESCRIPTION: this method casts the T1=float128 input vector to the an output vector
-//                 with the same content but type T2 specified by the user.
+//    DESCRIPTION: this method casts the float128 input vector to the an output vector
+//                 with the same content but type T specified by the user.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-template<typename type>
-std::vector<type> castVector(const std::vector<float128>& input_vector, const type& type_infer)
+template<typename T>
+std::vector<T> castVector(const std::vector<float128>& input_vector, const T& type_infer)
 {
-  std::vector<type> output_vector;
+  std::vector<T> output_vector;
   for(int k=0; k < input_vector.size(); k++)
   {
-    output_vector.push_back(static_cast<type>(input_vector[k]));
+    output_vector.push_back(static_cast<T>(input_vector[k]));
   }
   return output_vector;
 }
@@ -60,8 +60,8 @@ template std::vector<double> castVector<double>(const std::vector<float128>& inp
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-template<typename type>
-float128 doubleDotProduct(const std::vector<float128>& f_values, const std::vector<type>& weights)
+template<typename T>
+float128 doubleDotProduct(const std::vector<float128>& f_values, const std::vector<T>& weights)
 {
 
   // Create vector storing the values of the projection of one input vector onto the other

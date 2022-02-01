@@ -46,8 +46,8 @@ tools:
 	cd $(UTLDIR) && $(MAKE) $@
 
 clean:
-	rm -f $(OBJDIR)/Main.o Test
-	if [ -d "output" ]; then rm -r output; fi 
+	rm -f $(OBJDIR)/Main.o Test outputs.txt
+	if [ -d "output" ]; then rm -r output; fi
 
 allclean:
 	$(MAKE) clean

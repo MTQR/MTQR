@@ -24,14 +24,14 @@
 //
 //         OUTPUT: - lambda_max = additional exponent of the new binomial
 //
-//    DESCRIPTION: there might be cases in which the user wants to integrate singular 
-//                 monomials rather than generalised polynomials. In those cases the 
+//    DESCRIPTION: there might be cases in which the user wants to integrate generalised 
+//                 monomials rather than the alike polynomials. In those cases the 
 //                 monomial transformation quadrature rule requires additional input to 
 //                 work properly. The library handles such case by either allowing the
 //                 user to manually input the exponent of the additional term (from the 
 //                 CLI) or by letting the user specify the number of nodes to be used.
 //                 In this last instance this method automatically computes the resulting
-//                 maximum exponent of the additional term (lambda_max) that the monomial
+//                 maximum exponent of an additional term (lambda_max) that the monomial
 //                 transformation quadrature rule can precisely integrate.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -129,38 +129,53 @@ double computeMapOrder(const std::vector<float128>& lambdas, const std::vector<f
   // Compute r as the linear interpolation between r_min and r_max
   float128 transf_order = ((static_cast<float128>(1.0) + betas[0])/(static_cast<float128>(1.0) + lambdas[0])+
                          (static_cast<float128>(1.0) + betas[1])/(static_cast<float128>(1.0) + lambdas[1]))/static_cast<float128>(2.0);
-  
-  // Print on-screen information
-  std::cout << std::setprecision(std::numeric_limits<float>::max_digits10)
-            << "\n ** Transformation order = "
-            << transf_order << " **"
-            << std::endl;
+  extern bool loud_mode;
+  if(loud_mode)
+  {
+    // Create output sub-directory
+    std::string mkdir = "mkdir -p ";
+    std::string output_dir = "output";
+    std::string results_dir = mkdir + output_dir;
+    system(results_dir.c_str());
 
-  // Output the results on text file
-  std::string mkdir = "mkdir -p ";
-  std::string output_dir = "output";
-  std::string results_dir = mkdir + output_dir;
-  system(results_dir.c_str());
+    // Print on-screen information
+    std::cout << std::setprecision(std::numeric_limits<float>::max_digits10)
+              << "\n ** Transformation order = "
+              << transf_order << " **"
+              << std::endl;
 
-  std::string results_file = output_dir + "/Results.txt";
-  std::ofstream results;
-  
-  results.open(results_file);
-  results << std::setprecision(std::numeric_limits<float>::max_digits10)
-          << "\nINPUTS:"
-          << "\n        lambda_min = "
-          << lambdas[0]
-          << "\n        lambda_max = "
-          << lambdas[1];
-  results << std::setprecision(std::numeric_limits<float>::max_digits10)
-          << "\n\nMONOMIAL MAP:"
-          << "\n        beta_min = "
-          << betas[0]
-          << "\n        beta_max = "
-          << betas[1]
-          << "\n        transformation order = "
-          << transf_order;
-  results.close();
+    // Output the results on text file
+    std::string results_file = output_dir + "/Results.txt";
+    std::ofstream results;
+    
+    results.open(results_file);
+    results << std::setprecision(std::numeric_limits<float>::max_digits10)
+            << "\nINPUTS:"
+            << "\n        lambda_min = "
+            << lambdas[0]
+            << "\n        lambda_max = "
+            << lambdas[1];
+    results << std::setprecision(std::numeric_limits<float>::max_digits10)
+            << "\n\nMONOMIAL MAP:"
+            << "\n        beta_min = "
+            << betas[0]
+            << "\n        beta_max = "
+            << betas[1]
+            << "\n        transformation order = "
+            << transf_order;
+    results.close();
+  }
+  else
+  {
+    std::ofstream Outputs;
+    Outputs.open("outputs.txt", std::ios_base::app);
+    Outputs << std::setprecision(std::numeric_limits<float128>::max_digits10)
+            << "Monomial Transformation Quadrature Rule:"
+            << "\n    lambda_min = "
+            << lambdas[0]
+            << "\n    lambda_max = "
+            << lambdas[1];
+  }
 
   return static_cast<double>(transf_order);
 }
@@ -188,14 +203,18 @@ double computeMapOrder(const std::vector<float128>& lambdas, const std::vector<f
 
 std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, std::vector<float128>> computeQuadParams(const double& r, const int& n_min)
 {
-  std::ofstream results;
-  results.open("output/Results.txt", std::ios_base::app);
+  extern bool loud_mode;
+  if(loud_mode)
+  {
+    std::ofstream results;
+    results.open("output/Results.txt", std::ios_base::app);
 
-  results << "\n\n OUTPUTS:"
-          << "\n        num. of nodes = "
-          << n_min;
+    results << "\n\n OUTPUTS:"
+            << "\n        num. of nodes = "
+            << n_min;
 
-  results.close();
+    results.close();
+  }
 
   std::vector<float128> new_nodes, new_weights, old_nodes, old_weights;
 
@@ -308,8 +327,8 @@ std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, 
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-template<typename type1, typename type2>
-float128 computeQuadRule(const std::vector<type1>& nodes,const std::vector<type1>& weights, std::vector<type2>& muntz_sequence, std::vector<type2>& coeff_sequence)
+template<typename T, typename U>
+float128 computeQuadRule(const std::vector<T>& nodes,const std::vector<T>& weights, std::vector<U>& muntz_sequence, std::vector<U>& coeff_sequence)
 {
   // The quadrature rule retains the same precision as the input nodes and weights with which it is computed
   float128 In = static_cast<float128>(0.0);
@@ -358,9 +377,10 @@ template float128 computeQuadRule<double, double>(const std::vector<double>& nod
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-template<typename type>
-float128 computeExactError(const float128& In, std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence, bool& print_primitive)
+template<typename T>
+float128 computeExactError(const float128& In, std::vector<T>& muntz_sequence, std::vector<T>& coeff_sequence, bool& print_primitive)
 {
+  extern bool loud_mode;
   float128 I = static_cast<float128>(0.0);
   // Computing the definite integral of each monomial in [0,1]
   for(int k=0; k < muntz_sequence.size(); k++)
@@ -369,7 +389,7 @@ float128 computeExactError(const float128& In, std::vector<type>& muntz_sequence
     I += static_cast<float128>(coeff_sequence[k])/(static_cast<float128>(muntz_sequence[k]) + static_cast<float128>(1.0));
   }
   // Compute and return the exact a-posteriori remainder of the quadrature formula
-  if(print_primitive)
+  if(print_primitive && loud_mode)
   {
      std::cout << std::setprecision(std::numeric_limits<double>::max_digits10)
                << " ** I(p(x))   = "

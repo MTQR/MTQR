@@ -27,7 +27,7 @@ std::tuple<int, std::vector<float128>> streamMonMapData(const int& comp_num_node
 template<typename type>
 void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, std::vector<float128>>& quad_params, std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence);
 
-// (SEE LINES 374~399 IN 'src/DatIo.cpp') Computes and exports the transformed weights and nodes aling with other ouputs
+// (SEE LINES 374~399 IN 'src/DatIo.cpp') Computes and exports the transformed weights and nodes along with other ouputs
 template<typename type>
 void exportNewData(const std::vector<type>& nodes, const std::vector<type>& weights, const std::vector<float128>& output_data);
 

@@ -37,5 +37,13 @@ int main()
   }
   // PRINT COMPUTED QUADRATURE
   std::cout << "\n\n ** I_n(p(x)) = " << In << "  [with reloaded parameters in double precision] **" << std::endl;
+
+  // EXECUTE QUASIMONT IN SILENT MODE
+  std::cout << "\n    Executing QUASIMONT's silent mode..." << std::endl;
+  double lambda_min = static_cast<double>(-1/E);
+  double lambda_max = static_cast<double>(1.0/2.0);
+  std::vector<std::vector<double>> array = quasimont(lambda_min, lambda_max);
+  std::cout << "    Done!" << std::endl;
+
   return 0;
 }

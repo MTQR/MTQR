@@ -32,7 +32,7 @@ std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, 
 template<typename type1, typename type2>
 float128 computeQuadRule(const std::vector<type1>& nodes, const std::vector<type1>& weights, std::vector<type2>& muntz_sequence, std::vector<type2>& coeff_sequence);
 
-// (SEE LINES 337~359 IN 'src/MonMap.cpp') Computes the a-posteriori relative error of the quadrature rule In
+// (SEE LINES 337~359 IN 'src/MonMap.cpp') Computes the a-posteriori relative error of the quadrature rule
 template<typename type>
 float128 computeExactError(const float128& In, std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence, bool& print_primitive);
 
