@@ -1,18 +1,3 @@
-#---------------------------------------------------------------------------------------
-# File:      test/makefile
-#
-# Library:   QUASIMONT-QUAdrature of SIngular polynomials using MONomial Transformations:
-#                      a C++ library for high precision integration of singular 
-#                      polynomials of non-integer degree
-#
-# Authors:   Guido Lombardi, Davide Papapicco
-#
-# Institute: Politecnico di Torino
-#            C.so Duca degli Abruzzi, 24 - Torino (TO), Italia
-#            Department of Electronics and Telecommunications (DET)
-#            Electromagnetic modelling and applications Research Group
-#---------------------------------------------------------------------------------------
-
 CXX = g++
 
 BLDDIR = ../build
@@ -23,7 +8,7 @@ OBJDIR = $(BLDDIR)/obj
 
 OBJ = $(OBJDIR)/Main.o $(OBJDIR)/Quasimont.o $(OBJDIR)/VecOps.o
 
-CXXOPTIONS = -ansi -std=c++17
+CXXOPTIONS = -ansi -std=c++17 #-fext-numeric-literals
 CXXFLAGS = $(CXXOPTIONS) -I $(INCDIR)
 
 LDLIBS = -lm -lquadmath -lgsl -lgslcblas

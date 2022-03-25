@@ -1,8 +1,6 @@
 \documentclass[a4paper, twosided]{book}
 \usepackage{CustomStyle}
 
-\newcommand{\llll}[1]{\textcolor{red}{(GL: #1)}}
-
 \begin{document}
 
 \title{}
@@ -41,17 +39,26 @@
 \chapter[Preliminaries]{\Huge \ttfamily PRELIMINARIES}\chaptermark{PRELIMINARIES}
 %\ThisULCornerWallPaper{0.35}{images/TransparentLogo.png}
 
-This user manual provides a detailed description of the functionalities, correct installation and usage of the open-source C++ library QUASIMONT. Users of the library can refer to the following content for setting and executing the code as a stand alone package generating specialised quadrature rules for sets of generalised polynomials or by integrating it in their custom application for more flexibility as additional codes or static library. The principles behind the implementation of the library are discussed in the first chapter, followed by instructions for correctly building and running the library in a Linux distribution (outlined in the second and third chapter). The concluding chapter describes its inner workings and implementation. Being a mathematical software, a solid grasp of various topics in mathematical and numerical analysis is an advantage for the user to exploit the library to its fullest capability. In the second section of this chapter we provide a brief coverage on some of those concepts such as interpolatory quadrature formulae, Gaussian quadrature and asymptotic error estimation which are required for users that are not familiar with the aforementioned topics. Those are followed by the introduction of monomial transformation and its properties for quadrature of singular functions. This overview is far from complete and self-contained, and we direct to \cite{Lombardi09, Lombardi21}, and references therein, as the primary sources for a thorough theoretical exposition on the mathematical foundations of QUASIMONT.
+This user manual provides a detailed description of the functionalities, correct installation and usage of the open-source C++ library QUASIMONT. Users of the library can refer to the following content for setting and executing the code as its own package generating specialised quadrature rules for sets of generalised polynomials or by integrating it in external custom application. The principles behind the implementation of the library are discussed in this first chapter, followed by instructions for correctly building and running the library in a Linux distribution (outlined in the second and third chapter) and finally by a concluding chapter that briefly describes each of its modules. QUASIMONT offers its users a high degree of flexibility concerning its usage and interaction, specifically:
+\begin{itemize}
+    \item it can be compiled and executed either as a stand-alone software implementing high-precision quadrature rules (see Section \ref{Sec2.4} and \ref{Sec3.1}) or by instantiating its functionalities in external code (see Section \ref{Sec3.2});
+    \item it provides two {\itshape modes} of execution (namely the {\itshape loud} and {\itshape silent} modes) by limiting the terminal's output information and streaming out the results of its execution (see Section \ref{Sec3.2});
+    \item it can be integrated as an accessory tool in any C++ third-party application by linking the compiled code to its static library (see Section \ref{Sec3.3});
+    \item it can be deployed as a supporting utility to generate, export and manipulate the new optimised samples and weights for a given generalised polynomial (see Section \ref{Sec3.3} and \ref{Sec3.4}).
+\end{itemize}
+Being a mathematical software, a solid grasp of various topics in mathematical and numerical analysis is an advantage for the user to exploit the library to its fullest capability. In the second section of this chapter we provide a brief coverage on some of those concepts such as interpolatory quadrature formulae, Gaussian quadrature and asymptotic error estimation which are required for users that are not familiar with the aforementioned topics. Those are followed by the introduction of the monomial transformation, constituting the innovative core of the library, and its properties for quadrature of singular functions. This overview is far from complete and self-contained, and we direct to \cite{Lombardi09, Lombardi21}, and references therein, as the primary sources for a thorough theoretical exposition on the mathematical foundations of QUASIMONT.
 
 \section[Overview]{\changefont OVERVIEW}\sectionmark{OVERVIEW}\label{Sec1.1}
 
 \noindent
-As the name suggests, QUASIMONT provides a framework for the high-precision numerical computation of singular (definite) integrals whose integrands are generalised polynomials, i.e. whose monomial terms have non-integer degree. First and foremost one has to understand the motivation for such library to exist, in order to effectively decide whether or not its usage is necessary for her/his own application. Different techniques have been proposed to numerically approximate singular integrals however the accuracy of their performances is limited by their computational cost, effectively reducing their applications to canonical cases. We wrote QUASIMONT with the aim of helping the user when both generalized singular polynomials and high precision quadrature are a requirement (examples are outlined in the opening section of \cite{Lombardi21}) thus avoiding to compromise between accuracy and time of execution. The algorithm that stands at the core of the library is based on the error estimation for the Gauss-Legendre (G-L) quadrature rule applied to generalised monomials and on the ad-hoc numerical manipulation of the integration parameters (discussed in the following sections) that depends on the characteristics of the generalised polynomial to be integrated. The combination of those strategies results in an optimized \color{poliDarkBlue} \textbf{monomial transformation quadrature rule} \color{black} that achieves precise numerical integration of singular, generalised polynomials. The background theory of the method refers to \cite{Lombardi09} while the algorithm paper \cite{Lombardi21} reports the automatised implementation and performance of the library. The monomial transformation quadrature rule is a result of the application of a novel exact asymptotic error estimate for the G-L quadrature formula introduced in \cite{Lombardi09} that shows the potentialities of the G-L quadrature to integrate generalized polynomials composed by monomials of non-integer degree. Specifically the new estimate shows the same \color{poliDarkBlue} \textbf{degree of precision} \color{black} of the G-L quadrature formula when applied to generalised polynomials: this characteristics allows to define a  target relative error for sets of generalised monomials (see IEEE floating-point formats' machine-epsilon in Table \ref{table1.1}). Moreover, it enables the extension of the quadrature capability  \color{poliDarkBlue} \textbf{(range of validity)} \color{black} through the use of monomial transformations applied to arbitrary generalised polynomials of non-integer degree and in particular to those characterised by an end-point singularity in the integration interval. We want to emphasize these features of QUASIMONT right at the start of this user manual so that the user has a clear understanding of the contexts in which it becomes necessary. In fact, as we show in the test drivers section (see Section \ref{Sec2.4}), QUASIMONT significantly outperforms classical G-L quadrature for polynomials whose exponents' sequence is composed of either rational or irrational numbers (henceforth referred to as \color{poliDarkBlue} \textbf{Müntz sequence} \color{black}, see Sub-Section \ref{SubSec1.2.4}). To consistently achieve such performance, our package implements a routine based on the following fundamental steps (discussed in more detail in the following Chapter):
+As the name suggests, QUASIMONT provides a framework for the high-precision numerical computation of singular (definite) integrals whose integrands are generalised polynomials, i.e. whose monomial terms have non-integer degree. First and foremost one has to understand the motivation for such library to exist, in order to effectively decide whether or not its usage is necessary for her/his own application. Different techniques have been proposed to numerically approximate singular integrals however the accuracy of their performances is limited by their computational cost, effectively reducing their applications to canonical cases. We wrote QUASIMONT with the aim of helping the user when both generalized singular polynomials and high precision quadrature are a requirement (examples are outlined in the opening section of \cite{Lombardi21}) thus avoiding to compromise between accuracy and time of execution. The pivot algorithm around which the library has been built (i.e. the monomial transformation) has its roots in the relative error estimation of the Gauss-Legendre (G-L) quadrature rule and on the ad-hoc numerical manipulation of the integration parameters (discussed in the following sections) according to the characteristics of the generalised polynomial to be integrated. The combination of those strategies results in an optimized \color{poliDarkBlue} \textbf{monomial transformation quadrature rule} \color{black} that achieves precise numerical integration of singular, generalised polynomials. The background theory of the method refers to \cite{Lombardi09} while the work in \cite{Lombardi21} reports the automatised implementation and performance of the library. The monomial transformation quadrature rule is a result of the application of a novel exact asymptotic error estimate of the G-L quadrature rules introduced in \cite{Lombardi09} that shows the potentialities of such formulae to integrate generalized polynomials composed by monomials of non-integer degree. Specifically the new estimate shows the same \color{poliDarkBlue} \textbf{degree of precision} \color{black} of the G-L quadrature formula when applied to generalised polynomials: this characteristics allows to define a  target relative error for sets of generalised monomials (see IEEE floating-point formats' machine-epsilon in Table \ref{table1.1}). Moreover, it enables the extension of the quadrature capability  \color{poliDarkBlue} \textbf{(range of validity)} \color{black} through the use of monomial transformations applied to arbitrary generalised polynomials of non-integer degree and in particular to those characterised by an end-point singularity in the integration interval. We want to emphasize these features of QUASIMONT right at the start of this user manual so that the user has a clear understanding of the contexts in which it becomes necessary. In fact, as shown in the test drivers (see Section \ref{Sec2.4}), QUASIMONT significantly outperforms the classical G-L quadrature rule for polynomials whose exponents' sequence is composed of either rational or irrational numbers (henceforth referred to as \color{poliDarkBlue} \textbf{Müntz sequence} \color{black}, see Sub-Section \ref{SubSec1.2.4}). To consistently achieve such performance, our package implements a routine based on the following fundamental steps (discussed in more detail in the second chapter of this manual):
 \begin{enumerate}
     \item select a fixed threshold for the relative error of the integration rule (e.g. the machine-epsilon in IEEE double precision);
     \item exploit the in-depth error estimation of the G-L quadrature to determine the lower and upper bound for the degrees associated to generalised monomials whose quadrature is within the prescribed relative error;
     \item design the monomial transformation to generate a quadrature rule that obtains the specified relative precision on a family of selected generalized polynomials.
 \end{enumerate}
+
+Whilst QUASIMONT allows for the integration of monomials and polynomials of integer degree, we remark that these integrands are not the cases for which the library was written nor its execution is necessary to achieve accurate results (interpolatory classical and generalised Gaussian rules do suffice). Indeed, the core aim of the library is the efficient and precise integration of generalised polynomials where other techniques may require heavy computational cost at run-time \cite{Gautschi94} or may result in extremely specialized quadratures \cite{Ma1996,Milovanovic2015}. QUASIMONT is entirely written in C++17; beside the speed and versatility of the language, the primary motivation behind such choice was the accessibility to other open-source packages (see Section \ref{Sec2.1}). These packages are essential for the implementation of different routines since they extract fundamental information for the precise quadrature of singular integrals. One such example is the ability of handling operations in \textsl{higher-than-double} floating-point arithmetic (e.g. IEEE quadruple floating-point format or higher, see Table \ref{table1.1} below), provided in the \color{poliDarkBlue} \textbf{Boost's Multiprecision} \color{black} library, without which the precise computation of the quadrature parameters and the quadrature itself, for the most computationally demanding cases, would have not been possible. QUASIMONT implements methods that suit a very specific demand in numerical analysis so we used a procedural/modular approach in its writing (as opposed to an object-oriented paradigm) in which all the different functions interact through the \colorbox{poliGrayBlue}{quasimont} \color{black} module (see Section \ref{Sec2.1} and \ref{Sec2.2}).
 
 \begin{table}[H]
 \centering
@@ -68,13 +75,11 @@ As the name suggests, QUASIMONT provides a framework for the high-precision nume
 \textbf{real max}                    & 3.4028 e+38 & 1.7977 e+308 & 1.190 e+4932 \\
 \hline
 \end{tabular}
-  \caption{Some parameters of the most common floating-point formats specified by the IEEE 754 standard \cite{IEEE754}}
+  \caption{Some parameters of the most common floating-point formats specified by the IEEE 754 standard \cite{IEEE754}.}
   \label{table1.1}
 \end{table}
 
-\noindent
-Whilst QUASIMONT allows for the integration of monomials and polynomials of integer degree, we remark that these integrands are not the cases for which the library was written nor its execution is necessary to achieve accurate results (interpolatory classical and generalised Gaussian rules will suffice). Indeed, the core aim of the library is the efficient and precise integration of generalised polynomials where other techniques may require heavy computational cost at run-time \cite{Gautschi94} or may result in extremely specialized quadratures \cite{Ma1996,Milovanovic2015}. QUASIMONT is entirely written in C++17; beside the speed and versatility of the language, the primary motivation behind such choice was the accessibility to other open-source packages (see Section \ref{Sec2.1}). These packages are essential for the implementation of different routines since they extract fundamental information for the precise quadrature of singular integrals. One such example is the ability of handling operations in \textsl{higher-than-double} floating-point arithmetic (e.g. IEEE quadruple floating-point format or higher, see Table \ref{table1.1}), provided in the \color{poliDarkBlue} \textbf{Boost's Multiprecision} \color{black} library, without which the precise computation of the quadrature parameters and the quadrature itself, for the most computationally demanding cases, would have not been possible. QUASIMONT implements methods that suit a very specific demand in numerical analysis so we used a procedural programming with modules approach in its writing (as opposed to an object-oriented paradigm) in which all the different functions interact through the \colorbox{poliGrayBlue}{quasimont} \color{black} module (see Section \ref{Sec2.1} and \ref{Sec2.2}).
-
+\newpage
 \section[Mathematical background]{\changefont MATHEMATICAL BACKGROUND}\sectionmark{MATHEMATICAL BACKGROUND}\label{Sec1.2}
 
 \noindent
@@ -96,7 +101,7 @@ However, there are applications of numerical methods in various computational sc
 
 \subsection[Interpolatory quadrature]{\changefont INTERPOLATORY QUADRATURE}\label{SubSec1.2.1}
 
-We let $f:(a,b)\to\mathbb{R}$ be any function; we want to compute $I(f)$ although unfortunately its primitive is not known. One solution is to substitute the function with a polynomial interpolating some of its values at sampled point, called \color{poliDarkBlue} \textbf{nodes} \color{black}. Such nodes constitute a finite, countable set $\mathcal{I}_h:=\{x_1\,,\;x_2\,,\;\dots\,,\;x_{n}\}$ which can be thought as a discretisation of the original domain of integration $(a,b)$. The cardinality of such set is  $n$ and it is linked to the degree of the polynomial interpolating $f(x)$; in particular such degree will be $n-1$ (i.e. the degree is always equal to the number of nodes minus $1$). The interpolating polynomial $\mathbb{P}_{n-1}\ni\mathcal{L}_{n-1}(x):=\sum_{j=1}^{n}\ell_j(x)f(x_j)$ is expressed in terms of the \color{poliDarkBlue} \textbf{Lagrangian basis} \color{black} whose generators $\ell_j(x)\in\mathbb{P}_{n-1}$ are also polynomials of the same degree $n-1$. We will not address the theoretical aspects of Lagrangian interpolation and approximation theory since the user may refer to the classical literature about the topic. We can now express the integrand through an approximating polynomial of degree $n-1$
+We let $f:(a,b)\to\mathbb{R}$ to be an arbitrarily regular function; we want to compute $I(f)$ although unfortunately its primitive is not known. One solution is to substitute the function with a polynomial interpolating some of its values at sampled point in $(a,b)$, called \color{poliDarkBlue} \textbf{nodes}\color{black}. Such nodes constitute a finite, countable set $\mathcal{I}_h:=\{x_1\,,\;x_2\,,\;\dots\,,\;x_{n}\}$ which can be thought as a discretisation of the original domain of integration $(a,b)$. The cardinality of such set is  $n$ and it is linked to the degree of the polynomial interpolating $f(x)$; in particular such degree is $n-1$ (i.e. the degree is always equal to the number of nodes minus $1$). The interpolating polynomial $\mathbb{P}_{n-1}\ni\mathcal{L}_{n-1}(x):=\sum_{j=1}^{n}\ell_j(x)f(x_j)$ is expressed in the \color{poliDarkBlue} \textbf{Lagrangian basis} \color{black} whose generators $\ell_j(x)\in\mathbb{P}_{n-1}$ are also polynomials of the same $n-1$ degree. We will not address the theoretical aspects of Lagrangian interpolation and approximation theory since the user may refer to the classical literature about the topic. We can now express the integrand through an approximating polynomial of degree $n-1$
 
 \begin{equation}\label{eq1.3}
     f(x) = \mathcal{L}_{n-1}(x) + E^{'}_n(f) = \sum_{j=1}^{n}\ell_j(x)f(x_j) + E^{'}_n(f)\,\quad x_j\in\mathcal{I}_h\,,\;\forall j=1,...,n
@@ -105,7 +110,7 @@ We let $f:(a,b)\to\mathbb{R}$ be any function; we want to compute $I(f)$ althoug
 \color{black}
 
 \noindent
-By substituting (\ref{eq1.3}) in (\ref{eq1.1}) we obtain an approximation of the initial integral known as an \color{poliDarkBlue} \textbf{interpolatory quadrature} \color{black}
+By substituting (\ref{eq1.3}) in (\ref{eq1.1}) we obtain an approximation of the initial integral known as an \color{poliDarkBlue} \textbf{interpolatory quadrature formula} \color{black}
 
 \begin{equation}\label{eq1.4}
     I(f) = \int_a^b (\mathcal{L}_{n-1}(x) + E^{'}_n(f))\,dx = \sum_{j=1}^{n}f(x_j)\int_a^b \ell_j(x)\,dx + \int_a^b E^{'}_n(x) = \sum_{j=1}^{n}w_j\,f(x_j) + E_n(f)
@@ -117,65 +122,71 @@ where we define the \color{poliDarkBlue} \textbf{weights} \color{black} $w_j$ of
 \subsection[Gaussian quadrature formulae]{\changefont GAUSSIAN QUADRATURE FORMULAE}\label{SubSec1.2.2}
 
 One of the main issues with numerical integration using interpolatory quadratures is the selection of the nodes' distribution. The simplest case is the uniformly distributed partition 
-$\mathcal{I}_h =\big\{x_j = a + (j-1)\,h\,,\;h:=\frac{b-a}{n}\big\}_{j=1,...,n}$ which results in the \color{poliDarkBlue} \textbf{Newton-Cotes quadrature formula}\color{black}. As reported in the classical literature, better choices for such distribution, depending on the properties and behaviour of $f(x)$, are available. In particular the \color{poliDarkBlue} \textbf{Gaussian quadrature formula} \color{black} is one where each of the nodes corresponds to the root of an orthogonal polynomial. To introduce these approximations we now let the integrand to be an arbitrarily regular function
+$\mathcal{I}_h =\big\{x_j = a + (j-1)\,h\,,\;h:=\frac{b-a}{n}\big\}_{j=1,...,n}$ which results in the \color{poliDarkBlue} \textbf{Newton-Cotes quadrature formula}\color{black}. As reported in the classical literature, better choices for such distribution, depending on the properties and behaviour of $f(x)$, are available. In particular the \color{poliDarkBlue} \textbf{Gaussian quadrature formula} \color{black} is one where each of the nodes uniquely corresponds to the root of an orthogonal polynomial. To introduce these approximations we now let the integrand to be an arbitrarily regular function
 
 \begin{equation}\label{eq1.5}
     \mathcal{C}^m[\mathcal{I}]\ni f(x) = w(x)g(x)\,,\quad m\in\mathbb{N}
 \end{equation}
 
 \noindent
-where the factorised $g(x)$ always contains its most regular part whereas $w(x)$, known as the \color{poliDarkBlue} \textbf{weight function} \color{black} contains, if present, any irregular (non polynomial) and/or singular part of $f(x)$. Now if the weight function is not null everywhere in $(a,b)$ and we can find an infinite sequence of classical polynomials $P:=\big\{p_j(x)\in\mathbb{P}_j\big\}_{j=0,1,...}$ s.t.
+where the factorised $g(x)$ always contains its most regular part whereas $w(x)$, known as the \color{poliDarkBlue} \textbf{weight function} \color{black} contains, if present, any irregular and/or singular part of $f(x)$. If the weight function is not null everywhere in $(a,b)$ and we can find an infinite sequence of classical polynomials $P:=\big\{p_j(x)\in\mathbb{P}_j\big\}_{j=0,1,...}$ s.t.
 
 \begin{equation}\label{eq1.6}
     \int_a^b w(x)p_j(x)p_k(x)\,dx = \alpha_{jk}\delta_{jk}\,,\quad\forall p_j\,,\;p_k\in P
 \end{equation}
 
 \noindent
-where $\delta_{jk}$ is the Kronecker delta, then $P$ represents a \color{poliDarkBlue} \textbf{system of orthogonal polynomials} \color{black} w.r.t. the specified weight function $w(x)$. Any Gaussian quadrature formula built on  $n$ nodes is exact for any classical polynomial integrand $g(x)$ of degree $\alpha\leq 2n-1$. It is therefore easy to see why Gaussian quadrature is normally preferred over Newton-Cotes formulae for the numerical integration when dealing with regular functions. Although Gaussian quadrature allows the exact integration with respect to a limited number of weight functions, they have been generalised using refined approximations and numerical effort \cite{Gautschi94}. QUASIMONT integrates generalised polynomials which are extensively used in modelling several cases of particular relevance and interest in mathematical and scientific computing, as mentioned above. The simplest and arguably most widely used Gaussian quadrature rule is the Gauss-Legendre (G-L) formula. With the G-L quadrature rule the sequence $P$ is made of \color{poliDarkBlue} \textbf{Legendre's polynomials} \color{black} which are orthogonal with respect to the constant weight function $w(x)=1$. Usually the reference interval to define the quadrature rule is $(a=-1\,,\;b=+1)$.
+where $\delta_{jk}$ is the Kronecker delta, then $P$ represents a \color{poliDarkBlue} \textbf{system of orthogonal polynomials} \color{black} w.r.t. the specified weight function $w(x)$. Any Gaussian quadrature formula built on  $n$ nodes is exact for any classical polynomial integrand $g(x)$ of degree $\alpha\leq 2n-1$. It is therefore easy to see why Gaussian quadrature is normally preferred over Newton-Cotes formulae for the numerical integration when dealing with regular functions. Although Gaussian quadrature allows the exact integration with respect to a limited number of weight functions, throughout the years they have been generalised using refined approximations and numerical efforts \cite{Gautschi94}. QUASIMONT integrates generalised polynomials which are extensively used in modelling several cases of particular relevance and interest in mathematical modelling and scientific computing, as mentioned above. The simplest and arguably most widely used Gaussian quadrature rule is the Gauss-Legendre (G-L) formula, for which the sequence $P$ is made of \color{poliDarkBlue} \textbf{Legendre's polynomials} \color{black} that are orthogonal w.r.t. the constant weight function $w(x)=1$ over the interval $(a=-1\,,\;b=+1)$.
 
 \subsection[Asymptotic error estimation]{\changefont ASYMPTOTIC ERROR ESTIMATION \color{black}}\label{SubSec1.2.3}
 
-This subsection analyzes the accuracy of G-L quadrature formula with $n$ nodes. As reported in the previous sub-sections,  if $f(x)\in\mathbb{P}_k\,,\;k\in\mathbb{N}$ we have $E_n(f)=0$ for $k\leq2n-1$.  
-In the study of the performance of a scientific numerical algorithm  is often more appropriate to define and use an a-posteriori (actual) relative error associated to the approximating techniques, rather than an {\itshape absolute} one. For the specific case of the numerical integration of an arbitrary function $f(x)$ via G-L quadrature we have
+This subsection analyzes the accuracy of the G-L quadrature formula with $n$ nodes. As reported in the previous sub-sections, if $f(x)\in\mathbb{P}_k\,,\;k\in\mathbb{N}$ we'd have $E_n(f)=0,\,\forall k\leq2n-1$.  
+In analysing the performance of a numerical algorithm it is often more appropriate to define and use an a-posteriori (actual) relative error associated to the approximating techniques, rather than an {\itshape absolute} one s.a. the remainder $E_n(f)$. For the specific case of the numerical integration of an arbitrary function $f(x)$, via a G-L formula, we have
 \begin{equation}\label{eq1.7}
-    R_n^{(a)}(f) = \frac{|I(f)-I_h(f)|}{|I(f)|}\,,\quad I_h(f):=\sum_{j=1}^{n}w_j\,f(x_j)
+    R_n^{(a)}(f) = \frac{|I(f)-I_n(f)|}{|I(f)|}\,,\quad I_n(f):=\sum_{j=1}^{n}w_j\,f(x_j)
 \end{equation}
 \noindent
 where the sequence of pairs $\{(x_j,w_j)\}_{j=1,...,n}$ is the set of nodes and weights of the G-L quadrature rule. In those cases, where the performance of the quadrature rule, in terms of the associated relative error, needs to be known a priori, we must refer to an estimate of (\ref{eq1.7}) 
 \begin{equation}\label{eq1.8}
     R_n(f) = \frac{|E_n(f)|}{|I(f)|} \sim R_n^{(a)}
 \end{equation}
-where $E_n(f)$ is the estimated reminder of the quadrature rule. In \cite{Lombardi09}, one of the author of the present work, derived a closed form a-priori error asymptotic estimation of $E_n(f)$ for a G-L formula applied to a monomial term $f(x)=x^\lambda,\, \lambda>-1$
+where $E_n(f)$ is the estimated reminder of the quadrature rule. In \cite{Lombardi09}, one of the authors of the present work, derived a closed form a-priori error asymptotic estimation of $E_n(f)$ for a G-L formula applied to a monomial term $f(x)=x^\lambda,\, \lambda>-1$
 \begin{equation}\label{eq1.9}
     E_n(x^\lambda) = -2^{-2\lambda}\,\lambda\,\bigg(\frac{B(2\lambda,2n-\lambda)}{2n+\lambda} - \frac{B(2\lambda, 2+2n-\lambda)}{2+2n+\lambda}\bigg)
 \end{equation}
 \noindent
-where $B(z,w):=\frac{\Gamma(z)\Gamma(w)}{\Gamma(z+w)}$ is the Euler's Beta function. This result is important for the development of an ad-hoc quadrature rule whose error can be computed a-priori for any possible integrand function (see Sub-Section 3.3 in \cite{Lombardi21} and references therein). In particular, given a specified number of quadrature nodes $n$, we can clearly see in Figure \ref{Fig1.1} how the a priori relative error estimate $R_n(x^\lambda)$ behaves asymptotically with $\lambda$. For instance we immediately notice that the value of $R_n(f)$ for $n$ samples is below a pre-determined arbitrary precision (in terms of relative error) within a specific, finite range of values of $\lambda$ which we identify as $(\lambda_{min},\lambda_{max})\subset(-1,+\infty)$. In practice we consider a finite-arithmetic threshold that we can specify to be e.g. the machine-epsilon in double f.p. format as reported in the figure below (see constant black line). Once identified the interval $(\lambda_{\text{min}}, \lambda_{\text{max}})$ it coincides with the real values of the exponents of the polynomial function whose numerical integration using the specified G-L quadrature rule would be exact in finite arithmetic.
+where $B(z,w):=\frac{\Gamma(z)\Gamma(w)}{\Gamma(z+w)}$ is the Euler's Beta function. This result is important for the development of an ad-hoc quadrature rule whose error can be computed a-priori for any polynomial integrand function (see Sub-Section 3.3 in \cite{Lombardi21} and references therein). In particular, given a specified number of quadrature nodes $n$, we can clearly see in Figure \ref{Fig1.1} how the a-priori relative error estimate $R_n(x^\lambda)$ behaves asymptotically with $\lambda$. For instance we immediately notice that the value of $R_n(f)$, with a fixed $n$ samples, is below a pre-determined arbitrary precision (in terms of relative error) within a specific, finite range of values of $\lambda$ which we identify as $(\lambda_{min},\lambda_{max})\subset(-1,+\infty)$. In practice we consider a finite-arithmetic threshold that we can specify to be e.g. the machine-epsilon in double f.p. format as reported in the figure below (see constant black line). Once identified the interval $(\lambda_{\text{min}}, \lambda_{\text{max}})$ it coincides with the real values of the exponents of the polynomial function whose numerical integration using the specified G-L quadrature rule would be exact in finite arithmetic.
 
 
 \subsection[Müntz theorem and generalised polynomials]{\changefont MÜNTZ THEOREM AND GENERALISED POLYNOMIALS }\label{SubSec1.2.4}
 
-In the opening subsection we mentioned that QUASIMONT extends the integration of generalised polynomials of non-integer degree in the range $(-1,+\infty)$. As the reader may find in \cite{Lombardi09} and references therein, a complete theory on the properties of these kind of functions relates to Müntz polynomials, orthogonal Müntz polynomials and their numerical computation. We assume that the generalized polynomials feature a sequence of (real) exponents that is a subset of a Müntz sequence, i.e. an ordered sequence of real numbers $\Lambda:=\{\dots>\lambda_j>\lambda_{j-1}>\dots>\lambda_1>-1\}$ s.t.
+In the opening subsection we mentioned that QUASIMONT extends the integration of generalised polynomials of non-integer degree in the range $(-1,+\infty)$. As the reader may find in \cite{Lombardi09} and references therein, a complete theory on the properties of these kind of functions relates to Müntz polynomials, orthogonal Müntz polynomials and their numerical computation. 
+
+\newpage
+\begin{center}
+        \begin{figure}[t]
+        \captionsetup{singlelinecheck=off}
+        \includesvg[keepaspectratio, width=\textwidth]{images/Estimate.svg}
+        \caption{Evaluation of the relative error estimate $R_n(x^{\lambda})$ provided in (\ref{eq1.8}) for $n=10,18,26,34,42$. We note that for a fixed $n$ we have that the relative error is  below an arbitrary (pre-determined) precision threshold in  $\forall\lambda\in(\lambda_{min},\lambda_{max})$. In the figure the solid horizontal line shows f.p. double precision.  We also observe that as long as $\lambda$ is a natural integer value lower than $2n-1$, then the relative error shows negative spikes in logarithmic scales, therefore mimicking the property of a G-L quadrature to feature zero reminder. Finally it is important to emphasize that for $n=10$ the estimate barely reaches the machine-epsilon threshold for double precision entailing that it is the minimum number of nodes that can be used to achieve double precision quadrature for real non-integer $\lambda$. This plot has been realised using the secondary module of QUASIMONT (see Section \ref{Sec3.5}).}
+        \label{Fig1.1}
+        \end{figure}
+\end{center}
+
+\noindent
+We assume that the generalized polynomials feature a sequence of (real) exponents that is a subset of a Müntz sequence, i.e. an ordered sequence of real numbers $\Lambda:=\{\dots>\lambda_j>\lambda_{j-1}>\dots>\lambda_1>-1\}$ s.t.
 
 \begin{equation}\label{eq1.10}
     \sum_{j=1}^{+\infty}\frac{1}{\lambda_j}=+\infty
 \end{equation}
 
 \noindent
-Such condition satisfies the known \color{poliDarkBlue} \textbf{Müntz theorem} \color{black} for which the vector space $\Pi(\Lambda):=\text{span}\{x^{\lambda_j}\}$ spanned by the monomials of degree in $\Lambda$ is dense in $\mathcal{C}(0,1]$. Elements $p^{(m)}(x) = \sum_{j=1}^{r} c_j\,x^{\lambda_j}\in\Pi(\Lambda)$ are therefore known as \color{poliDarkBlue} \textbf{Müntz polynomials} \color{black} of degree $\lambda_r$ defined in $(0,1]$ where  $\Lambda_r:=\{\lambda_r>\dots>\lambda_j>\lambda_{j-1}>\dots>\lambda_1>-1\},\, r\in\mathbb{N}_0$. In the following we shall assume that a polynomial with $r$ terms having at least one constituting monomial of non-integer degree are to be considered Müntz (generalised) polynomials. Our library is capable of approximating the integral of generalised polynomials defined in $(0,1)$ and, crucially, featuring an endpoint singularity at $x=0$. The proposed quadrature allows to obtain an arbitrary fixed precision for the integral combining G-L's quadrature performance (see in Figure \ref{Fig1.1} the relative error falls below the machine-epsilon threshold in double f.p. format) with an ad-hoc designed monomial transformation.
+Such condition satisfies the known \color{poliDarkBlue} \textbf{Müntz theorem} \color{black} for which the vector space $\Pi(\Lambda):=\text{span}\{x^{\lambda_j}\}$ spanned by the monomials of degree in $\Lambda$ is dense in $\mathcal{C}(0,1]$. Elements $p^{(m)}(x) = \sum_{j=1}^{r} c_j\,x^{\lambda_j}\in\Pi(\Lambda)$ are therefore known as \color{poliDarkBlue} \textbf{Müntz polynomials} \color{black} of degree $\lambda_r$ defined in $(0,1]$ where  $\Lambda_r:=\{\lambda_r>\dots>\lambda_j>\lambda_{j-1}>\dots>\lambda_1>-1\},\, r\in\mathbb{N}_0$. In the following we shall assume that any polynomial with $r$ terms having at least one constituting monomial of non-integer degree are to be considered Müntz (generalised) polynomials. Our library is capable of approximating the integral of generalised polynomials defined in $(0,1)$ and, crucially, featuring an endpoint singularity at $x=0$. The proposed quadrature allows to obtain an arbitrary fixed precision for the integral combining the G-L quadrature's performance (see in Figure \ref{Fig1.1} the relative error falls below the machine-epsilon threshold in double f.p. format) with an ad-hoc designed monomial transformation.
 
-\begin{center}
-        \begin{figure}[t]
-        \captionsetup{singlelinecheck=off}
-        \includesvg[keepaspectratio, width=\textwidth]{images/Estimate.svg}
-        \caption{Evaluation of the relative error estimate $R_n(x^{\lambda})$ provided in (\ref{eq1.8}) for $n=10,18,26,34,42$. We note that for a fixed $n$ we have that the relative error is  below an arbitrary (pre-determined) precision threshold in  $\forall\lambda\in(\lambda_{min},\lambda_{max})$. In the figure the solid horizontal line shows f.p. double precision.  We also observe that as long as $\lambda$ is a natural integer value lower than $2n-1$, then the relative error shows negative spikes in logarithmic scales, therefore mimicking the property of a G-L quadrature to feature zero reminder. Finally it is important to emphasize that for $n=10$ the estimate barely reaches the machine-epsilon threshold for double precision entailing that it is the minimum number of nodes that can be used to achieve double precision quadrature for real non-integer $\lambda$. This plot has been realised using the secondary module of QUASIMONT (see Section \ref{Sec3.4}).}
-        \label{Fig1.1}
-        \end{figure}
-\end{center}
+
 
 \subsection[Integration interval]{\changefont INTEGRATION INTERVAL}\label{SubSec1.2.5}
 
-As reported in the algorithm paper, we consider the problem of the quadrature of generalised polynomials $f(x)$ in the interval $(0,1)$ with a possible endpoint singularity at $x=0$, i.e. 
+As previously stated and also reported in \cite{Lombardi21}, we consider the problem of the quadrature of generalised polynomials $f(x)$ in the interval $(0,1)$ with a possible endpoint singularity at $x=0$, i.e. 
 \begin{equation}\label{eq1.11}
     I(f) = \int_0^1 f(\tilde{x}) d\tilde{x},
 \end{equation}
@@ -183,11 +194,11 @@ for three reasons:
 \begin{itemize}
   \item to uniquely investigate the precision property of G-L quadrature and derive unique rules to design a monomial transformation for the numerical integration algorithm;
   \item to completely avoid or at least severely restrict the effects of numerical cancellation in the numerical quadrature of singular generalised polynomials;
-  \item to be coherent with the definition of Müntz polynomials and the related theory.
+  \item to be consistent with the definition of Müntz polynomials and the related theory.
 \end{itemize}
 
 \noindent
-The second property is necessary to avoid rounding errors in the calculation of the transformed quadrature nodes. In fact, as the quadrature points tend to be clustered around the singularity, when it is located far from the origin $x=0$, the resulting samples will be affected by numerical cancellation. Often, in practical problems, integration on an arbitrary interval $(a,b)$ is requested. For this reason, we need to define an affine transformation to map the original, generic, integration interval $(a,b)$ into $(0,1)$. To that purpose, let us introduce a (linear) affine map $\varphi:(a,b)\to(0,1)$ specified as
+The second property is necessary to avoid rounding errors in the calculation of the transformed quadrature nodes. In fact, as the quadrature points tend to be clustered around the singularity, when it is located far from the origin $x=0$, the resulting samples may be affected by numerical cancellation. Often, in practical problems, integration on an arbitrary interval $(a,b)$ is requested. For this reason, we need to define an affine transformation to map the original, generic, integration interval $(a,b)$ into $(0,1)$. To that purpose, let us introduce a (linear) affine map $\varphi:(a,b)\to(0,1)$ specified as
 \begin{equation}\label{eq1.12}
     \varphi(y) := \alpha\,y + \beta = \tilde{x}\,,\quad y\in(a,b)
 \end{equation}
@@ -243,18 +254,19 @@ respectively, where $\tilde{x}_j,\:\tilde{w}_j$ are the classical G-L nodes and 
     \Pi(\Lambda)\ni p(x) = ex^{e+\frac{1}{4}} -\frac{1}{10}x^{-\frac{1}{2}} + \frac{1}{10}x^{-\frac{\pi}{4}}\,,\quad\Lambda=\Big\{-\frac{\pi}{4},-\frac{1}{2},e+\frac{1}{3}\Big\}
 \end{equation}
 
+\noindent
+A visual representation of $p(x)$ is reported in Figure \ref{Fig1.2} together with the effect of the ad-hoc designed monomial transformation on the quadrature. The Table \ref{table1.2} below lists the classical G-L nodes and weights alongside their $(\ref{eq1.16})$ and $(\ref{eq1.19})$ respective counterparts used by the proposed monomial transformation quadrature rule.
+\vspace{0.5cm}
 \begin{center}
         \begin{figure}[h]
         \captionsetup{singlelinecheck=off}
-        \includegraphics[keepaspectratio,width=\textwidth-1cm]{images/GenPolyMonMap.png}
+        \includegraphics[keepaspectratio,width=\textwidth]{images/GenPolyMonMap.png}
         \caption{Plot of three generalised monomial terms of the Müntz polynomial $p(x)$ in (\ref{eq1.20}). On the bottom of the graph there is the distribution in $(0,1)$ of the $n=14$ nodes of a classical G-L formula (magenta) and the new samples obtained by the monomial transformation quadrature rule (linear color gradient). Due to the extreme clustering of the latter (see \ref{table1.2}), they are plotted with scaled-down circles as we move from $a=0$ to $b=1$. We clearly observe how classical G-L nodes in $(0,1)$ are insufficient to model the singular behaviour near $x=0$, causing a consistent loss in accuracy. On the other hand, the action of map $(\ref{eq1.16})$ on the nodes (whose order $r=28.77$ is given by (\ref{eq1.17})) re-arranges the vast majority of them around the endpoint singularities of $x^{-\frac{\pi}{4}}$ and $x^{-\frac{1}{2}}$, i.e. $x=0$.}
         \label{Fig1.2}
         \end{figure}
 \end{center}
 
-\vspace{-1.25cm}
-\noindent
-A visual representation of $p(x)$ is reported in Figure \ref{Fig1.2} together with the effect of the ad-hoc designed monomial transformation on the quadrature.
+\newpage
 
 \begin{table}[H]
 \centering
@@ -280,31 +292,28 @@ $j\in\mathbb{N}$ & $\tilde{x}_j\in(0,1)$ & $\tilde{w}_j\in\mathbb{R}^+$ & $x_j\i
 14  &  0.993141904348406   &  0.0175597301658759   &  0.820378484398468     & 0.417316809008697  \\
 \hline
 \end{tabular}
-  \caption{List of all the $n=14$ G-L nodes and weights before (classical) and after the application of the monomial transformation of order $r=28.77$ depicted in Figure \ref{Fig1.2}.}
+  \caption{List of all the $n=14$ G-L nodes and weights before (classical) and after the application of the monomial transformation of order $r=28.77$ as depicted by Figure \ref{Fig1.2}.}
   \label{table1.2}
 \end{table}
 
-\noindent
-Table \ref{table1.2} reports G-L weights and points and, the resulting monomial transformation quadrature weights and points after the application of the map defined in $(\ref{eq1.16})$.
-
 \chapter[Installation]{\Huge \ttfamily INSTALLATION}\chaptermark{INSTALLATION}
 
-In the following chapter we illustrate how to build executable files with QUASIMONT from its source code as well as the dependencies needed at link-time by the resulting application. We begin from the latter by outlining the third-party source code necessary for the library prior to the compilation itself. Later, a brief description of the organisation and structure of the code is given in order to facilitate the comprehension of the user interface at compile and link time. Then, we address how the library is actually built and illustrate its core features through the execution of some proposed test drivers. Although all of the following content regards the execution of QUASIMONT as a stand-alone software, we postpone to the next chapter of the present manual instructions on how to use our tool as a static library fully-integrable into a user's own application.
+In the following chapter we illustrate how to build executable applications with QUASIMONT from its source code as well as the dependencies needed at link-time. We begin from the latter by outlining the third-party source code necessary for the library prior to the compilation itself. Later, a brief description of the organisation and structure of the code is given in order to facilitate the comprehension of the user interface at compile and link time. Then, we address how the library is actually built and illustrate its core features through the execution of some proposed test drivers. We remark that all of the following content regards the execution of QUASIMONT as a stand-alone software as we postpone to the next chapter the instructions needed to use our tool as a static library that is fully-integrable into a user's own application. Finally we address what has been originally mentioned in the opening lines of the first chapter of the present manual, that is that our package features two {\itshape modes} of execution, namely the \color{poliDarkBlue} \textbf{loud} \color{black} and \color{poliDarkBlue} \textbf{silent mode} \color{black}. Although the content of the present chapter is independent of the {\itshape mode} with which QUASIMONT is executed, we hereby refer exclusively to the former loud mode while for the latter we direct the user to Section \ref{Sec3.2} in which we address the main differences in I/O between the two.
 
 \section[Third-party code]{\changefont THIRD-PARTY CODE}\sectionmark{THIRD-PARTY CODE}\label{Sec2.1}
 
 \noindent
-As reported in the opening section, QUASIMONT is entirely written in C++17; beside the speed and versatility of the language, the primary motivation behind such choice was the accessibility to other open-source packages. The library that we propose is composed by two modules with  corresponding \colorbox{poliGrayBlue}{main} functions. The {\itshape primary} module is the one used  to build executables and it implements all the essential methods that are required for the accomplishment of QUASIMONT's purpose, that is the computation of a monomial transformation quadrature rule that achieves double precision approximations of a definite integral whose integrands are generalized polynomials.  The {\itshape secondary} module provides supporting tools for the user's in-depth understanding of the fundamental blocks of the monomial transformation. It provides the plot of the asymptotic estimate $(\ref{eq1.8})$ and the computation of $\beta_{\text{min}}(n)$ and $\beta_{\text{min}}(n)$. As the secondary module is not essential for the correct functioning of the library (primary module), we kept it separated from the rest of the code, mainly because it introduces additional dependencies. In the following we address the main points concerning the primary module and we post-pone to Section \ref{Sec3.4} a brief description of the secondary module. QUASIMONT relies on a number of third-party open-source libraries. Many of them usually come shipped with C++ itself e.g. the \color{poliDarkBlue} \textbf{standard} \color{black} and \color{poliDarkBlue} \textbf{vector} \color{black} libraries (required for basic data-structures and functions), the \color{poliDarkBlue} \textbf{algorithm} \color{black} library (needed for sorting methods), the \color{poliDarkBlue} \textbf{math} \color{black} library (used for basic mathematical operations s.a. \colorbox{poliGrayBlue}{fabs}, \colorbox{poliGrayBlue}{pow} and \colorbox{poliGrayBlue}{ceil}) and others. The software also requires two more libraries that are well-known in the scientific computing and open-source communities with minimum required version reported between brackets:
+As reported in the opening section, QUASIMONT is entirely written in C++17; beside the speed and versatility of the language, the primary motivation behind such choice was the accessibility to other open-source packages. The library that we propose is composed by two modules with  corresponding \colorbox{poliGrayBlue}{main} functions. The {\itshape primary} module is the one used  to build executables and it implements all the essential methods that are required for the accomplishment of QUASIMONT's purpose, that is the computation of a monomial transformation quadrature rule that achieves double precision approximations of a definite integral whose integrands are generalized polynomials.  The {\itshape secondary} module provides supporting tools for the user's in-depth understanding of the fundamental blocks of the monomial transformation. It provides the plot of the asymptotic estimate $(\ref{eq1.8})$ and the computation of $\beta_{\text{min}}(n)$ and $\beta_{\text{min}}(n)$. As the secondary module is not essential for the correct functioning of the library (primary module), we kept it separated from the rest of the code, mainly because it introduces additional dependencies. In the following we address the main points concerning the primary module and we post-pone to Section \ref{Sec3.5} a brief description of the secondary module. QUASIMONT relies on a number of third-party open-source libraries. Many of them usually come shipped with C++ itself e.g. the \color{poliDarkBlue} \textbf{standard} \color{black} and \color{poliDarkBlue} \textbf{vector} \color{black} libraries (required for basic data-structures and functions), the \color{poliDarkBlue} \textbf{algorithm} \color{black} library (needed for sorting methods), the \color{poliDarkBlue} \textbf{math} \color{black} library (used for basic mathematical operations s.a. \colorbox{poliGrayBlue}{fabs}, \colorbox{poliGrayBlue}{pow} and \colorbox{poliGrayBlue}{ceil}) and others. The software also requires two more libraries that are well-known in the scientific computing and open-source communities; those are listed below with their minimum versions required for the correct build and execution of QUASIMONT reported between brackets:
 
 \begin{itemize}
-    \item \color{poliDarkBlue} \textbf{Boost C++ libraries (v-1.66)} \color{black}\cite{boost}: a vast, peer-reviewed, collection of mostly header source files. In particular QUASIMONT extensively uses the \colorbox{poliGrayBlue}{Multiprecision} library, where non-native higher precision f.p. formats have been implemented as C++ data-types. Of particular interest for our module is the IEEE 754 quadruple f.p. format which is supplied by Boost's library as {\itshape GCC's \_\_float128} or {\itshape Intel's \_Quad} data types.
+    \item \color{poliDarkBlue} \textbf{Boost C++ libraries (v-1.66)} \color{black}\cite{boost}: a vast, peer-reviewed, collection of mostly header source files. In particular QUASIMONT extensively uses the \colorbox{poliGrayBlue}{Multiprecision} library, where non-native higher precision f.p. formats have been implemented as C++ data-types. Of particular interest for our module is the IEEE 754 quadruple f.p. format which is supplied by Boost's library as GCC's \colorbox{poliGrayBlue}{\_\_float128} or Intel's \colorbox{poliGrayBlue}{\_Quad} types.
     \item \color{poliDarkBlue} \textbf{GSL - GNU Scientific Library (v-2.5)} \color{black}\cite{gsl}: required by QUASIMONT in only one instance, that is the computation of the roots of $(\ref{eq1.18})$ via the method \colorbox{poliGrayBlue}{gsl\_poly\_complex\_solve}. Alternative solvers and root-finders are available however in our case we were also interested in automatically locating the sole real root of such polynomial (corresponding to $n_{\text{min}}$ in $(\ref{eq1.18})$), hence the choice we made.
 \end{itemize}
 
 \noindent
 These dependencies need to be installed/compiled correctly on the user's machine; furthermore macros to each static library need to be included in the standard search paths in order to correctly link the objects files compiled from the source code. All of the listed requirements are easily installed in Linux using package managers, such as the \color{poliDarkBlue} \textbf{Advanced Package Tool} \color{black} and the \color{poliDarkBlue} \textbf{Yellowdog Updater, Modified} \color{black} (or its successor \color{poliDarkBlue} \textbf{Dandified YUM}\color{black}), with a few commands on the terminal.
 
-\vspace{0.5cm}
+\vspace{0.2cm}
 \begin{tcblisting}{enhanced,
                    arc=5mm,
                    title = \color{black}{\large \ttfamily Installation of third-party libraries},
@@ -316,16 +325,17 @@ user@machine: home> # For Debian-based distros (Ubuntu, Mint, Knoppix, Kali ...)
 user@machine: home> sudo apt-get update
 user@machine: home> sudo apt-get install libboost-all-dev libgsl-dev
 user@machine: home> # For RPM-based distros (CentOS, Fedora, SUSE, Scientific Linux ...)
+user@machine: home> sudo dnf makecache --refresh
 user@machine: home> sudo dnf install http://repo.okay.com.mx/centos/8/x86_64/release/okay-release-1-1.noarch.rpm
 user@machine: home> sudo dnf install boost gsl libquadmath
 user@machine: home> sudo dnf install boost-devel gsl-devel
 \end{tcblisting}
-\vspace{0.5cm}
+\vspace{0.3cm}
 
 \noindent
-Additionally, QUASIMONT requires the proper installation of the appropriate building tools; at the present moment the library has been written for Linux platforms only and therefore we prioritized a minimalist and straightforward build process over cross-platform compliance by adopting the usage of {\itshape makefile} (see Section \ref{Sec2.3}). The default compiler we selected for building QUASIMONT is the \color{poliDarkBlue} \textbf{GCC - GNU Compiler Collection} \color{black} \cite{gcc} that is invoked from the \color{poliDarkBlue} \textbf{GNU Make} \color{black} \cite{make} program. For this reason the installation of \colorbox{poliGrayBlue}{gcc} and \colorbox{poliGrayBlue}{make} are required on the user machine. Also in this case the aforementioned package managers allow fast and simple installation of the tools with minimal input on the terminal.
+Additionally, QUASIMONT requires the proper installation of the appropriate building tools; at the present moment the library has been written for Linux platforms only and therefore we prioritized a minimalist and straightforward building process over cross-platform compliance by adopting the usage of {\itshape makefiles} (see Section \ref{Sec2.3}). The default compiler we selected for building QUASIMONT is the \color{poliDarkBlue} \textbf{GCC - GNU Compiler Collection} \color{black} \cite{gcc} that is invoked from the \color{poliDarkBlue} \textbf{GNU Make} \color{black} \cite{make} program. For this reason the installation of \colorbox{poliGrayBlue}{gcc} and \colorbox{poliGrayBlue}{make} are required on the user machine. Also in this case the aforementioned package managers allow fast and simple installation of the tools with minimal input on the terminal.
 
-\vspace{0.5cm}
+\vspace{0.2cm}
 \begin{tcblisting}{enhanced,
                    arc=5mm,
                    title = \color{black}{\large \ttfamily Installation of building tools},
@@ -342,14 +352,31 @@ user@machine: home> sudo dnf install gcc gcc-c++ make
 user@machine: home> gcc --version
 user@machine: home> make --version
 \end{tcblisting}
-\vspace{0.5cm}
+\vspace{0.3cm}
 
 \noindent
-We remark that our QUASIMONT's built has been achieved using the minimum versions \colorbox{poliGrayBlue}{8.5.0} and \colorbox{poliGrayBlue}{4.2.1} of GCC and GNU Make respectively. We then tested its compilation and execution on three different architectures, namely with two Intel(R) Core(TM) i5-1035G1 @ 1.00GHz and i9-9900K @ 3.60GHz processors on a DEB-based \colorbox{poliGrayBlue}{Ubuntu 20.04.3} distro and with a Intel(R) Core(TM) i7-10700 @ 2.90GHz processor on a RPM-based \colorbox{poliGrayBlue}{CentOS 8.5} distro (the last two running on virtual machines on a Windows host). Once all the above packages have been installed, the user should thoroughly check the correct configuration, having care in particular if links to the static libraries of each of the dependencies listed above have been added to \colorbox{poliGrayBlue}{gcc}'s linker \colorbox{poliGrayBlue}{ld} standard search paths. During compilation it may happen that, depending on the distro and version of \colorbox{poliGrayBlue}{gcc} used, the user is prompted with the following \colorbox{poliGrayBlue}{error: unable to find numeric literal operator ‘operator""Q’}. In such case the user must append the \colorbox{poliGrayBlue}{-fext-numeric-literals} compiler option to the \colorbox{poliGrayBlue}{CXXOPTIONS} macros in all of QUASIMONT's three \colorbox{poliGrayBlue}{makefile} (see Section \ref{Sec2.2} and Figure \ref{Fig2.1}). The dependencies are constituted of large libraries, although QUASIMONT uses a limited amount of the methods they provide. We therefore made sure that only the necessary parts of the libraries are included in the source code, striving to maintain a clean and light final product. For the sake of completeness we hereby list all the methods of the selected third-party libraries  that are used by QUASIMONT.  These methods can be located in the source code, specifically in the header file \colorbox{poliGrayBlue}{Quasimont.h}, reported in the snippet below. As for any other source file in the library, a comment block precedes the code content, in which the first line specifies the location of it in the library's relative directory's tree (see Figure \ref{Fig2.1}).
-We note that all external source code headers are included in \colorbox{poliGrayBlue}{Quasimont.h} together with the declarations of all the implemented functions (see Section \ref{Sec2.2}).
+We remark that our QUASIMONT's built has been achieved using the minimum versions \colorbox{poliGrayBlue}{8.5.0} and \colorbox{poliGrayBlue}{4.2.1} of \colorbox{poliGrayBlue}{gcc} and \colorbox{poliGrayBlue}{make} respectively. We then tested its compilation and execution on three different platforms, namely using two Intel(R) Core(TM) i5-1035G1 @ 1.00GHz and i9-9900K @ 3.60GHz processors on a DEB-based \colorbox{poliGrayBlue}{Ubuntu 20.04.3} operating system (OS) and also a Intel(R) Core(TM) i7-10700 @ 2.90GHz processor on a RPM-based \colorbox{poliGrayBlue}{CentOS 8.5} OS (the last two running on virtual machines on a Windows host). Although the library has been tested in multiple development configurations that are compatible with the above listed requirements, the user may refer to Table \ref{table2.1} where we recap the information regarding the aforementioned authors' specific development environments. Once all the above packages have been installed, the user should thoroughly check the correct configuration, having care to particularly assure that links to the static libraries of each of the dependencies listed above have been added to \colorbox{poliGrayBlue}{gcc}'s linker \colorbox{poliGrayBlue}{ld} standard search paths.
 
-\newpage
-\vspace{0.5cm}
+\begin{table}[H]
+\centering
+\begin{tabular}{|c||c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{9}{|c|}{\textbf{Environments recap}} \\
+\hline
+Env. n. & OS (Unix) & Processor & GCC & Make & Boost & GSL & MPFR & GMP \\
+\hline
+1 & Ubuntu 20.04.3 & i5-1035G1 & 9.3.0 & 4.2.1 & 1.77 & 2.5 & 4.1.0 & 6.2.1 \\
+2 & CentOS 8.5     & i7-10700  & 8.5.0 & 4.2.1 & 1.66 & 2.5 & 4.1.6 & 5.1.0 \\
+\hline
+\end{tabular}
+  \caption{QUASIMONT Development environments used by the authors. The two rightmost columns refer to the secondary module of the library and are not a dependency requirement (see Section \ref{Sec3.5}).}
+  \label{table2.1}
+\end{table}
+
+\noindent
+The dependencies are constituted of large libraries, although QUASIMONT uses a limited amount of the methods they provide. We therefore made sure that only the necessary parts of the libraries are included in the source code, striving to maintain a clean and light final product. For the sake of completeness we hereby list all the methods of the selected third-party libraries  that are used by QUASIMONT.  These methods can be located in the source code, specifically in the header file \colorbox{poliGrayBlue}{Quasimont.h}, reported in the snippet below.
+
+\vspace{0.2cm}
 \tcbinputlisting{enhanced,
                  arc=5mm,
                  title = \color{black}{\large \ttfamily Quasimont.h},
@@ -358,12 +385,13 @@ We note that all external source code headers are included in \colorbox{poliGray
                  listing only,
                  listing style=CppStyle,
                  listing file=snippets/Quasimont.h}
-\vspace{0.5cm}
-
-\noindent
-Further down in \colorbox{poliGrayBlue}{Quasimont.h} we find definitions of some constants used throughout the library and finally the declaration of the access point of the primary module of the library, i.e. the method \colorbox{poliGrayBlue}{quasimont} in which all other methods of QUASIMONT interact. The definition of such method is given in the homonym source file \colorbox{poliGrayBlue}{Quasimont.cpp} reported below. On such file we highlight the comment block at the beginning of the definition of the function itself (lines \colorbox{poliGrayBlue}{18-31}) where the user finds quick useful insights about its usage, I/O and implementation. Such pattern is shared by each method across the main module of the library (see Chapter \ref{Chap4}).
 
 \newpage
+
+\noindent
+As for any other source file in the library, a comment block precedes the code; in it the first line specifies the location of the specific file in the library's relative directory's tree (see Figure \ref{Fig2.1}). We only report such comment box for the above snippet of \colorbox{poliGrayBlue}{Quasimont.h} and omit it for any following snippet for the sake of space and clarity.
+
+\vspace{0.2cm}
 \tcbinputlisting{enhanced,
                  arc=5mm,
                  title = \color{black}{\large \ttfamily Quasimont.cpp},
@@ -373,13 +401,19 @@ Further down in \colorbox{poliGrayBlue}{Quasimont.h} we find definitions of some
                  listing style=CppStyle,
                  listing file=snippets/Quasimont.cpp}
 
+\newpage
+\noindent
+We note that all the headers (and thus the declarations of all their methods) constituting the library (see Section \ref{Sec2.2}) are included in \colorbox{poliGrayBlue}{Quasimont.h}. Further below in the above header we find the definitions of the important constants that are used throughout the library which precede the declaration of the access point of the primary module of the library, i.e. the method \colorbox{poliGrayBlue}{quasimont} in which all other methods of QUASIMONT interact. The user may notices that we overloaded the primary module \colorbox{poliGrayBlue}{quasimont} method by taking different inputs and returning different outputs depending on whether the loud or silent mode is executed. We observe that compile-time polymorphism in C++ is not allowed when only the return type of the function differs which results in identical signatures. The definition for both modes of the method is given in the homonym source file \colorbox{poliGrayBlue}{Quasimont.cpp} reported above.
+
 \section[Structure]{\changefont STRUCTURE}\sectionmark{STRUCTURE}\label{Sec2.2}
 
 \noindent
-The source-code in the library does not use relative paths for finding the definitions of its methods in the headers; relative paths are instead used at compile and link time by the \colorbox{poliGrayBlue}{makefile} (see Section \ref{Sec2.3}). The user is nonetheless discouraged from moving files and/or changing those paths because they do appear occasionally in the source code for retrieving data from specific non-source files. It is important therefore to understand where these files are stored and how the code is organised. As mentioned in the previous chapters, QUASIMONT is not object-oriented and all its methods interact through the access point of the primary module \colorbox{poliGrayBlue}{quasimont} that interfaces the user through the inputs defined in the \colorbox{poliGrayBlue}{main} function. Apart from it, all the remaining source code that constitutes the primary module of the proposed software is made of only $12$ methods whose definitions are collected in one of the following three source files and related headers:
+The source-code in the library does not use relative paths for finding the definitions of its methods in the headers; relative paths are instead used at compile and link time by the \colorbox{poliGrayBlue}{makefile} (see Section \ref{Sec2.3}). The user is nonetheless discouraged from moving files and/or changing those paths because they do appear occasionally in the source code for retrieving data from specific non-source files. All of QUASIMONT's methods interact through the access point of the primary module \colorbox{poliGrayBlue}{quasimont} that interfaces the user through the inputs defined in the \colorbox{poliGrayBlue}{main} function. Apart from it, all the remaining source code that constitutes the primary module of the proposed software is made of only $12$ methods whose definitions are collected in one of the following three source files and related headers:
 
 \begin{itemize}
     \item \colorbox{poliGrayBlue}{MonMap.cpp} contains every method associated with the computation of the monomial transformation quadrature rule, ranging from the monomial map itself (i.e. $\beta_{\text{min/max}}$ and $r$) to the quadrature parameters (i.e. $\tilde{x}_j$, $\tilde{w}_j$, $J_{[a,b]}$, etc...). To provide an easier reference for code debugging and amendment, a naming scheme of these methods is adopted. Every function in this file is in fact named \color{poliDarkBlue} \textbf{compute}$\boldsymbol{<}$\textbf{NameOfFunction$\boldsymbol{>}$} \color{black} as it can be evinced from the corresponding header file containing such functions' declarations
+    
+    \vspace{0.2cm}
     \tcbinputlisting{enhanced,
                  arc=5mm,
                  grow to left by=8mm, 
@@ -389,9 +423,11 @@ The source-code in the library does not use relative paths for finding the defin
                  listing only,
                  listing style=CppStyle,
                  listing file=snippets/MonMap.h}
-    \newpage      
-    \item \colorbox{poliGrayBlue}{DatIo.cpp} is the source file defining each method that does not perform raw computations but instead manages the data flow e.g. in I/O operations. Every function follows the naming scheme \color{poliDarkBlue} $\boldsymbol{<}$\textbf{NameOfFunction$\boldsymbol{>}$}\textbf{Data} \color{black} emphasizing its characteristics of data manipulation method. The methods are declared in the corresponding header file
-    \vspace{0.5cm}
+    
+    \newpage
+    \item \colorbox{poliGrayBlue}{DatIo.cpp} is the source file defining each method that does not perform raw computations but instead manages the data flow e.g. in I/O operations. Every function follows the naming scheme \color{poliDarkBlue} $\boldsymbol{<}$\textbf{NameOfFunction$\boldsymbol{>}$}\textbf{Data} \color{black} emphasizing its characteristics of data manipulation method. The methods are declared in the header below
+    
+    \vspace{0.2cm}
     \tcbinputlisting{enhanced,
                  arc=5mm,
                  grow to left by=8mm,
@@ -401,11 +437,11 @@ The source-code in the library does not use relative paths for finding the defin
                  listing only,
                  listing style=CppStyle,
                  listing file=snippets/DatIo.h}
-    \vspace{0.5cm}
-    \item \colorbox{poliGrayBlue}{VecOps.cpp} defines every function that does not perform either direct computations for the quadrature rule nor it performs I/O operations on data. The methods defined in it are used to automatise specific operations on vectors that are required multiple times across the library. \colorbox{poliGrayBlue}{castVector} method for example converts vectors' values in \textsl{higher-than-double} floating-point format via \colorbox{poliGrayBlue}{static\_cast} of each of its elements, while \colorbox{poliGrayBlue}{doubleDotProduct} implements the inner product operation between two vectors with high precision avoiding numerical cancellations of smaller-than-epsilon values. Given the generic nature of their task, no naming scheme is assigned to these methods whose declarations are found in the header file \colorbox{poliGrayBlue}{Utils.h} below. In \colorbox{poliGrayBlue}{Utils.h} we also find declarations of the $3$ methods of the secondary module that are defined, alongside its \colorbox{poliGrayBlue}{main}, in the \colorbox{poliGrayBlue}{ErrTools.cpp} source file (see Section \ref{Sec3.4}).
+    \vspace{0.3cm}
     
-    \newpage
-    \vspace{0.5cm}
+    \item \colorbox{poliGrayBlue}{VecOps.cpp} defines every function that neither performs quadrature-related computations nor I/O data operations. Given their generic nature, no naming scheme is assigned to them as they are declared in \colorbox{poliGrayBlue}{Utils.h} alongside the $3$ methods of the secondary module defined in \colorbox{poliGrayBlue}{ErrTools.cpp} (see Section \ref{Sec3.5}).
+    
+    \vspace{0.15cm}
     \tcbinputlisting{enhanced,
                  arc=5mm,
                  grow to left by=8mm,
@@ -419,19 +455,17 @@ The source-code in the library does not use relative paths for finding the defin
 \end{itemize}
 
 \noindent
-With reference to Figure \ref{Fig2.1} we present a visual sketch of the files' organisation in the library's directory. Source files of the primary module, i.e. \colorbox{poliGrayBlue}{MonMap.cpp} and \colorbox{poliGrayBlue}{DatIo.cpp} are located in the subdirectory \colorbox{poliGrayBlue}{\textbf{QUASIMONT/src}} alongside \colorbox{poliGrayBlue}{Quasimont.cpp}. On the other hand the \colorbox{poliGrayBlue}{VecOps.cpp} source file is instead placed in the \colorbox{poliGrayBlue}{\textbf{QUASIMONT/utilities}} subdirectory where we can also find the secondary module's source code \colorbox{poliGrayBlue}{ErrTools.cpp}. Despite such separation, all the header files outlined above are located in the \colorbox{poliGrayBlue}{\textbf{QUASIMONT/include}} subdirectory, including \colorbox{poliGrayBlue}{Quasimont.h}. We recall that some relative paths are essential for the correct loading of raw data from \color{poliDarkBlue} \textbf{tabulated data-files} \color{black} into the source code.
+With reference to Figure \ref{Fig2.1} we present a visual sketch of the files' organisation in the library's directory. Source files of the primary module, i.e. \colorbox{poliGrayBlue}{MonMap.cpp} and \colorbox{poliGrayBlue}{DatIo.cpp} are located in the subdirectory \colorbox{poliGrayBlue}{\textbf{QUASIMONT/src}} alongside \colorbox{poliGrayBlue}{Quasimont.cpp}. On the other hand the \colorbox{poliGrayBlue}{VecOps.cpp} source file is instead placed in the supplementary \colorbox{poliGrayBlue}{\textbf{QUASIMONT/utilities}} subdirectory where we can also find the secondary module's source code \colorbox{poliGrayBlue}{ErrTools.cpp}. Despite such separation, all the header files outlined above are located in the \colorbox{poliGrayBlue}{\textbf{QUASIMONT/include}} subdirectory, including \colorbox{poliGrayBlue}{Quasimont.h}. We recall that some relative paths are essential for the correct loading of raw data from \color{poliDarkBlue} \textbf{tabulated data-files} \color{black} into the source code.
 
-\newpage
 \begin{center}
         \begin{figure}[H]
         \centering
-        \includegraphics[keepaspectratio,scale=0.30]{images/DirectoryStructureCentered.png}
+        \includegraphics[keepaspectratio, width=.6\textwidth]{images/DirectoryStructureCentered.png}
         \caption{The directory tree representing the structure and organisation of QUASIMONT}
         \label{Fig2.1}
         \end{figure}
 \end{center}
 
-%\vspace{-1cm}
 \noindent 
  Those files are:
 \begin{itemize}
@@ -445,9 +479,9 @@ We note that the latter two tabulated values of the original G-L nodes and weigh
 \section[Build process]{\changefont BUILD PROCESS}\sectionmark{BUILD PROCESS}\label{Sec2.3}
 
 \noindent
-QUASIMONT is a quadrature tool that can be easily integrated in  users' applications, while creating executable. In the provided library, the integration is performed, for example, through the compilation and linking of the library's source code with a \colorbox{poliGrayBlue}{Main.cpp} file containing the user's input, thus called \color{poliDarkBlue} \textbf{input source file} \color{black} (see Section \ref{Sec3.1}). This file determines the {\itshape gateway} for the access point \colorbox{poliGrayBlue}{quasimont} of the primary module and therefore there should be one in any application built by the user. This is due to a fundamental rule in C++, for which only one \colorbox{poliGrayBlue}{main} is defined at global level. By design, in our library, \colorbox{poliGrayBlue}{quasimont} method acts as the designated {\itshape entry point} of the monomial transformation quadrature algorithm at run-time.
+QUASIMONT is a quadrature tool that can be easily integrated in  users' applications, while creating executables. In the provided library, the integration is performed, for example, through the compilation and linking of the library's source code with a \colorbox{poliGrayBlue}{Main.cpp} file containing the user's input, thus called \color{poliDarkBlue} \textbf{input source file} \color{black} (see Section \ref{Sec3.1}). This file determines the {\itshape gateway} for the access point \colorbox{poliGrayBlue}{quasimont} of the primary module and therefore there should be one in any application built by the user. This is due to a fundamental rule in C++, for which only one \colorbox{poliGrayBlue}{main} is defined at global level. By design, in our library, \colorbox{poliGrayBlue}{quasimont} method acts as the designated {\itshape entry point} of the monomial transformation quadrature algorithm at run-time.
 
-\vspace{0.25cm}
+\vspace{0.2cm}
 \tcbinputlisting{enhanced,
                  arc=5mm,
                  title = \color{black}{\large \ttfamily Application's own (top-level) makefile},
@@ -456,11 +490,12 @@ QUASIMONT is a quadrature tool that can be easily integrated in  users' applicat
                  listing only,
                  listing style=MakeStyle,
                  listing file=snippets/makefile}
+\vspace{0.3cm}
 
 \noindent
-The source code of the library itself (i.e. the source files in \colorbox{poliGrayBlue}{\textbf{QUASIMONT/src}}) does not define any \colorbox{poliGrayBlue}{main} function and thus can only be compiled but not executed by itself. In order to build applications, the compiled source code has to be linked with a compiled \colorbox{poliGrayBlue}{main} that provides the access point of the primary module to the program's executable. We can define a sort of one-to-one correspondance between each application's executable and its associated \colorbox{poliGrayBlue}{main} function, the latter uniquely identified by the input singular generalised polynomials defined by the user. The build process is based on a \textsl{recursive make} approach, i.e. the input source file is built through a top-level \colorbox{poliGrayBlue}{makefile} (reported above) that recursively invokes the \colorbox{poliGrayBlue}{makefile} responsible for building the source code of the library, its utilities and third-party dependencies. The library source code shall be compiled just once and the resulting objects shall remain available thereafter for linking to any \colorbox{poliGrayBlue}{main}, i.e. new applications. Whenever the rule \colorbox{poliGrayBlue}{allclean} is invoked from the top-level \colorbox{poliGrayBlue}{makefile}, it will delete those object files and the source code will require to be compiled again. This practice is useful for users who require to execute standalone applications by reusing the unchanged compiled objects of the source code multiple times. In these cases we remark that the output consists of the specialised quadrature samples in addiction to the numerical estimation of the integral for a generalised polynomial. Such output data is stored in a specific sub-directory as described at Section \ref{Sec3.2}.
+The source code of the library itself (i.e. the source files in \colorbox{poliGrayBlue}{\textbf{QUASIMONT/src}}) does not define any \colorbox{poliGrayBlue}{main} function and thus can only be compiled but not executed by itself. In order to build applications, the compiled source code has to be linked with a compiled \colorbox{poliGrayBlue}{main} that provides the access point of the primary module to the program's executable. We can define a sort of one-to-one correspondance between each application's executable and its associated \colorbox{poliGrayBlue}{main} function, the latter uniquely identified by the input singular generalised polynomials defined by the user. The build process is based on a \textsl{recursive make} approach, i.e. the input source file is built through a top-level \colorbox{poliGrayBlue}{makefile} (reported above) that recursively invokes the \colorbox{poliGrayBlue}{makefile} responsible for building the source code of the library, its utilities and third-party dependencies. The library source code shall be compiled just once and the resulting objects shall remain available thereafter for linking to any \colorbox{poliGrayBlue}{main}, i.e. new applications. Whenever the rule \colorbox{poliGrayBlue}{allclean} is invoked from the top-level \colorbox{poliGrayBlue}{makefile}, it deletes those object files and the source code does require to be compiled again. This practice is useful for users who require to execute standalone applications by reusing the unchanged compiled objects of the source code multiple times. In these cases we remark that the output consists of the specialised quadrature samples in addiction to the numerical estimation of the integral for a generalised polynomial. Such output data is stored in a specific sub-directory as described in Section \ref{Sec3.2}.
 
-\vspace{0.5cm}
+\vspace{0.2cm}
 \begin{tcblisting}{enhanced,
                    arc=5mm,
                    title = \color{black}{\large \ttfamily Compilation and Linking of the library},
@@ -509,15 +544,15 @@ g++ ../build/obj/*.o -o Test -lm -lquadmath -lgsl -lgslcblas
 
  Input polynomial p(x) = ...
 \end{tcblisting}
-\vspace{0.5cm}
+\vspace{0.3cm}
 
 \noindent
-On the other hand, if integration of QUASIMONT in larger more complex software is required (e.g. in FEM/BEM libraries), linking to the static library is necessary, which is addressed later in the manual at Section \ref{Sec3.3}. To conclude the discussion on how the QUASIMONT is built locally, let us display the outcome of some of the basic rules defined in the top-level \colorbox{poliGrayBlue}{makefile}. The output of the compilation of the source files are object files that will be stored in the \colorbox{poliGrayBlue}{\textbf{QUASIMONT/build/obj}} subdirectory. The linking of those objects is invoked only by the top-level makefile associated to the specific application. For each application built by the user it is considered a good practice to invoke the \colorbox{poliGrayBlue}{clean} rule prior to the build process itself. We emphasize that, with the exception of those cases when QUASIMONT is used as a tool in a larger library, each application should be associated to its own subdirectory located within QUASIMONT itself. In this subdirectory a user input source file containing the \colorbox{poliGrayBlue}{main}, named \colorbox{poliGrayBlue}{Main.cpp} by default, should be located. User may opt for changing the filename of \colorbox{poliGrayBlue}{main} as it does not impact any aspect of the source code as long as the same name appears in the \colorbox{poliGrayBlue}{default} rule reported in the top-level \colorbox{poliGrayBlue}{makefile} of the application, which should also be located in the subdirectory. For simplicity, we suggest to retain the naming convention reported in the provided \colorbox{poliGrayBlue}{makefile}. In this scheme, the application's name (in our example \colorbox{poliGrayBlue}{Test}) matches that of the directory in which its input source file \colorbox{poliGrayBlue}{Main.cpp} is located (i.e. \colorbox{poliGrayBlue}{\textbf{QUASIMONT/test}}). In the next subsection a reference application located in  \colorbox{poliGrayBlue}{\textbf{QUASIMONT/test}} (already shipped with the library) exemplifies the whole build sequence.
+On the other hand, if integration of QUASIMONT in larger more complex software is required (e.g. in FEM/BEM libraries), linking to the static library is necessary, which is addressed later in the manual at Section \ref{Sec3.3}. Regardless, during compilation it may happen that, depending on the distro and version of \colorbox{poliGrayBlue}{gcc} used, the user is prompted with the following \colorbox{poliGrayBlue}{error: unable to find numeric literal operator 'operator''''Q'}. In such case the user must append the \colorbox{poliGrayBlue}{-fext-numeric-literals} flag to the \colorbox{poliGrayBlue}{CXXOPTIONS} macro as reported in the above \colorbox{poliGrayBlue}{makefile} snippet and all the remaining ones in the library (see Section \ref{Sec2.2} and Figure \ref{Fig2.1}). To conclude the discussion on how the QUASIMONT is built locally, let us display the outcome of some of the basic rules defined in the top-level \colorbox{poliGrayBlue}{makefile}. The output of the compilation of the source files are object files that are stored in the \colorbox{poliGrayBlue}{\textbf{QUASIMONT/build/obj}} subdirectory. The linking of those objects is invoked only by the top-level makefile associated to the specific application. For each application built by the user it is considered a good practice to invoke the \colorbox{poliGrayBlue}{clean} rule prior to the build process itself. We emphasize that, with the exception of those cases when QUASIMONT is used as a tool in a larger library, each application should be associated to its own subdirectory located within QUASIMONT itself. In this subdirectory a user input source file containing the \colorbox{poliGrayBlue}{main}, named \colorbox{poliGrayBlue}{Main.cpp} by default, should be located. User may opt for changing the filename of \colorbox{poliGrayBlue}{main} as it does not impact any aspect of the source code as long as the same name appears in the \colorbox{poliGrayBlue}{default} rule reported in the top-level \colorbox{poliGrayBlue}{makefile} of the application, which should also be located in the subdirectory. For simplicity, we suggest to retain the naming convention reported in the provided \colorbox{poliGrayBlue}{makefile}. In this scheme, the application's name (in our example \colorbox{poliGrayBlue}{Test}) matches that of the directory in which its input source file \colorbox{poliGrayBlue}{Main.cpp} is located (i.e. \colorbox{poliGrayBlue}{\textbf{QUASIMONT/test}}). In the next subsection a reference application located in  \colorbox{poliGrayBlue}{\textbf{QUASIMONT/test}} (already shipped with the library) exemplifies the whole build sequence.
 
 \section[Installation and test driver]{\changefont INSTALLATION AND TEST DRIVER}\sectionmark{INSTALLATION AND TEST DRIVER}\label{Sec2.4}
 
 \noindent
-The installation of the library can be done by building the \colorbox{poliGrayBlue}{Main.cpp} input source file in the \colorbox{poliGrayBlue}{\textbf{QUASIMONT/test}} subdirectory, which contains the test driver for benchmarking QUASIMONT's performance. The \colorbox{poliGrayBlue}{Test} application  runs the library's processing methods onto three generalised and classical polynomial integrands that introduce the user to the library interaction, execution and output whilst assuring that the core functionalities have been compiled correctly (no conflict at linking stage occurs). The three polynomial functions are the following
+The installation of the library can be done by building the \colorbox{poliGrayBlue}{Main.cpp} input source file in the \colorbox{poliGrayBlue}{\textbf{QUASIMONT/test}} subdirectory, which contains the test driver for benchmarking QUASIMONT's performance. The \colorbox{poliGrayBlue}{Test} application  runs the library's processing methods for three generalised and classical polynomial, thus introducing the user to its execution and interaction whilst assuring that the core functionalities have been compiled correctly (no conflict at linking stage occurs). The three polynomial functions are the following
 
 \begin{equation*}
     \begin{split}
@@ -528,10 +563,9 @@ The installation of the library can be done by building the \colorbox{poliGrayBl
 \end{equation*}
 
 \noindent
-and, with the exception of $p_3(x)$, all have a singularity in $x=0$.  We set the integration interval to be $(0,1)$ by default in QUASIMONT. Once both the library's and user input's source files have been compiled and linked into the corresponding executable, the resulting application integrates each polynomial using the monomial transformation quadrature rule. A list of important information regarding both the I/O and the monomial transformation itself is displayed on the terminal whereas the results of interest (i.e. the new processed quadrature together with the related numerical integration) \color{black}  are exported in files located in the appropriate output directory (see Section \ref{Sec3.2}). To check the correctness of the built application, the user should verify that the results obtained do indeed match the output data reported in the following tables \ref{table2.1}, \ref{table2.2}, \ref{table2.3} for each polynomial function. To run each benchmark the user needs to return to the CLI where the program is waiting for her/him to go ahead to the next case. Note that, since we are implementing three benchmark polynomials in a single source file, such pause is necessary during the execution in order to capture the new processed quadrature together with the associated numerical integration as the files in the output directory are overwritten at each execution. The correct execution of all three benchmarks will then close the application. The user should check that each benchmark is executed without problems and the results are correctly generated (see Section \ref{Sec3.2}). As for the quality of the results obtained for those tests, an in-depth analysis, coupled with the fast execution of the program, shows the advantages provided by QUASIMONT over classical G-L and other generalised quadrature rules. The first polynomial $p_1(x)$ is a model proposed in equation (73) of \cite{Lombardi09}, \textsl{Section 5.1, Example 1}, and it represents the typical integrand function often encountered in numerical methods for differential and integral equations featuring singular modelling, on which QUASIMONT is indeed considered an helpful, effective and precise tool. The proposed generalised polynomial $p_1(x)$ features a strong singularity at $x=0$ in the interval $(0,1)$ and all but two of its monomial terms have non-integer degree. The numerical approximation of the integral at double precision is achieved with $n=32$ nodes using a monomial transformation applied to the classical G-L quadrature with $n$ nodes in $(0,1)$. 
+and, with the exception of $p_3(x)$, all have a singularity in $x=0$ (QUASIMONT defaults the integration interval to be $(0,1)$). Once the library's and the input source file have been compiled and linked into the corresponding executable, the resulting application integrates each polynomial using the monomial transformation quadrature rule. We remark that, although no difference in numerical results occurs, the following report solely concerns the loud mode of execution. A list of information regarding the monomial transformation itself is displayed on the terminal whereas the results of interest (i.e. the new processed quadrature together with the related numerical integration) \color{black} are exported in files located in the appropriate output directory (see Section \ref{Sec3.2}). 
 
-\newpage 
-
+\vspace{0.2cm}
 \begin{tcblisting}{enhanced,
                    arc=5mm,
                    title = \color{black}{\large \ttfamily Building and executing the test driver: p\_1(x)},
@@ -572,39 +606,16 @@ g++ ../build/obj/*.o -o Test -lm -lquadmath -lgsl -lgslcblas
 
  ** QUASIMONT HAS TERMINATED **
 \end{tcblisting}
-\vspace{0.15cm}
 
 \noindent
-Table \ref{table2.1} shows what was graphically reported in Figure \ref{Fig1.2}. The classical G-L nodes of the associated quadrature rule with $n=32$ are in fact distributed symmetrically in $(0,1)$ with an equal abundance of those at both bounds of the integration interval, while the proposed quadrature based on the monomial transformation  concentrates nodes towards the lower bound $x=0$, squashing the vast majority of them ($26$ out of the total $32$) inside the sub-interval $(0,0.1)$ where the singularity behaviour is captured. The second benchmark polynomial is proposed with the scope of introducing the user to a core functionality of QUASIMONT that requires further input on the CLI. Indeed, $p_2(x)$ is a monomial of non-integer degree and its numerical integration requires careful manipulation. During the modelling process of larger applications, especially when dealing with finite elements constructed over meshed domains with singular spatial geometry behaviour \cite{Graglia04,Graglia08} it is often necessary to integrate low-order singular generalised polynomial basis functions together with high-order regular polynomial basis functions. QUASIMONT allow to integrate such integrals identifying the degree of the monomial as $\lambda_{\text{min}}$ and the maximum degree  $\lambda_{\text{max}}$ of the all set of combined polynomial functions. For this reason, in this test, we add a monomial with $\lambda_{\text{max}}$ degree and unitary coefficient to $p_2(x)$. Once constructed the final polynomial we apply the proposed algorithm to process the optimised nodes and weights. 
+To check the correctness of the built application, the user should verify that the results obtained do indeed match the output data reported in the following tables \ref{table2.2}, \ref{table2.3}, \ref{table2.4} for each polynomial function. To run each benchmark the user needs to return to the CLI where the program is waiting for her/him to go ahead to the next case. Note that, since we are implementing three benchmark polynomials in a single source file, such pause is necessary during the execution in order to capture the new processed quadrature together with the associated numerical integration as the files in the output directory are overwritten at each execution. The correct execution of all three benchmarks will then close the application. The user should check that each benchmark is executed without problems and the results are correctly generated (see Section \ref{Sec3.2}). As for the quality of the results obtained for those tests, an in-depth analysis, coupled with the fast execution of the program, shows the advantages provided by QUASIMONT over classical G-L and other generalised quadrature rules. The first polynomial $p_1(x)$ is a model proposed in equation (73) of \cite{Lombardi09}, \textsl{Section 5.1, Example 1}, and it represents the typical integrand function often encountered in numerical methods for differential and integral equations featuring singular modelling, on which QUASIMONT is indeed considered an helpful, effective and precise tool. The proposed generalised polynomial $p_1(x)$ features a strong singularity at $x=0$ in the interval $(0,1)$ and all but two of its monomial terms have non-integer degree. The numerical approximation of the integral at double precision is achieved with $n=32$ nodes using a monomial transformation applied to the classical G-L quadrature with $n$ nodes in $(0,1)$. The Table \ref{table2.2} below shows what was graphically reported in Figure \ref{Fig1.2} i.e. the ad-hoc suited and more efficient distribution of the samples obtained by the monomial transformation as opposed to the ones of the classical G-L quadrature rule.
 
-\vspace{0.15cm}
-\begin{tcblisting}{enhanced,
-                   arc=5mm,
-                   title = \color{black}{\large \ttfamily Building and executing the test driver: p\_2(x)},
-                   colbacktitle=bashGray,
-                   colback=bashBlue,
-                   listing only,
-                   listing style=BashStyle}
-    |-------------------------------------------------|
-    |                 ** QUASIMONT **                 |
-    |  ** MONOMIAL TRANSFORMATION QUADRATURE RULE **  |
-    |-------------------------------------------------|
-
- Input polynomial p(x) =  +x^(-0.906093943) 
-
- ** WARNING ** Your input is a monomial of non-integer degree.
-               QUASIMONT needs a binomial for double-precision quadrature.
-               How do you proceed? ['nodes' for n_min ~ 'lambda' for lambda_max]
-               Input: 
-\end{tcblisting}
-
-\newpage
-
+\vspace{0.2cm}
 \begin{table}[H]
 \centering
 \begin{tabular}{|c||c|c|}
 \hline
-\multicolumn{3}{|c|}{\textbf{Nodes and weights (double f.p. format) of the proposed quadrature for $p_1(x)$ }} \\
+\multicolumn{3}{|c|}{\textbf{Nodes and weights of the proposed quadrature for $p_1(x)$ }} \\
 \hline
 $j\in\mathbb{N}$ & $x_j\in(0,1)$ & $w_j\in\mathbb{R}^+$ \\
 \hline
@@ -643,13 +654,38 @@ $j\in\mathbb{N}$ & $x_j\in(0,1)$ & $w_j\in\mathbb{R}^+$ \\
 \hline
 \end{tabular}
   \caption{Nodes and weights obtained by a monomial transformation of order $r=28.77$ applied to the G-L quadrature integrating $p_1(x)$ in $(0,1)$ at double precision with $n=32$ samples.}
-  \label{table2.1}
+  \label{table2.2}
 \end{table}
 
 \noindent
-The integration is enabled using a caveat prompted on the terminal and it consists in choosing one path between two mutually exclusive options that the user must exercise in order to continue with the application. One of those is the choice of specifying the maximum number $n$ for the quadrature rule, in which case the library  automatically compute $\lambda_{\text{max}}$ and integrate $\tilde{p_2}(x) = x^{-\frac{e}{3}} + x^{\lambda_\text{max}}$ accordingly. The second path allows instead to specify $\lambda_{\text{max}}$ directly and let QUASIMONT carry out the integration. It is easy to see that the second case reduces to a \textsl{"standard"} polynomial input, as far as the library is concerned. The user should therefore type \colorbox{poliGrayBlue}{nodes} on the CLI and press Enter; we are now prompted to select any value of $n\in[10,100]$; user should type, for example, $64$ and press Enter again. On the contrary typing \colorbox{poliGrayBlue}{lambda} will cause the application to resort to its original workflow with the additional intermediate step of requiring the input value of $\lambda_{\text{max}}$. We remark that any miss-typed or empty input, will cause QUASIMONT to throw an error message and exit the program. After the specified selection, QUASIMONT computes automatically a value of $\lambda_{\text{max}} = 10.3166381$ for $p_2(x)$ and the resulting quadrature barely retains the machine-epsilon double precision for the relative error of the numerical integration. Here, the library is stressed more as it can be evinced by the substantially greater value of the transformation order $(r=45.2603038)$ w.r.t. the previous instance in $p_1(x)$. The effects of such magnitude for the monomial transformation order are easily registered by assessing the mapped nodes and weights listed in the following table. Furthermore we highlight how the relative error obtained with \colorbox{poliGrayBlue}{float128} monomial transformation quadrature rule's parameters is not substantially better than the one derive with the same nodes and weights optimised in double f.p. format. In fact we observe that the latter format has been selected despite being slightly less precise than the former. The logic behind is that both relative errors are computed at run-time and if their absolute difference is smaller than twice the machine-epsilon in double precision than we go ahead and export the data in the most optimised format.
+While in fact we know that the $n=32$ nodes of the classical G-L quadrature rule are distributed symmetrically in $(0,1)$ with an equal abundance of those at both bounds of the integration interval, our proposed quadrature scheme, based on the monomial transformation, concentrates the samples close to the lower bound $x=0$, squashing the vast majority of them ($26$ out of the total $32$) inside the sub-interval $(0,0.1)$ thereby better capturing the singular behaviour of $p_1(x)$. The second benchmark polynomial is proposed with the scope of introducing the user to a core functionality of QUASIMONT that requires further input on the CLI. Indeed, $p_2(x)$ is a monomial of non-integer degree and its numerical integration requires careful manipulation. During the modelling process of larger applications, especially when dealing with finite elements constructed over meshed domains with singular spatial geometry behaviour \cite{Graglia04,Graglia08} it is often necessary to integrate low-order singular generalised polynomial basis functions together with high-order regular polynomial basis functions. QUASIMONT allows to integrate such integrals identifying the degree of the monomial as $\lambda_{\text{min}}$ and the maximum degree  $\lambda_{\text{max}}$ of the all set of combined polynomial functions. For this reason, in this test, we add a monomial with $\lambda_{\text{max}}$ degree and unitary coefficient to $p_2(x)$. Once constructed the final polynomial we apply the proposed algorithm to process the optimised nodes and weights. The integration is enabled using a caveat prompted on the terminal and it consists in choosing one path between two mutually exclusive options that the user must exercise in order to continue with the application.
 
-\newpage
+\vspace{0.2cm}
+\begin{tcblisting}{enhanced,
+                   arc=5mm,
+                   title = \color{black}{\large \ttfamily Building and executing the test driver: p\_2(x)},
+                   colbacktitle=bashGray,
+                   colback=bashBlue,
+                   listing only,
+                   listing style=BashStyle}
+    |-------------------------------------------------|
+    |                 ** QUASIMONT **                 |
+    |  ** MONOMIAL TRANSFORMATION QUADRATURE RULE **  |
+    |-------------------------------------------------|
+
+ Input polynomial p(x) =  +x^(-0.906093943) 
+
+ ** WARNING ** Your input is a monomial of non-integer degree.
+               QUASIMONT needs a binomial for double-precision quadrature.
+               How do you proceed? ['nodes' for n_min ~ 'lambda' for lambda_max]
+               Input: 
+\end{tcblisting}
+\vspace{0.3cm}
+
+\noindent
+One of those is the choice of specifying the maximum number $n$ for the quadrature rule, in which case the library  automatically compute $\lambda_{\text{max}}$ and integrate $\tilde{p_2}(x) = x^{-\frac{e}{3}} + x^{\lambda_\text{max}}$ accordingly. The second path allows instead to specify $\lambda_{\text{max}}$ directly and let QUASIMONT carry out the integration. It is easy to see that the second case reduces to a \textsl{"standard"} polynomial input, as far as the library is concerned. The user should therefore type \colorbox{poliGrayBlue}{nodes} on the CLI and press Enter; we are now prompted to select any value of $n\in[10,100]$; user should type, for example, $64$ and press Enter again. On the contrary typing \colorbox{poliGrayBlue}{lambda} causes the application to resort to its original workflow with the additional intermediate step of requiring the input value of $\lambda_{\text{max}}$. We remark that any miss-typed or empty input results in QUASIMONT to throw an error message and exit the program. 
+
+\vspace{0.2cm}
 \begin{tcblisting}{enhanced,
                    arc=5mm,
                    title = \color{black}{\large \ttfamily Building and executing the test driver: p\_2(x)},
@@ -679,11 +715,14 @@ Please specify the desired number of quadrature nodes (number must be even): 64
  ** QUASIMONT HAS TERMINATED **
 \end{tcblisting}
 
+\noindent
+After the specified selection, QUASIMONT computes automatically a value of $\lambda_{\text{max}} = 10.3166381$ for $p_2(x)$ and the resulting quadrature barely retains the machine-epsilon double precision for the relative error of the numerical integration. Here, the library is stressed more as it can be evinced by the substantially greater value of the transformation order $(r=45.2603038)$ w.r.t. the previous instance in $p_1(x)$. The effects of such magnitude for the monomial transformation order are easily registered by assessing the mapped nodes and weights listed in the following table. Furthermore we highlight how the relative error obtained with \colorbox{poliGrayBlue}{float128} monomial transformation quadrature rule's parameters is not substantially better than the one derive with the same nodes and weights optimised in double f.p. format. In fact we observe that the latter format has been selected despite being slightly less precise than the former. The logic behind is that both relative errors are computed at run-time and if their absolute difference is smaller than twice the machine-epsilon in double precision than we go ahead and export the data in the most optimised format.
+
 \begin{table}[H]
-\hspace{-1cm}
+\hspace{-1.4cm}
 \begin{tabular}{|c||c|c||c||c|c|}
 \hline
-\multicolumn{6}{|c|}{\textbf{Nodes and weights (double f.p. format) of the proposed quadrature for $p_2(x)$}} \\
+\multicolumn{6}{|c|}{\textbf{Nodes and weights of the proposed quadrature for $p_2(x)$}} \\
 \hline
 $j\in\mathbb{N}$ & $x_j\in(0,1)$ & $w_j\in\mathbb{R}^+$ & $j\in\mathbb{N}$ & $x_j\in(0,1)$ & $w_j\in\mathbb{R}^+$ \\
 \hline
@@ -722,13 +761,17 @@ $j\in\mathbb{N}$ & $x_j\in(0,1)$ & $w_j\in\mathbb{R}^+$ & $j\in\mathbb{N}$ & $x_
 \hline
 \end{tabular}
   \caption{Nodes and weights obtained by a monomial transformation of order $r=45.26$ applied to the G-L quadrature integrating $p_2(x)$ in (0,1) at double precision with $n=64$ samples.}
-  \label{table2.2}
+  \label{table2.3}
 \end{table}
 
 \noindent
-Finally, with the last benchmark a classical polynomial of high integer-degree is integrated; indeed, $p_3(x)$ is a binomial. For standard, polynomials we compare the performance of standard  G-L quadrature with the one of QUASIMONT. According to the properties described in Sub-Section \ref{SubSec1.2.2}, the former requires $n=\frac{\lambda_{max}+1}{2}=18$ nodes to achieve double precise integration.
+Finally, with the last benchmark a classical polynomial of high integer-degree is integrated; indeed, $p_3(x)$ is a binomial. For standard, polynomials we compare the performance of standard  G-L quadrature with the one of QUASIMONT. According to the properties described in Sub-Section \ref{SubSec1.2.2}, the former requires $n=\frac{\lambda_{max}+1}{2}=18$ nodes to achieve double precise integration however, we immediately realise that our library (more sepcifically the monomial transformation quadrature rule) outperforms the classical G-L quadrature rule for a fixed double precision accuracy as only $n=12$ samples are needed. We also remark  that the transformation order needed by the monomial map is significantly lower than the previous two cases, in particular less than $1$.
 
-\vspace{0.5cm}
+\newpage
+\noindent
+Since $p_3(x)$ does not have a singularity at $x=0$, the processing of G-L quadrature yields a monomial transformation quadrature with samples that are not clustered on $x=0$. In this instance instead, the transformation forces the performance of the quadrature to effectively integrate generalised polynomials with $\lambda\in\{17,35\}$ with machine-epsilon precision specified for the double f.p. format, as it can be assessed by the table below.
+
+\vspace{0.2cm}
 \begin{tcblisting}{enhanced,
                    arc=5mm,
                    title = \color{black}{\large \ttfamily Building and executing the test driver: p\_3(x)},
@@ -762,18 +805,18 @@ Input polynomial p(x) =  +x^(17)  +x^(35)
 
 user@machine: home/QUASIMONT/test>
 \end{tcblisting}
-\vspace{0.5cm}
+\vspace{0.3cm}
 
 \noindent
-While running QUASIMONT, we immediately note that our proposed software outperforms G-L quadrature for double precision numerical integration as only $n=12$ samples are needed. We also remark  that the transformation order needed by the monomial map is significantly lower than the previous two cases, in particular less than 1. Since $p_3(x)$ does not have a singularity at $x=0$, the processing of G-L quadrature yields a monomial transformation quadrature with samples that are not clustered on $x=0$. In this instance instead, the transformation forces the performance of the quadrature to effectively integrate generalised polynomials with $\lambda\in\{17,35\}$ with machine-epsilon precision specified for the double f.p. format, as it can be assessed by the table below.
+With these results we would like to direct the user's attention on the possibility of using QUASIMONT even for specific standard/classical polynomials of integer degree as its processed nodes and weights lead to a fewer samples in the quadrature rule (especially with higher-degrees) and thus more efficient and less expensive code to run. At the best of our knowledge, and based on the tests reported here and in \cite{Lombardi09, Lombardi21}, the monomial transformation can be adapted to the widest range of generalised polynomial of non-integer degree as long as the constraint of $\lambda_{\text{min}}>-1$ holds for the integrand. By excluding those cases of rational functions we argue that the usage of QUASIMONT produces more accurate results faster (i.e. using the minimum possible number of samples) and more efficiently (outputting the most optimised f.p. formats for the new quadrature parameters) than any other algorithm that currently deals with both classical and singular generalised polynomial integrands.
 
 \begin{table}[H]
 \centering
 \begin{tabular}{|c||c|c|}
 \hline
-\multicolumn{3}{|c|}{\textbf{Nodes and weights (double f.p. format) of the proposed quadrature for $p_3(x)$}} \\
+\multicolumn{3}{|c|}{\textbf{Nodes and weights of the proposed quadrature for $p_3(x)$}} \\
 \hline
-$j\in\mathbb{N}$ & $x_j\in[0,1]$ & $w_j\in\mathbb{R}^+$ \\
+$j\in\mathbb{N}$ & $x_j\in(0,1)$ & $w_j\in\mathbb{R}^+$ \\
 \hline
 1   &  0.0597707229696358   &  0.0919264663553836  \\
 2   &  0.1610307309568925   &  0.1079664407846363  \\
@@ -784,28 +827,26 @@ $j\in\mathbb{N}$ & $x_j\in[0,1]$ & $w_j\in\mathbb{R}^+$ \\
 7   &  0.7076854327640707   &  0.0941968566214454  \\
 8   &  0.7958143666363263   &  0.0816648573999376  \\
 9   &  0.8702918448156044   &  0.0669634924046180  \\
-10   &  0.9291601555462656   &  0.0505192348221430  \\
+10  &  0.9291601555462656   &  0.0505192348221430  \\
 11  &  0.9708981507831240   &  0.0327793590987762  \\
 12  &  0.9944473508291223   &  0.0142322139984140  \\
 \hline
 \end{tabular}
   \caption{Nodes and weights obtained by a monomial transformation of order $r=0.6011$ applied to the G-L quadrature integrating $p_3(x)$ in (0,1) at double precision with $n=12$ samples.}
-  \label{table2.3}
+  \label{table2.4}
 \end{table}
 
-\noindent
-With these results we would like to direct the user's attention on the possibility of using QUASIMONT even for specific standard/classical polynomials of integer degree as its processed nodes and weights lead to a fewer samples in the quadrature rule (especially with higher-degrees) and thus more efficient and less expensive code to run. At the best of our knowledge, and based on the tests reported here and in \cite{Lombardi09, Lombardi21}, the monomial transformation can be adapted to the widest range of generalised polynomial of non-integer degree as long as the constraint of $\lambda_{\text{min}}>-1$ holds for the integrand. By excluding those cases of rational functions we argue that the usage of QUASIMONT produces more accurate results faster (i.e. using the minimum possible number of samples) and more efficiently (outputting the most optimised f.p. formats for the new quadrature parameters) than any other algorithm that currently deals with both classical and singular generalised polynomial integrands.
 
 \chapter[User interface]{\Huge \ttfamily USER INTERFACE}\chaptermark{USER INTERFACE}
 
-The execution of the test drivers should have introduced the user on the fundamentals and interaction with the library. In this chapter we will therefore expose the I/O interface and how the user can quickly build a new application. In particular a step-by-step procedure to setup, build and execute a custom-made application from scratch will be described. In the first section we discuss the input source file, amendable by the user to create her/his first application with the library. In the second section we address how the results are exported. Finally we briefly outline how these results can be used by other applications and loaded in external code automatically by integrating QUASIMONT in a larger library and conclude with a short description of the previously mentioned secondary module.
+Now that we have introduced the fundamentals regarding execution and interaction with the library, in this chapter we hereby expose its I/O operations interface by quickly building a new custom application. In the first section we discuss the input source file, amendable by the user to create her/his first application with the QUASIMONT. In the second section we address the outputs of the library and how the results are exported; we also consider the main differences between the loud and silent mode of execution. Subsequently we briefly outline how QUASIMONT's results can be used by other applications as they are imported in external code by integrating our library in a larger software. Finally we provide an exposition to the methods instantiated directly by the primary module and conclude with a short description of the previously mentioned secondary module.
 
 \section[The input source file]{\changefont THE INPUT SOURCE FILE}\sectionmark{THE INPUT SOURCE FILE}\label{Sec3.1}
 
 \noindent
-Let us start by implementing a new exemplifying application by reconsidering the singular generalised polynomial $p_1(x)$ introduced in the test driver of Section \ref{Sec2.4}. We begin by creating a copy of the source file \colorbox{poliGrayBlue}{Main.cpp} and of the associated top-level makefile of test application located in  \colorbox{poliGrayBlue}{\textbf{QUASIMONT/test}} into a new subdirectory labelled \colorbox{poliGrayBlue}{\textbf{QUASIMONT/MyApp}}
+Let us start by implementing a new application by specifying the generalised polynomial $p_1(x)$ introduced in the test driver of Section \ref{Sec2.4}. We can simply create a copy of the source file \colorbox{poliGrayBlue}{Main.cpp} and of the associated top-level makefile located in  \colorbox{poliGrayBlue}{\textbf{QUASIMONT/test}} into a new subdirectory called \colorbox{poliGrayBlue}{\textbf{QUASIMONT/MyApp}}
 
-\vspace{0.5cm}
+\vspace{0.2cm}
 \begin{tcblisting}{enhanced,
                    arc=5mm,
                    title = \color{black}{\large \ttfamily Creation of application's directory},
@@ -819,29 +860,28 @@ user@machine: home/QUASIMONT/MyApp> make clean
 rm -f ../build/obj/Main.o Test
 if [ -d "output" ]; then rm -r output; fi 
 \end{tcblisting}
-\vspace{0.5cm}
+\vspace{0.3cm}
 
 \noindent
-In both\colorbox{poliGrayBlue}{Main.cpp} and  \colorbox{poliGrayBlue}{makefile} we change the inputs according to the new application. We start from the latter for which the amendments amount to
+In both\colorbox{poliGrayBlue}{Main.cpp} and  \colorbox{poliGrayBlue}{makefile} we change the inputs according to the new application. For the latter we must:
 
 \begin{itemize}
-    \item substitute the string \colorbox{poliGrayBlue}{Test} to \colorbox{poliGrayBlue}{MyApp} whenever it is mentioned to effectively rename the application built by the compiler;
-    \item alternatively at line define a macro variable \colorbox{poliGrayBlue}{EXE\_NAME = MyApp} and invoke it as \colorbox{poliGrayBlue}{\$(EXE\_NAME)} at the corresponding lines above.
+    \item substitute \colorbox{poliGrayBlue}{Test} to \colorbox{poliGrayBlue}{MyApp} whenever it is mentioned, renaming the application built by the compiler;
+    \item alternatively define a macro variable \colorbox{poliGrayBlue}{EXE\_NAME = MyApp} and invoke it as \colorbox{poliGrayBlue}{\$(EXE\_NAME)}.
 \end{itemize}
 
 \noindent
-Recalling that QUASIMONT is designed to perform precise numerical integration of generalised polynomials defined in the interval $(0,1)$, we need to modify the inputs related to the two sequences of coefficients and exponents that uniquely define the polynomial itself in \colorbox{poliGrayBlue}{Main.cpp}, i.e.
+For the former we need to specify the inputs related to the two sequences of coefficients and exponents that uniquely define the polynomial itself i.e.
 
-\newpage
 \begin{itemize}
     \item the \colorbox{poliGrayBlue}{coefficients\_sequence} stored in a \colorbox{poliGrayBlue}{std::vector} of length $r+1$, that is the number of non null-coefficients (see Sub-Section \ref{SubSec1.2.4});
-    \item the \colorbox{poliGrayBlue}{muntz\_sequence} of exponents of the polynomial $p(x)$ also stored in a \colorbox{poliGrayBlue}{std::vector} of the same length $r+1$
+    \item the \colorbox{poliGrayBlue}{muntz\_sequence} of exponents of the polynomial $p(x)$ also stored in a \colorbox{poliGrayBlue}{std::vector} of the same length $r+1$.
 \end{itemize}
 
 \noindent
-If the two data-structures have different lengths, QUASIMONT will throw an error message and exit the program. We shall retain the exact same sequence that has been previously defined in $p_1(x)$, i.e. lines \colorbox{poliGrayBlue}{21-22}
+If the two data-structures have different lengths, QUASIMONT throws an error message and exit the program. We shall retain the exact same sequence that has been previously defined in $p_1(x)$ as reported below
 
-\vspace{0.25cm}
+\vspace{0.2cm}
 \tcbinputlisting{enhanced,
                  arc=5mm,
                  title = \color{black}{\large \ttfamily Main.cpp (input source file)},
@@ -849,23 +889,49 @@ If the two data-structures have different lengths, QUASIMONT will throw an error
                  colback=poliGrayBlue,
                  listing only,
                  listing style=CppStyle,
-                 listing file=snippets/Main.cpp}
-\vspace{0.5cm}
+                 listing file=snippets/Main_Loud.cpp}
+\vspace{0.3cm}
 
 \noindent
-Order of input of either \colorbox{poliGrayBlue}{muntz\_sequence} and \colorbox{poliGrayBlue}{coefficients\_sequence} does not matter as QUASIMONT automatically extract $\lambda_{\text{min}}$ and $\lambda_{\text{max}}$ through a \textsl{sorting} algorithm. Regardless of the \textsl{"absolute"} order, it is trivial that the user must make sure that the \textsl{"relative"} order of the two sequences must coincide. Once we correctly defined all the inputs we can instantiate the primary method \colorbox{poliGrayBlue}{quasimont}, then save the amended file and exit the editor. Although the aim of QUASIMONT is to integrate generalised polynomials with double precision, we note that the coefficients and exponents sequences are defined as \colorbox{poliGrayBlue}{float128} data-types; this is to ensure the convergence check on our tests without missing any digit. Applications with coefficients and exponents sequences defined with double precision is straightforward.
+We remark that the order of input of either \colorbox{poliGrayBlue}{muntz\_sequence} and \colorbox{poliGrayBlue}{coefficients\_sequence} does not matter as QUASIMONT automatically extract $\lambda_{\text{min}}$ and $\lambda_{\text{max}}$ through a \textsl{sorting} algorithm. Regardless of the \textsl{"absolute"} order, it is trivial that the user must make sure that the \textsl{"relative"} order of the two sequences must coincide. Once we correctly defined all the inputs we can instantiate the primary method \colorbox{poliGrayBlue}{quasimont}, then save the amended file and exit the editor. Although the aim of QUASIMONT is to integrate generalised polynomials with double precision, we note that the coefficients and exponents sequences are defined as \colorbox{poliGrayBlue}{float128} data-types; this is to ensure the convergence check on our tests without missing any digit. Applications with coefficients and exponents sequences defined with double precision is straightforward.
 
 \section[Results and outputs]{\changefont RESULTS AND OUTPUTS}\sectionmark{RESULTS AND OUTPUTS}\label{Sec3.2}
 
 \noindent
-In the top-level \colorbox{poliGrayBlue}{makefile} of the \colorbox{poliGrayBlue}{Test} application we embedded the automatic execution of the program once the compilation is (successfully) completed. If the user wants to disable such execution, it is necessary to erase the corresponding line of the \colorbox{poliGrayBlue}{makefile} and manually input \colorbox{poliGrayBlue}{./MyApp} on the CLI at the end of the compilation. Once the application is ran, the first feedback to the user is its input followed by the computed parameters of the monomial map i.e. $\lambda_{\text{min}},\;\lambda_{\text{max}},\;\beta_{\text{min}},\;\beta_{\text{max}},\;r$. The next information is the floating-point format with which the new nodes and weights have been exported (see below for further explanation) and lastly the value of the primitive (or analytic integral), numerical integral and the relative error. The classical G-L parameters are stored in \colorbox{poliGrayBlue}{TabulatedGlNodes.csv} and \colorbox{poliGrayBlue}{TabulatedGlWeights.csv} in text format and imported in the source code as \colorbox{poliGrayBlue}{float128} f.p. data-types, retaining up to 34 decimal digits of precision. Since double-precision quadrature can be achieved with lower precision data, QUASIMONT features a method called \colorbox{poliGrayBlue}{optimiseData} (see Sub-Section \ref{SubSec4.2.3}) that automatically selects the most optimised format possible, among those listed in Section \ref{Sec1.1}, with which to export the output, results i.e. the new quadrature nodes and weights, to reach the prescribed relative precision for the integration (e.g. double precision). The optimality here is meant as the lowest-precision f.p. format that still allows to retain a machine-epsilon accuracy (we specified double f.p. precision however the procedure is easily generalised using C++ template parameters) for the relative error of the integral computed through the monomial  transformation quadrature rule. The results are not shown on the terminal but are instead exported in three separate files called \colorbox{poliGrayBlue}{Results.txt}, \colorbox{poliGrayBlue}{Nodes.txt} and \colorbox{poliGrayBlue}{Weights.txt}, all located in the \colorbox{poliGrayBlue}{\textbf{QUASIMONT/MyApp/output}} subdirectory created automatically by the application. The text files introduced above collect inputs and outputs of the library alongside the values of the numerical integral approximated using both the classical G-L and the proposed monomial transformation quadrature rule together with the exact analytical result. The file \colorbox{poliGrayBlue}{Results.txt} is therefore intended for the user to have an immediate feedback on the quality of the approximation made by QUASIMONT. The remaining two files, as their names suggest, list the actual output of the library i.e. the new nodes and weights respectively. The user should compare her/his results with those listed in the previous Table \ref{table2.1}. The resulting new quadrature samples, established by the monomial rule and optimised accordingly by the aforementioned routine, are exported with the f.p. precision guarantees the quadrature relative error to be within the machine-epsilon in double precision. The choice was made here to use text files instead of streaming them as outputs of the primary method \colorbox{poliGrayBlue}{quasimont} so that a permament record of them will be retrievable, at any time, by the user, regardless of the type of application and software integration of our library. We emphasize that by instantiating \colorbox{poliGrayBlue}{quasimont} the output files are overwritten.
+In the following we first discuss how outputs are generated for the loud mode of execution of QUASIMONT for the \colorbox{poliGrayBlue}{MyApp} application initialised in the previous section; we wrap the section up by exposing the different input parameters and outputs of QUASIMONT when executed in silent mode. In the top-level \colorbox{poliGrayBlue}{makefile} of the \colorbox{poliGrayBlue}{Test} application we embedded the automatic execution of the program once the compilation is (successfully) completed. If the user wants to disable such execution, it is necessary to erase the corresponding line of the \colorbox{poliGrayBlue}{makefile} and manually input \colorbox{poliGrayBlue}{./MyApp} on the CLI at the end of the compilation. Once the application is ran, the first feedback to the user is its input followed by the computed parameters of the monomial map i.e. $\lambda_{\text{min}},\;\lambda_{\text{max}},\;\beta_{\text{min}},\;\beta_{\text{max}},\;r$. The next information is the floating-point format with which the new nodes and weights have been exported and lastly the value of the primitive (or analytic integral), numerical integral and the relative error obtained using the new quadrature parameters in quadruple (i.e. \colorbox{poliGrayBlue}{float128} f.p. format) and \colorbox{poliGrayBlue}{double} precision. The classical G-L quadrature parameters are stored in \colorbox{poliGrayBlue}{TabulatedGlNodes.csv} and \colorbox{poliGrayBlue}{TabulatedGlWeights.csv} in text format and imported in the source code as \colorbox{poliGrayBlue}{float128} f.p. data-types, retaining up to 34 decimal digits of precision. Since double-precision quadrature can be achieved with lower precision data, QUASIMONT features a method called \colorbox{poliGrayBlue}{optimiseData} (see Sub-Section \ref{SubSec4.2.3}) that automatically selects the most optimised format possible between, \colorbox{poliGrayBlue}{float128} and \colorbox{poliGrayBlue}{double}, with which to export the new quadrature nodes and weights to reach the prescribed relative precision. The optimality here is meant as the lowest-precision f.p. format that still allows to retain a machine-epsilon accuracy (we specified double f.p. precision however the procedure is easily generalised using C++ template parameters) for the relative error of the integral computed through the monomial  transformation quadrature rule. The results of the quadrature and the new nodes and weights are then exported in three separate files called \colorbox{poliGrayBlue}{Results.txt}, \colorbox{poliGrayBlue}{Nodes.txt} and \colorbox{poliGrayBlue}{Weights.txt}, all located in the \colorbox{poliGrayBlue}{\textbf{QUASIMONT/MyApp/output}} subdirectory created automatically by the application. These text files collect the inputs and outputs of the library alongside the values of the numerical integral approximated using both the classical G-L and the proposed monomial transformation quadrature rule together with the exact analytical result. The file \colorbox{poliGrayBlue}{Results.txt} is therefore intended for the user to have an immediate feedback on the quality of the approximation made by QUASIMONT. The remaining two files, as their names suggest, list the actual output of the library i.e. the new nodes and weights respectively. The user should compare her/his results with those listed in the previous Table \ref{table2.2}. The resulting new quadrature samples, established by the monomial transformation quadrature rule and optimised accordingly by the aforementioned routine, are exported with the f.p. precision that guarantees the a-posteriori relative error of the numerical integral to be within the machine-epsilon in double precision. When executing QUASIMONT in loud mode, as we did for the test drivers in Section \ref{Sec2.4} and for the present application, those new quadrature parameters are not streamed to the stack/heap as outputs of the primary method \colorbox{poliGrayBlue}{quasimont}; they can only be retrieved manually (at any time) by the user by accessing the aforementioned text files. Furthermore, as explained extensively thus far, the user is required to fully specify the input generalised polynomial by providing a list of coefficients and exponents of each monomial term that constitute the integrand. However, as anticipated in the closing lines of Section \ref{Sec2.1}, the primary module gateway's \colorbox{poliGrayBlue}{quasimont} is overloaded to a silent mode that takes only two \colorbox{poliGrayBlue}{double} parameters specifying $\lambda_{\text{min}}$ and $\lambda_{\text{max}}$ instead of the full sequence of exponents and coefficients. The silent mode then defaults both generalised monomials to have unitary coefficients and thus computes the quadrature of the following integrand
 
+\begin{equation*}
+    p(x) = x^{\,\lambda_{\text{min}}} + x^{\lambda_{\,\text{max}}}\,,\quad x\in(0,1) 
+\end{equation*}
+
+\noindent
+using the exact same monomial transformation quadrature rule. As opposed to the loud mode discussed and instantiated thus far, the silent mode overloading \colorbox{poliGrayBlue}{quasimont} does in fact return the new nodes and weights to the stack/heap of the user's local machine, returned by the function in a \colorbox{poliGrayBlue}{std::vector$<$std::vector$<$double$>$ $>$} data structure as depicted in the snippet below. For a specific input values of $\lambda_{\text{min}} = -\frac{1}{e}$ and $\lambda_{\text{max}} = +\frac{1}{2}$ the input source file is as simple as
+
+\vspace{0.2cm}
+\tcbinputlisting{enhanced,
+                 arc=5mm,
+                 title = \color{black}{\large \ttfamily Main.cpp (silent mode execution)},
+                 colbacktitle=poliOrange,
+                 colback=poliGrayBlue,
+                 listing only,
+                 listing style=CppStyle,
+                 listing file=snippets/Main_Silent.cpp}
+\vspace{0.3cm}
+
+\noindent
+The above execution of QUASIMONT in silent mode suppresses any on-screen printing of the results and generates a single \colorbox{poliGrayBlue}{outputs.txt} file containing all the information regarding the monomial transformation quadrature rule (namely the values of $\lambda_{\text{min}}$ and $\lambda_{\text{max}}$ and the a-posteriori relative error) followed by the new same nodes and weights returned to memory. We emphasize however that, though the new nodes and weights written to \colorbox{poliGrayBlue}{outputs.txt} are optimised by QUASIMONT's routine to be the proper f.p. format, those that are instead streamed to memory by the silent mode are, by default, returned in \colorbox{poliGrayBlue}{double} precision regardless of the associated accuracy of the numerical integral. The reason for this choice of implementation for the silent mode of QUASIMONT is two-fold:
+\begin{itemize}
+    \item on the practical side, the silent mode of QUASIMONT is providing the user with the core fundamentals of its functionality while stripping down the ancillaries concerning the testing, monitoring and debugging features s.a. on-screen information printing and progress tracking. Furthermore we realised that in most applications of interest in computational engineering it is frequent to only care about the extreme bounds of the input generalised polynomials, thus disregarding both all the real-valued exponents in between $\lambda_{\text{min}}>-1$ and $\lambda_{\text{max}}$ and also the values of the coefficients of each monomial term. As such, should the user be concerned with the convergence properties of the application we encourage her/him to go ahead instantiating the loud mode of \colorbox{poliGrayBlue}{quasimont} as it always assures the optimal f.p. format for the quadrature nodes and weights. If convergence study is not a concern, then the silent mode should be used for its enhanced efficiency in I/O handling.
+    \item rather than a placeholder type specifier (i.e. \colorbox{poliGrayBlue}{auto}) to be deduced at compile time for exporting in memory the new nodes and weights in an optimised f.p. format we simply resort to a {\itshape matrix-}like structure in \colorbox{poliGrayBlue}{double} precision. This choice was made to facilitate the interface of the user with our library as the \colorbox{poliGrayBlue}{double} is much more wide-spread in use than the \colorbox{poliGrayBlue}{float128} quadruple precision f.p. counterpart 
+\end{itemize}
+
+\newpage
 \section[Static-library and software integration]{\changefont STATIC-LIBRARY AND SOFTWARE INTEGRATION}\sectionmark{STATIC-LIBRARY AND SOFTWARE INTEGRATION}\label{Sec3.3}
 
 \noindent
-Although we have demonstrated the effectiveness and consistency of QUASIMONT as stand-alone application, in this section we discuss its integration in larger mathematical software in numerical analysis and scientific simulations. We do this by providing \color{poliDarkBlue} \textbf{static library facilities} \color{black}, to which the user can easily link to, when building any other C++ application. This option enables the user to integrate with ease the primary module \colorbox{poliGrayBlue}{quasimont}, which is the one of interest from a computational perspective. First and foremost the static library \colorbox{poliGrayBlue}{libquasimont.a} needs to be created by invoking the non-default rule \colorbox{poliGrayBlue}{make static} of the library's source \colorbox{poliGrayBlue}{makefile} in the aforementioned subdirectory.
+While we demonstrated the effectiveness and consistency of QUASIMONT as a stand-alone application, in this section we discuss its integration in larger mathematical software in numerical analysis and scientific simulations. We do this by providing \color{poliDarkBlue} \textbf{static library facilities}\color{black}, to which the user can easily link to when building any other C++ application. This option enables the user to integrate with ease the primary module \colorbox{poliGrayBlue}{quasimont}, in both its loud and silent modes, which is the one of interest from a computational perspective. First and foremost the static library \colorbox{poliGrayBlue}{libquasimont.a} needs to be created by invoking the non-default rule \colorbox{poliGrayBlue}{make static} of the library's source \colorbox{poliGrayBlue}{makefile} located in the \colorbox{poliGrayBlue}{\textbf{QUASIMONT/build}} subdirectory.
 
-\vspace{0.5cm}
+\vspace{0.2cm}
 \begin{tcblisting}{enhanced,
                    arc=5mm,
                    title = \color{black}{\large \ttfamily Creation of libquasimont static library},
@@ -884,19 +950,19 @@ g++ -c VecOps.cpp -o ../build/obj/VecOps.o -ansi -std=c++17 -I ../include
 make[1]: Leaving directory '/home/QUASIMONT/utilities'
 ar rcs ../static/libquasimont.a obj/Quasimont.o obj/DatIo.o obj/MonMap.o obj/VecOps.o
 \end{tcblisting}
-\vspace{0.5cm}
+\vspace{0.3cm}
 
 \noindent
-We chose to implement an example application using the static library of QUASIMONT in a separate directory \colorbox{poliGrayBlue}{\textbf{QUASIMONT/static}}; by default the \colorbox{poliGrayBlue}{make static} rule will create \colorbox{poliGrayBlue}{libquasimont.a} in such directory. While building an external software, the user needs to specify absolute or relative paths (at her/his own discretion) to properly link the static library, i.e.:
+To showcase how to easily integrate the static library of our software in an external code we implemented a simple applications that is shipped with the library itself in \colorbox{poliGrayBlue}{\textbf{QUASIMONT/static}}; by default the aformentioned \colorbox{poliGrayBlue}{make static} rule will compile and create \colorbox{poliGrayBlue}{libquasimont.a} in such directory. While building an external software, the user needs to specify absolute or relative paths (at her/his own discretion) to properly link the static library, i.e.:
 \begin{itemize}
-    \item the \colorbox{poliGrayBlue}{\textbf{QUASIMONT/include}} subdirectory containing the library header files, which is done by adding the flag \colorbox{poliGrayBlue}{-Ipath/to/QUASIMONT/include} to the GCC compiler options. For our case this path variable will be \colorbox{poliGrayBlue}{-I../include};
-    \item the actual \colorbox{poliGrayBlue}{libquasimont.a} itself by adding \colorbox{poliGrayBlue}{path/to/QUASIMONT/build/libquasimont.a} to the GCC linker option. For our case this path variable will be that of the current directory.
+    \item the \colorbox{poliGrayBlue}{\textbf{QUASIMONT/include}} subdirectory containing the library header files, which is done by adding the flag \colorbox{poliGrayBlue}{-Ipath/to/QUASIMONT/include} to the GCC compiler options. For our case this path variable is \colorbox{poliGrayBlue}{-I../include};
+    \item the actual \colorbox{poliGrayBlue}{libquasimont.a} itself by adding \colorbox{poliGrayBlue}{path/to/QUASIMONT/static/libquasimont.a} to the GCC linker option. For our case this path variable is that of the current directory.
 \end{itemize}
 
 \noindent
-Therefore, if the user wants to build an external \colorbox{poliGrayBlue}{App} using the static library QUASIMONT, those two GCC options must be appended to the commands specified for compiling and linking the user's own software. If the \colorbox{poliGrayBlue}{App} is built using a \colorbox{poliGrayBlue}{makefile} then those commands are to be added to the appropriate rules, as reported in the example below. 
+Therefore, if the user wants to build an external \colorbox{poliGrayBlue}{App} using the static version of QUASIMONT, those two GCC options must be appended to the commands specified for compiling and linking the user's own software. If the \colorbox{poliGrayBlue}{App} is built using a \colorbox{poliGrayBlue}{makefile} then those are to be added to the appropriate rules, as reported in the example below. 
 
-\vspace{0.25cm}
+\vspace{0.2cm}
     \tcbinputlisting{enhanced,
                  arc=5mm,
                  title = \color{black}{\large \ttfamily External software's makefile},
@@ -905,12 +971,12 @@ Therefore, if the user wants to build an external \colorbox{poliGrayBlue}{App} u
                  listing only,
                  listing style=MakeStyle,
                  listing file=snippets/static/makefile}
-\vspace{0.25cm}
+\vspace{0.3cm}
 
 \noindent
-We recall that it is fundamental to correctly link third-party dependencies alongside QUASIMONT as reported at Section \ref{Sec2.1}; failing to do so will result in undefined references. Moreover, the primary module's header file \colorbox{poliGrayBlue}{Quasimont.h} needs to be included in the software's \colorbox{poliGrayBlue}{App.cpp} source code in order to avoid undefined references to QUASIMONT's methods. This is clearly exemplified in the snippet below showing the content of the simplest external \colorbox{poliGrayBlue}{App} using the primary method of our library. 
+We recall that it is fundamental to correctly link all the third-party dependencies alongside QUASIMONT as reported in Section \ref{Sec2.1}; failing to do so will result in undefined references. Moreover, the \colorbox{poliGrayBlue}{Quasimont.h} header file needs to be included in the source code in order to avoid undefined references to QUASIMONT's methods. This is clearly exemplified in the snippet below in which we implement a simple procedure for taking \colorbox{poliGrayBlue}{quasimont} primary module's inputs from terminal rather than an input source file discussed in Section \ref{Sec3.1}. The user should input the coefficients and the exponents of the following generalised polynomial $p(x) = 0\,x^{-\frac{1}{2}} + x^{14} + 0\,x^{28}$; this is to showcase the ability of QUASIMONT of achieving much higher precision for the numerical approximation when the number of quadrature samples $n$ is overvalued with respect to the degree of the integrand.
 
-\vspace{0.25cm}
+\vspace{0.2cm}
 \tcbinputlisting{enhanced,
                  arc=5mm,
                  title = \color{black}{\large \ttfamily App.cpp (user's external source code)},
@@ -919,12 +985,12 @@ We recall that it is fundamental to correctly link third-party dependencies alon
                  listing only,
                  listing style=CppStyle,
                  listing file=snippets/static/App.cpp}
-\newpage
+\vspace{0.3cm}
 
 \noindent
-In this App the user instantiates the access point \colorbox{poliGrayBlue}{quasimont} for an input polynomial $p(x) = \pi x^{-\frac{1}{e}} + 3 x^{\frac{1}{2}}$ by specifying its coefficients and exponents sequence. QUASIMONT will then execute and outputting the results in the \colorbox{poliGrayBlue}{\textbf{output}} subdirectory. From it the user can easily retrieve the new, optimised monomial transformation quadrature rule's parameters and re-load them back in \colorbox{poliGrayBlue}{App}; those new monomial transformed quadrature samples and weights can be used for whatever purpose the user intends to e.g. computing the numerical integrals of specific generalised polynomials. As reported below, the integral of $p(x)$ computed by QUASIMONT and the one computed manually by re-loading the quadrature coincide, entailing no loss of information takes place while loading those from the text files discussed in the previous Section \ref{Sec3.2}. This re-loading procedure allows the direct use of specific quadratures generated by QUASIMONT in any user's apps while retaining separated her/his code from the library itself; this feature allows the users of our library to keep the resulting executable as light and versatile as possible. The user should run the above script and verify that the program executes smoothly.
+The execution of this \colorbox{poliGrayBlue}{App.cpp} with QUASIMONT's loud mode does not allow to keep our optimised nodes and weights in memory as they are instead exported via text files in a separate directory (see Section \ref{Sec3.2}). In the \colorbox{poliGrayBlue}{App.cpp} snippet above we implemented a simple and straightforward, automatised procedure that allows the user to load back in memory those parameters, from the text files, as \colorbox{poliGrayBlue}{std::vector$<$ $>$} data structures. In our case we re-imported them with \colorbox{poliGrayBlue}{float128} f.p. precision however this decision is arbitrary. Nevertheless we can use the re-imported nodes and weights to fulfill any of user's need, e.g. by recomputing the numerical integral in the last lines of the snippet above we showcase that no loss of information occurs when loading back the optimised quadrature parameters. As a matter of fact, as reported above, the integral of $p(x)$ computed and printed on-screen by QUASIMONT's loud mode and the one computed manually by re-loading the transformed quadrature parameters coincide exactly apart for a trailing numerical error due to representation of constant literals in \colorbox{poliGrayBlue}{float128} f.p. format.
 
-\vspace{0.5cm}
+\vspace{0.2cm}
 \begin{tcblisting}{enhanced,
                    arc=5mm,
                    title = \color{black}{\large \ttfamily Execution of external source code using QUASIMONT' static library},
@@ -932,63 +998,141 @@ In this App the user instantiates the access point \colorbox{poliGrayBlue}{quasi
                    colback=bashBlue,
                    listing only,
                    listing style=BashStyle}
- Input polynomial p(x) =  +3.14159265*x^(-0.367879441) +3*x^(0.5)
+user@machine: home/QUASIMONT> cd static/
+user@machine: home/QUASIMONT/static> make
+g++  -c App.cpp -o App.o -ansi -std=c++17 -I../include
+g++ App.o -o App libquasimont.a -lm -lquadmath -lgsl -lgslcblas
+./App
+Insert the number of terms of the input polynomial: 3
+
+Coefficient: 0
+Exponent: -0.5
+
+Coefficient: 1
+Exponent:   14
+
+Coefficient: 0
+Exponent:   28
+
+    |-------------------------------------------------|
+    |                 ** QUASIMONT **                 |
+    |  ** MONOMIAL TRANSFORMATION QUADRATURE RULE **  |
+    |-------------------------------------------------|
+    
+ Input polynomial p(x) =  0*x^(-0.5) +x^(14)  0*x^(28)
 
  ** Accepted sequence of exponents ** 
-    {-0.367879441, 0.5}
- ** Lambda_min = -0.367879441, Lambda_max = 0.5 **
+    {-0.5, 14, 28}
+ ** Lambda_min = -0.5, Lambda_max = 28 **
  --------------------------------------------------
- ** N_min = 14
- ** Beta_min = 7.32695513, Beta_max = 28.924995 **
- ** Transformation order = 16.5615229 **
+ ** N_min = 52
+ ** Beta_min = 3.51043403, Beta_max = 335.894726 **
+ ** Transformation order = 10.3189638 **
  --------------------------------------------------
  ** Using double f.p. format for nodes and weights **
- ** I(p(x))   = 6.9699264004508497 **
- ** I_n(p(x)) = 6.9699264004508496      [with parameters in float128 precision] **
- ** E_n(p(x)) = 1.2031606718315283e-17  [with parameters in float128 precision] **
- ** I_n(p(x)) = 6.9699264004508496      [with parameters in double precision] **
- ** E_n(p(x)) = 1.338886432916513e-17   [with parameters in double precision] **
+ ** I(p(x))   = 0.066666666666666667 **
+ ** I_n(p(x)) = 0.066666666666666667    [with parameters in float128 precision] **
+ ** E_n(p(x)) = 1.0291688140319292e-32  [with parameters in float128 precision] **
+ ** I_n(p(x)) = 0.066666666666666664    [with parameters in double precision] **
+ ** E_n(p(x)) = 4.4965745828494425e-17  [with parameters in double precision] **
 
  ** QUASIMONT HAS TERMINATED **
 
- ** I_n(p(x)) = 6.9699264004508496      [with reloaded parameters in double precision] **
+ ** I_n(p(x)) = 0.066666666666666665    [with reloaded parameters in double precision] **
+ ** E_n(p(x)) = 7.8398326893941964e-18  [with reloaded parameters in double precision] **
 \end{tcblisting}
+\vspace{0.3cm}
 
 \noindent
-The resulting $n=14$ nodes and weights computed by QUASIMONT are reported Table \ref{table3.1} for reference. As a final remark we note that, because of the relative paths to the raw data (see Section \ref{Sec2.2}), the folder \colorbox{poliGrayBlue}{\textbf{QUASIMONT/data}} must necessarily be copied one level above the the software's \colorbox{poliGrayBlue}{App.cpp} source code that instantiates \colorbox{poliGrayBlue}{quasimont} from the static library.
+This re-loading procedure allows the direct use of specific quadratures generated by QUASIMONT in any user's apps while retaining separated her/his code from the library itself; this feature allows the users of our library to keep the resulting executable as light and versatile as possible. As a final remark we note that, because of the relative paths to the raw data (see Section \ref{Sec2.2}), the folder \colorbox{poliGrayBlue}{\textbf{QUASIMONT/data}} must necessarily be copied one level above the the software's \colorbox{poliGrayBlue}{App.cpp} source code that instantiates \colorbox{poliGrayBlue}{quasimont} from the static library. If such subdirectory is not placed properly the library fails to locate the necessary \colorbox{poliGrayBlue}{.csv} files needed for its execution and subsequently throw an error at run-time. For our case no further action is necessary as the directory \colorbox{poliGrayBlue}{\textbf{QUASIMONT/data}} is already placed one level above \colorbox{poliGrayBlue}{App.cpp} as it is located in sudirectory \colorbox{poliGrayBlue}{\textbf{QUASIMONT/static}} that is on the same level of the aforementioned \colorbox{poliGrayBlue}{\textbf{QUASIMONT/data}}.
 
-\begin{table}[H]
-\centering
-\begin{tabular}{|c||c|c|}
-\hline
-\multicolumn{3}{|c|}{\textbf{Nodes and weights (double f.p. format) of the proposed quadrature}} \\
-\hline
-$j\in\mathbb{N}$ & $x_j\in(0,1)$ & $w_j\in\mathbb{R}^+$ \\
-\hline
-1   &  1.4596052905532561e-36   &  6.1894206168766954e-35 \\
-2   &  1.1132574083627952e-24   &  2.0651035137532638e-23 \\
-3   &  2.4377731846127742e-18   &  2.8391986747117744e-17 \\ 
-4   &  4.4998382880885933e-14   &  3.7464568184030571e-13 \\
-5   &  6.4003132127985324e-11   &  4.057105095079503e-10  \\
-6   &  1.7781156719228688e-08   &  8.8748074290566141e-08 \\
-7   &  1.5559948578773301e-06   &  6.2192989916469207e-06 \\
-8   &  5.6557186314867493e-05   &  0.00018196919612818068 \\
-9   &  0.0010151600139893485    &  0.002615333542701164   \\
-10   &  0.010082613309455394     &  0.020446702552108884   \\
-11  &  0.059855653657067465     &  0.092358369558320871   \\
-12  &  0.22390628224095116      &  0.24661688102402748    \\
-13  &  0.54690717721044069      &  0.37649243764791818    \\
-14  &  0.89228314395297181      &  0.26128199802564411    \\
-\hline
-\end{tabular}
-  \caption{Nodes and weights obtained by a monomial transformation of order $r=16.56$ applied to the G-L quadrature integrating $p(x)$ in (0,1) at double precision with $n=14$ for this custom application.}
-  \label{table3.1}
-\end{table}
+\newpage
+\section[Modular calls for independent integration/development]{\changefont MODULAR CALLS FOR INDEPENDENT INTEGRATION/DEVELOPMENT}\sectionmark{MODULAR CALLS}\label{Sec3.4}
 
 \noindent
-If such subdirectory is not placed properly the library will fail to locate the necessary \colorbox{poliGrayBlue}{.csv} files needed for its execution and subsequently throw an error at run-time. For our case no further action is necessary as the directory \colorbox{poliGrayBlue}{\textbf{QUASIMONT/data}} is already placed one level.
+In this section we explore in more details the methods that interact directly within the primary module \colorbox{poliGrayBlue}{quasimont}. The purpose of this brief Section is to expose the fundamental modular calls that are required at run-time for the execution of the monomial transformation quadrature rule implemented in the template method \colorbox{poliGrayBlue}{quasimont}. By explicitly outline the scope and I/O data structures handled at run-time we intend to provide the user with a capability of using some, or all of those methods independently from the execution or integration of our library. The user can find the types that have to be defined to correctly instantiate each of the following methods. We refer the user to Chapter \ref{Chap4} for the description of those methods where we report the comment block proceeding each function definition. With reference to the snippet reported in Section \ref{Sec2.1}, the \colorbox{poliGrayBlue}{Quasimont.cpp} source file instantiates $5$ of the $12$ total methods that constitute the library, which are specified in the following list sorted by the order of instantiation:
+\begin{itemize}
+    \item \color{poliDarkBlue} \textbf{input\_data} \color{black} $=$ \colorbox{poliGrayBlue}{manageData}(\color{poliDarkBlue} \textbf{muntz\_sequence}\color{black}, \color{poliDarkBlue} \textbf{coeff\_sequence}\color{black})
+    \newline Interfaces with user's inputs provided in the \colorbox{poliGrayBlue}{main} of the application by arranging the proper data-structures (see Sub-Section \ref{SubSec4.2.1}).
+    \begin{itemize}
+        \item \color{poliDarkBlue} \textbf{INPUTS} \color{black}:
+        \begin{itemize}
+            \item \colorbox{poliGrayBlue}{std::vector$<$T$>$} \color{poliDarkBlue} \textbf{muntz\_sequence} \color{black} is a list of real numbers $\{\lambda_0, \lambda_1, \dots, \lambda_k\}$ representing the terms of a truncated Müntz sequence of real-valued exponents associated to the generalised polynomial $p(x)\in\mathbb{P}_{\lambda_{\text{max}}},\:\lambda_{\text{max}}=\text{max}_{\,k}\{\lambda_0, \lambda_1, \dots, \lambda_k\}$ that the user wants to integrate using the monomial transformation quadrature rule. The data type \colorbox{poliGrayBlue}{T} templatising the structure is one amongst the discussed f.p. formats \colorbox{poliGrayBlue}{float128} or \colorbox{poliGrayBlue}{double};
+            \item \colorbox{poliGrayBlue}{std::vector$<$T$>$} \color{poliDarkBlue} \textbf{coeff\_sequence} \color{black} is a list of real numbers $\{c_{\lambda_0}, c_{\lambda_1}, \dots, c_{\lambda_k}\}$ representing the coefficients of the terms of the generalised polynomial. The order of the elements and data type \colorbox{poliGrayBlue}{T} of the structure has to match that of \color{poliDarkBlue} \textbf{muntz\_sequence}\color{black}.
+        \end{itemize}
+        \item \color{poliDarkBlue} \textbf{OUTPUTS} \color{black}:
+        \begin{itemize}
+            \item \colorbox{poliGrayBlue}{std::tuple$<$int, std::vector$<$float128$>>$} \color{poliDarkBlue} \textbf{input\_data} \color{black} contains an \colorbox{poliGrayBlue}{int} variable $n_{\text{min}}$ and a $2-$ dimensional \colorbox{poliGrayBlue}{std::vector$<$float128$>$} array $\{\lambda_{\text{min}}, \,\lambda_{\text{max}}\}$; the former is the minimum number of quadrature nodes computed as the sole real root of $(\ref{eq1.18})$ and the latter is the infimum and supremum of the \color{poliDarkBlue} \textbf{muntz\_sequence} \color{black} input list.
+        \end{itemize}
+    \end{itemize}
+    
+    \item \color{poliDarkBlue} \textbf{monomial\_data} \color{black} $=$ \colorbox{poliGrayBlue}{streamMonMapData}(\color{poliDarkBlue} \textbf{n\_min}\color{black})
+    \newline Computes and extracts all the necessary parameters to uniquely specify and build the monomial map, i.e. its order $r$ (see Sub-Section \ref{SubSec4.2.2}).
+    \begin{itemize}
+        \item \color{poliDarkBlue} \textbf{INPUTS} \color{black}:
+        \begin{itemize}
+            \item \colorbox{poliGrayBlue}{int} \color{poliDarkBlue} \textbf{n\_min} \color{black} is one of the outputs of \colorbox{poliGrayBlue}{manageData}, specifically $n_{\text{min}}$, which is easily accessed with \colorbox{poliGrayBlue}{std::get$<$0$>$}(\color{poliDarkBlue} \textbf{input\_data}\color{black}).
+        \end{itemize}
+        \item \color{poliDarkBlue} \textbf{OUTPUTS} \color{black}:
+        \begin{itemize}
+            \item \colorbox{poliGrayBlue}{std::tuple$<$int, std::vector$<$float128$>>$} \color{poliDarkBlue} \textbf{monomial\_data} \color{black} contains an \colorbox{poliGrayBlue}{int} variable $n_{\text{min}}$ and a $2-$ dimensional \colorbox{poliGrayBlue}{std::vector$<$float128$>$} array $\{\beta_{\text{min}}, \,\beta_{\text{max}}\}$; the former is the closest greater even integer of the minimum number of quadrature nodes provided with \color{poliDarkBlue} \textbf{n\_min} \color{black} while the latter is a $2-$dimensional array containing the entries of \colorbox{poliGrayBlue}{TabulatedErrorValues.csv}
+            for the minimum and maximum monomial exponents integrated exactly with $n_{\text{min}}$ quadrature nodes.
+        \end{itemize}
+    \end{itemize}
+    
+    \item \color{poliDarkBlue} \textbf{transf\_order} \color{black} $=$ \colorbox{poliGrayBlue}{computeMapOrder}(\color{poliDarkBlue} \textbf{lambdas}\color{black}, \color{poliDarkBlue} \textbf{betas}\color{black})
+    \newline Using the parameters streamed by the above method, compute the transformation order $r$ of the monomial map for the input generalised polynomial (see Sub-Section \ref{SubSec4.1.3}).
+    \begin{itemize}
+        \item \color{poliDarkBlue} \textbf{INPUTS} \color{black}:
+        \begin{itemize}
+            \item \colorbox{poliGrayBlue}{std::vector$<$float128$>$} \color{poliDarkBlue} \textbf{lambdas} \color{black} is one of the outputs of \colorbox{poliGrayBlue}{manageData}, specifically $\{\lambda_{\text{min}},\,\lambda_{\text{max}}\}$ and they are accessed with \colorbox{poliGrayBlue}{std::get$<$0$>$}(\color{poliDarkBlue} \textbf{input\_data}\color{black});
+            \item \colorbox{poliGrayBlue}{std::vector$<$float128$>$} \color{poliDarkBlue} \textbf{betas} \color{black} is one of the outputs of \colorbox{poliGrayBlue}{streamMonMapData}, specifically $\{\beta_{\text{min}},\,\beta_{\text{max}}\}$ and they are accessed with \colorbox{poliGrayBlue}{std::get$<$0$>$}(\color{poliDarkBlue} \textbf{monomial\_data}\color{black}).
+        \end{itemize}
+        \item \color{poliDarkBlue} \textbf{OUTPUTS} \color{black}:
+        \begin{itemize}
+            \item \colorbox{poliGrayBlue}{double} \color{poliDarkBlue} \textbf{transf\_order} \color{black} is the real-valued transformation order $r\in\mathbb{R}$ of the monomial map introduced in $(\ref{eq1.16})$.
+        \end{itemize}
+    \end{itemize}
+    
+    \item \color{poliDarkBlue} \textbf{quad\_data} \color{black} $=$ \colorbox{poliGrayBlue}{computeQuadParams}(\color{poliDarkBlue} \textbf{transf\_order}\color{black}, \color{poliDarkBlue} \textbf{n\_min\_even}\color{black})
+    \newline Based on the monomial map computed at the previous step (specified by its order $r$) derives the computational parameters, i.e. nodes and weights, of the monomial transformation quadrature rule (see Sub-Section \ref{SubSec4.1.4}).
+    \begin{itemize}
+        \item \color{poliDarkBlue} \textbf{INPUTS} \color{black}:
+        \begin{itemize}
+            \item \colorbox{poliGrayBlue}{double} \color{poliDarkBlue} \textbf{transf\_order} \color{black} is the output of the above \colorbox{poliGrayBlue}{computeMapOrder} method;
+            \item \colorbox{poliGrayBlue}{int} \color{poliDarkBlue} \textbf{n\_min\_even} \color{black} is one of the output of \colorbox{poliGrayBlue}{streamMonMapData}, specifically $n_{min}$.
+        \end{itemize}
+        \item \color{poliDarkBlue} \textbf{OUTPUTS} \color{black}:
+        \begin{itemize}
+            \item \colorbox{poliGrayBlue}{std::tuple$<$std::vector$<$float128$>$, std::vector$<$float128$>$, std::vector$<$float128$>$, std::vector$<$float128$>>$} \color{poliDarkBlue} \textbf{quad\_data} \color{black} is a list of $4$ vectors, namely:
+            \begin{itemize}
+                \item[\color{poliDarkBlue} $\star$] $\{x_1,\,\dots,\,x_{n_{\text{min}}}\}$ is the list of the new samples of the monomial transformation quadrature rule obtained with $(\ref{eq1.16})$;
+                \item[\color{poliDarkBlue} $\star$] $\{w_1,\,\dots,\,w_{n_{\text{min}}}\}$ is the list of the new weights of the monomial transformation quadrature rule obtained with $(\ref{eq1.17})$;
+                \item[\color{poliDarkBlue} $\star$] $\{\tilde{x}_1,\,\dots,\,\tilde{x}_{n_{\text{min}}}\}$ is the list of the samples of the classical G-L quadrature rule affinely mapped in $(0,1)$ obtained in $(\ref{eq1.15})$;
+                \item[\color{poliDarkBlue} $\star$] $\{\tilde{w}_1,\,\dots,\,\tilde{w}_{n_{\text{min}}}\}$ is the list of the weights of the classical G-L quadrature rule obtained in $(\ref{eq1.15})$;.
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+    
+    \item \colorbox{poliGrayBlue}{optimiseData}(\color{poliDarkBlue} \textbf{quad\_data}\color{black}, \color{poliDarkBlue} \textbf{muntz\_sequence}\color{black}, \color{poliDarkBlue} \textbf{coeff\_sequence}\color{black})
+    \newline This method optimises the f.p. format (\colorbox{poliGrayBlue}{float128} or \colorbox{poliGrayBlue}{double}) of the 
+    monomial transformation quadrature rules' parameters by computing the numerical integral in $(\ref{eq1.14})$ and the associated a-posteriori relative error in $(\ref{eq1.7})$ (see Sub-Section \ref{SubSec4.2.3}), that are displayed at run-time. 
+    \begin{itemize}
+        \item \color{poliDarkBlue} \textbf{INPUTS} \color{black}:
+        \begin{itemize}
+            \item \colorbox{poliGrayBlue}{std::tuple$<$std::vector$<$float128$>$, std::vector$<$float128$>$, std::vector$<$float128$>$, std::vector$<$float128$>>$} \color{poliDarkBlue} \textbf{quad\_data} \color{black} is the output of the above \colorbox{poliGrayBlue}{computeParamsGl};
+            \item \colorbox{poliGrayBlue}{std::vector$<$T$>$} \color{poliDarkBlue} \textbf{muntz\_sequence} \color{black} is the same input of method \colorbox{poliGrayBlue}{manageData} i.e. the list of real-valued exponents of the input generalised polynomial with data type \colorbox{poliGrayBlue}{T} that can be one of the f.p. format \colorbox{poliGrayBlue}{float128} and \colorbox{poliGrayBlue}{double};
+            \item \colorbox{poliGrayBlue}{std::vector$<$T$>$} \color{poliDarkBlue} \textbf{coeff\_sequence} \color{black} is the same input of method \colorbox{poliGrayBlue}{manageData} i.e. the list of real-valued coefficients of the terms of the input generalised polynomial. Data type \colorbox{poliGrayBlue}{T} has to match that of the \color{poliDarkBlue} \textbf{coeff\_sequence} \color{black}.
+        \end{itemize}
+        \item \color{poliDarkBlue} \textbf{OUTPUTS} \color{black}:
+        \begin{itemize}
+            \item the method does not return any data. Instead the results of the numerical integration are printed on the terminal at run-time while the new (optimised) monomial transformation quadrature rule's parameters are written on appropriate files (see Section \ref{Sec3.2}).
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
 
-\section[Additional supporting and visual tools]{\changefont SECONDARY MODULE:  ADDITIONAL SUPPORTING AND VISUAL TOOLS}\sectionmark{ADDITIONAL TOOLS}\label{Sec3.4}
+\newpage
+\section[Additional supporting and visual tools]{\changefont SECONDARY MODULE:  ADDITIONAL SUPPORTING AND VISUAL TOOLS}\sectionmark{ADDITIONAL TOOLS}\label{Sec3.5}
 
 \noindent
 To conclude the user interface of the library, we illustrate the additional functionalities of QUASIMONT's secondary module. All the content of the secondary module is provided by the unique \colorbox{poliGrayBlue}{ErrTools.cpp} source file where, aside from the \colorbox{poliGrayBlue}{main} function, it contains four methods instantiated inside it. They provide:
@@ -996,6 +1140,33 @@ To conclude the user interface of the library, we illustrate the additional func
     \item the exact same tabulated data reported in \colorbox{poliGrayBlue}{TabulatedErrorValues.csv} of $\beta_{\text{min}}(n)$ and $\beta_{\text{max}}(n)$ that is available in \colorbox{poliGrayBlue}{\textbf{QUASIMONT/data}};
     \item the plot of the novel asymptotic error estimate $(\ref{eq1.8})$ for a given, user-specified, value of $n$, that is fundamental to design the monomial transformation quadrature rule. \color{black} 
 \end{itemize}
+
+\noindent
+The secondary module has two additional dependencies w.r.t. the primary module, which is part of the reason why we decided to keep them separated in their implementation. Those are
+\begin{itemize}
+    \item \color{poliDarkBlue} \textbf{GNU MPFR} \color{black}\cite{mpfr}: based on \color{poliDarkBlue} \textbf{GMP - GNU Multi Precision} \color{black} library, and interfaced with QUASIMONT via Boost Multiprecision library's back-end wrapper classes, it provides access to {\itshape higher-than-quadruple} f.p. formats which are necessary for the evaluation of the Euler's Gamma function in the computation of the asymptotic error estimate $(\ref{eq1.8})$.
+    \item \color{poliDarkBlue} \textbf{Gnuplot} \color{black}: the well-knonw cross-platform utility used for plotting scientific charts and used by the shell script \colorbox{poliGrayBlue}{plot.sh} in the \colorbox{poliGrayBlue}{\textbf{QUASIMONT/utilities}} subdirectory.
+\end{itemize}
+
+\noindent
+The above required third-party libraries are once again easily installed locally by exploiting the relative package managers of the Linux distro of reference
+
+\vspace{0.5cm}
+\begin{tcblisting}{enhanced,
+                   arc=5mm,
+                   title = \color{black}{\large \ttfamily Installation of third-party libraries for the secondary module},
+                   colbacktitle=bashGray,
+                   colback=bashBlue,
+                   listing only,
+                   listing style=BashStyle}
+user@machine: home> # For Debian-based distros (Ubuntu, Mint, Knoppix, Kali ...)
+user@machine: home> sudo apt-get update
+user@machine: home> sudo apt-get install libgmp3-dev libmpfr-dev gnuplot
+user@machine: home> # For RPM-based distros (CentOS, Fedora, SUSE, Scientific Linux ...)
+user@machine: home> sudo dnf makecache --refresh
+user@machine: home> sudo dnf install gmp-devel mpfr-devel gnuplot
+\end{tcblisting}
+\vspace{0.5cm}
 
 \noindent
 The user can compile and execute the secondary module by invoking the rule \colorbox{poliGrayBlue}{tools} from the application's top level \colorbox{poliGrayBlue}{makefile}.
@@ -1024,31 +1195,8 @@ Computing for n = ...
 \end{tcblisting}
 
 \noindent
-The results will be stored in the run-time created \colorbox{poliGrayBlue}{\textbf{QUASIMONT/utilities/estimate}} subdirectory. If the users re-compiles the source code of the secondary-module by specifying a different value of $n$, the previously obtained plots and error values will not be over-written.
-The secondary module has two additional dependencies w.r.t. the primary module, which is part of the reason why we decided to keep them separated in their implementation. Those are
-\begin{itemize}
-    \item \color{poliDarkBlue} \textbf{GNU MPFR} \color{black}\cite{mpfr}: based on \color{poliDarkBlue} \textbf{GMP - GNU Multi Precision} \color{black} library, and interfaced with QUASIMONT via Boost Multiprecision library's back-end wrapper classes, it provides access to {\itshape higher-than-quadruple} f.p. formats which are necessary for the evaluation of the Euler's Gamma function in the computation of the asymptotic error estimate $(\ref{eq1.8})$.
-    \item \color{poliDarkBlue} \textbf{Gnuplot} \color{black}: the well-knonw cross-platform utility used for plotting scientific charts and used by the shell script \colorbox{poliGrayBlue}{plot.sh} in the \colorbox{poliGrayBlue}{\textbf{QUASIMONT/utilities}} subdirectory.
-\end{itemize}
+The results are stored in the run-time created \colorbox{poliGrayBlue}{\textbf{QUASIMONT/utilities/estimate}} subdirectory. If the users re-compiles the source code of the secondary-module by specifying a different value of $n$, the previously obtained plots and error values will not be over-written.
 
-\noindent
-The above required third-party libraries are once again easily installed locally by exploiting the relative package managers of the Linux distro of reference
-
-\vspace{0.5cm}
-\begin{tcblisting}{enhanced,
-                   arc=5mm,
-                   title = \color{black}{\large \ttfamily Installation of third-party libraries for the secondary module},
-                   colbacktitle=bashGray,
-                   colback=bashBlue,
-                   listing only,
-                   listing style=BashStyle}
-user@machine: home> # For Debian-based distros (Ubuntu, Mint, Knoppix, Kali ...)
-user@machine: home> sudo apt-get install libgmp3-dev
-user@machine: home> sudo apt install libmpfr-dev
-user@machine: home> # For RPM-based distros (CentOS, Fedora, SUSE, Scientific Linux ...)
-user@machine: home> sudo dnf install install gmp-devel mpfr
-\end{tcblisting}
-\vspace{0.5cm}
 
 \chapter[Modules description]{\Huge \ttfamily MODULES DESCRIPTION}\chaptermark{MODULES DESCRIPTION}\label{Chap4}
 
@@ -1060,8 +1208,8 @@ In this final chapter we provide the user with a reference description of all me
                  \item \ttfamily computeLambdaMax;
                  \item \ttfamily computeNumNodes;
                  \item \ttfamily computeMapOrder;
-                 \item \ttfamily computeParamsGl;
-                 \item \ttfamily computeQuadGl;
+                 \item \ttfamily computeQuadParams;
+                 \item \ttfamily computeQuadRule;
                  \item \ttfamily computeExactError;
           \end{itemize}
           
@@ -1101,17 +1249,15 @@ In this final chapter we provide the user with a reference description of all me
 //
 //         OUTPUT: - lambda_max = additional exponent of the new binomial
 //
-//    DESCRIPTION: the monomial transformation quadrature rule processes the G-L nodes & 
-//                 weights for those polynomials characterised by an arbitrarly large
-//                 gap between the terms of minimum and maximum degree. There might be
-//                 cases however in which the user wants to integrate singular 
-//                 monomials; in those cases the library will require an additional, 
-//                 non-constant, term to be added to the monomial. It does so by either 
-//                 allowing the user to manually input the exponent of the additional
-//                 term from the CLI or to specify the number of nodes to use in
-//                 its application. In this last instance the following function 
-//                 automatically generates the resulting exponent of the additional
-//                 term (lambda_max).
+//    DESCRIPTION: there might be cases in which the user wants to integrate generalised 
+//                 monomials rather than the alike polynomials. In those cases the 
+//                 monomial transformation quadrature rule requires additional input to 
+//                 work properly. The library handles such case by either allowing the
+//                 user to manually input the exponent of the additional term (from the 
+//                 CLI) or by letting the user specify the number of nodes to be used.
+//                 In this last instance this method automatically computes the resulting
+//                 maximum exponent of an additional term (lambda_max) that the monomial
+//                 transformation quadrature rule can precisely integrate.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1138,14 +1284,11 @@ float128 computeLambdaMax(float128& lambda_min, int num_nodes)
 //         OUTPUT: - n = number of (quadrature) nodes computed as the only real solution
 //                       of equation 1.18 reported in the doc/UserManual.pdf
 //
-//    DESCRIPTION: once the exponents in the terms with minimum and maximum degree in
-//                 the user-input polynomial have been determined, this method 
-//                 solves equation 1.18, which is a 7-th degree polynomial in
-//                 n derived by a linear regression of n in beta_min/beta_max. 
-//                 It then extracts the only real root whose integer floor will then be 
-//                 the minimum possible number of (quadrature) nodes to be used in the
-//                 new quadrature formula to achieve double precision (the solver itself
-//                 is a class' method implemented in GSL-GNU Scientific Library).
+//    DESCRIPTION: this method solves equation (1.18) in doc/UserManual.pdf, which is a 
+//                 7-th degree polynomial in n_min (the number of quadrature nodes).
+//                 Of the 7 roots, it then extracts the only real one and then takes its
+//                 ceil to return an integer value for n_min. The solver itself is a 
+//                 class' method implemented in the GSL-GNU Scientific Library.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1171,44 +1314,41 @@ int computeNumNodes(const float128& lambda_min, const float128& lambda_max)
 //
 //         OUTPUT: - r = value of the transformation order of the monomial map (gamma)
 //
-//    DESCRIPTION: the order of the monomial transformation that characterises the new
-//                 samples of the quadrature rule obtained starting from those of the
-//                 G-L quadrature formula is computed as a linear interpolation
-//                 beetween the minimum and maximum bound outlined in the inequality
-//                 1.17 of the doc/UserManual.pdf.
+//    DESCRIPTION: this method computes the order of the monomial transformation (1.16)
+//                 in doc/UserManual.pdf. It is derived as a linear interpolation of the
+//                 minimum and maximum bound of inequality (1.17) of doc/UserManual.pdf.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
 double computeMapOrder(const std::vector<float128>& lambdas, const std::vector<float128>& betas)
 \end{tcblisting}
 
-\subsection[computeParamsGl]{\changefont computeParamsGl}\label{SubSec4.1.4}
+\subsection[computeQuadParams]{\changefont computeQuadParams}\label{SubSec4.1.4}
 
 \begin{tcblisting}{enhanced,
                    arc=5mm,
-                   title = \color{black}{\large \ttfamily MonMap.cpp/computeParamsGl},
+                   title = \color{black}{\large \ttfamily MonMap.cpp/computeQuadParams},
                    colbacktitle=poliOrange,
                    colback=poliGrayBlue,
                    listing only,
                    listing style=CppStyle}
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-//       FUNCTION: [{new_x, new_w, old_x, old_w}] = computeParamsGl(r, n_min)
+//       FUNCTION: [{new_x, new_w, old_x, old_w}] = computeQuadParams(r, n_min)
 //                
 //          INPUT: - r = output of function 'computeMapOrder'
 //                 - n_min = output of function 'streamMonMapData'
 //
-//         OUTPUT: - {new_x, new_w} = new set of G-L quadrature nodes (x) and
-//                                    weights (w) following the monomial map
-//                 - {old_x, old_w} = classical set of G-L quadrature nodes (x) and
+//         OUTPUT: - {new_x, new_w} = new set of monomial transformation quadrature rule
+//                                    nodes (x) and weights (w)
+//                 - {old_x, old_w} = old set of classical G-L quadrature nodes (x) and
 //                                    weights (w) following the affine map
 //
-//    DESCRIPTION: once the transformation order is available, the monomial map itself
-//                 is applied to the G-L nodes and weights that have been previously
-//                 mapped from [-1,1] to [0,1] via an affine (linear) map. The 
-//                 complete set of new and old nodes and weights (referred to as
-//                 quadrature_parameters) are collected in a tuple and outputted by
-//                 this method.
+//    DESCRIPTION: with the transformation order being set, the monomial map is applied
+//                 to transform the G-L nodes and weights, previously mapped from (-1,1)
+//                 to (0,1) via the affine (linear) map in (1.12) in doc/UserManual.pdf.  
+//                 The complete set of new and old nodes and weights are collected in a 
+//                 tuple and returned.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1216,42 +1356,38 @@ std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, 
 \end{tcblisting}
 
 \newpage
-\subsection[computeQuadGl]{\changefont computeQuadGl}\label{Sec4.1.5}
+\subsection[computeQuadRule]{\changefont computeQuadRule}\label{Sec4.1.5}
 
 \begin{tcblisting}{enhanced,
                    arc=5mm,
-                   title = \color{black}{\large \ttfamily MonMap.cpp/computeQuadGl},
+                   title = \color{black}{\large \ttfamily MonMap.cpp/computeQuadRule},
                    colbacktitle=poliOrange,
                    colback=poliGrayBlue,
                    listing only,
                    listing style=CppStyle}
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-//       FUNCTION: In = computeQuadGl(x, w, muntz_sequence, coeff_sequence)
+//       FUNCTION: In = computeQuadRule(x, w, muntz_sequence, coeff_sequence)
 //                
-//          INPUT: - x = output of function 'computeParamsGl' optimised by 'optimiseData'
-//                 - w = output of function 'computeParamsGl' optimised by 'optimiseData'
+//          INPUT: - x = output of 'computeQuadParams' as optimised by 'optimiseData'
+//                 - w = output of 'computeQuadParams' as optimised by 'optimiseData'
 //                 - muntz_sequence = sequence of real exponents of the polynomial
 //                 - coeff_sequence = sequence of real coefficients of the polynomial
 //
 //         OUTPUT: - In = value of the numerical approximated integral for the user input
 //
-//    DESCRIPTION: every interpolatory quadrature rule approximates the definite integral
-//                 by means of a weighted sum of the kernel's values on specific points
-//                 along the integration interval (i.e. nodes); an interpolatory
-//                 Gaussian quadrature formula is a quadrature rule whose nodes 
-//                 corresponds to the roots of a polynomial that is orthogonal in the 
-//                 integration interval to the weight function of the kernel. A G-L 
-//                 quadrature formula with n+1 nodes is a Gaussian formula for which the
-//                 nodes corresponds to the roots of the Legendre n-th degree polynomial
-//                 that is orthogonal to the weight function w(x) = 1 in [-1, 1]. This 
-//                 routine implements the computation of such weighted sum in a general 
-//                 fashion, i.e. regardless of the quadrature rules.
+//    DESCRIPTION: the computation of the numerical integral using a quadrature formula 
+//                 involves the sum of the weighted values that the integrand assumes on
+//                 specified samples of the interval. This method uses such information
+//                 to implement the weighted sum and returns it. Note that this method
+//                 does not implement a specific quadrature rule, but rather a generic
+//                 one. In the context of the library it is therefore used for both the
+//                 monomial transformation and the classical G-L quadrature rules.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename type1, typename type2>
-float128 computeQuadGl(const std::vector<type1>& nodes,const std::vector<type1>& weights, std::vector<type2>& muntz_sequence, std::vector<type2>& coeff_sequence)
+float128 computeQuadRule(const std::vector<type1>& nodes,const std::vector<type1>& weights, std::vector<type2>& muntz_sequence, std::vector<type2>& coeff_sequence)
 \end{tcblisting}
 
 \subsection[computeExactError]{\changefont computeExactError}\label{SubSec4.1.6}
@@ -1269,7 +1405,7 @@ float128 computeQuadGl(const std::vector<type1>& nodes,const std::vector<type1>&
 //                                       muntz_sequence, coeff_sequence, print_flag)
 //                
 //          INPUT: - {post_map_quadrature, pre_map_quadrature} = output of function
-//                                                               'computeQuadGl'
+//                                                               'computeQuadRule'
 //                 - muntz_sequence = sequence of real exponents of the polynomial
 //                 - coeff_sequence = sequence of real coefficients of the polynomial
 //                 - print_flag = boolean parameter to tell the routine wheter or not
@@ -1278,12 +1414,12 @@ float128 computeQuadGl(const std::vector<type1>& nodes,const std::vector<type1>&
 //         OUTPUT: - En = relative error of the specified rule computed with the new
 //                        nodes and weights
 //
-//    DESCRIPTION: let I_n be the numerical integral calculated using the G-L quadrature
-//                 rule (outputed by function 'computeQuadGl') and I_ex be the exact
-//                 (analytic) value of such integral then the relative error of the 
-//                 quadrature can be computed a-posteriori as R_n = |I_ex - I_n|/|I_ex|.
-//                 Such computation is implemented in this routine with the exact 
-//                 integral being as precise as the user-input polynomial is.
+//    DESCRIPTION: let I_n be the numerical integral calculated using the above method
+//                 computeQuadRule for a specific quadrature rule and let I be the exact
+//                 (analytic) counterpart of such integral. The relative error of the 
+//                 quadrature can be computed a-posteriori as R_n = |I - I_n|/|I| as in.
+//                 (1.7) of doc/UserManual.pdf. This method is the implementation of such
+//                 error calculation being as precise as the user-input polynomial is.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1315,21 +1451,17 @@ float128 computeExactError(const float128& In, std::vector<type>& muntz_sequence
 //               - lambda_min = minimum exponent in the input "muntz_sequence"
 //               - lambda_max = maximum exponent in the input "muntz_sequence"
 //
-//    DESCRIPTION: the user-input polynomial is provided to the library via Main.cpp; the
-//                 polynomial itself is specified via a unsorted sequence of 
-//                 coefficients and exponents of the various monomials in the polynomial.
-//                 Once those input are read, checks have to be made in order to validate
-//                 the proper functioning of the library; those are:
+//    DESCRIPTION: the user-input polynomial is provided to the library, via Main.cpp, by.
+//                 two unique lists of coefficients and exponents. This method first 
+//                 checks the proper form of those inputs. In particular:
 //                    - the number of exponents and the number of coefficients coincide;
 //                    - the input polynomial is at least a binomial (otherwise the 
-//                      further CLI user-input is required, see Section 2.4 in the
-//                      doc/UserManual.pdf; 
+//                      further user-input as reported in doc/UserManual.pdf);
 //                    - lambda_min > -1 (otherwise the input sequence of exponents is 
-//                      not a Muntz sequence and thus the program exits);
-//                 Once those checks are ran the exponents' sequence is sorted locally
-//                 and lambda_min/lambda_max are thus identified and outputted alongside
-//                 the associated number of nodes computed by the function 
-//                 'computeNumNodes' (see lines 57~121 in the 'src/MonMap.cpp' file).
+//                      not a Muntz sequence and the polynomial is not L1);
+//                 Following the checks the exponents' sequence is then sorted locally
+//                 to identify and return lambda_min/lambda_max at global level alongside
+//                 the associated minimum number of nodes computed n_min.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1358,7 +1490,7 @@ std::tuple<int, std::vector<float128>> manageData(std::vector<type>& muntz_seque
 //                 - beta_min = minimum value for the exponent of the post-map polynomial
 //                 - beta_max = maximum value for the exponent of the post-map polynomial
 //
-//    DESCRIPTION: the monomial transformation gamma: [0,1] -> [0,1] is uniquely 
+//    DESCRIPTION: the monomial transformation gamma: (0,1) -> (0,1) is uniquely 
 //                 identified by its order r which in turn requires the knowledge of
 //                 beta_min/beta_max. This method scans the tabulated vales in the 
 //                 'data/TabulatedErrorValues.csv' file to extract such values
@@ -1383,21 +1515,21 @@ std::tuple<int, std::vector<float128>> streamMonMapData(const int& comp_num_node
 //
 //       FUNCTION: optimiseData(quadrature_parameters, muntz_sequence, coeff_sequence)
 //                
-//          INPUT: - quadrature_parameters = output of function 'computeParamsGl'
+//          INPUT: - quadrature_parameters = output of function 'computeQuadParams'
 //                 - muntz_sequence = sequence of real exponents of the polynomial
 //                 - coeff_sequence = sequence of real coefficients of the polynomial
 //
 //         OUTPUT: no outputs
 //
-//    DESCRIPTION: the declared objective of the library is to exploit the defining
-//                 characteristic of the input singular polynomial to derive an ad-hoc
-//                 quadrature scheme whose new nodes and weights are redistributed to
-//                 better capture the singularity while retaining the lowest possible
-//                 computational complexity. Such measure (threshold of accuracy for E_n)
-//                 is set to be the machine-epsilon in double precision by default,
-//                 although more and less stringent constraints can be inserted. Once the
-//                 new set of nodes and weights have been computed, this function
-//                 optimises their floating-point representation.
+//    DESCRIPTION: the method automatically selects the most optimised format possible
+//                 (between double and float128) to export the output results, i.e. the
+//                 transformed (new) quadrature nodes and weights, to reach the 
+//                 prescribed relative precision for the integration (e.g. double 
+//                 precision). The optimality here is meant as the f.p. format with lowest
+//                 precision that still allows to retain a machine-epsilon accuracy (we 
+//                 specified double-precision however the procedure is easily generalised
+//                 using the method's templatisation) for the relative error of the
+//                 integral computed using the monomial transformation quadrature rule.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1418,22 +1550,21 @@ void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::
 //
 //       FUNCTION: exportNewData(optim_nodes, optim_weights, [I_new, E_new, I_old, E_old])
 //                
-//          INPUT: - optim_nodes = output of function 'computeParamsGl' optimised by
+//          INPUT: - optim_nodes = output of function 'computeQuadParams' optimised by
 //                                 'optimiseData'
-//                 - optim_weights = output of function 'computeParamsGl' optimised by
+//                 - optim_weights = output of function 'computeQuadParams' optimised by
 //                                 'optimiseData'
-//                 - [I_new, E_new, I_old, E_old] = values of the numerical quadrature
-//                                                  (I_new, I_old) and its relative
-//                                                  error (E_new, E_old) obtained with
-//                                                  the new samples provided by the 
-//                                                  monomial transformation quadrature 
-//                                                  rule and by the classical G-L 
-//                                                  samples
+//                 - [I_new, E_new, I_old, E_old] = values of the numerical quadratures
+//                                  (I_new, I_old) and relative errors (E_new, E_old)
+//                                  obtained using the nodes and weights provided 
+//                                  by the monomial transformation and classical G-L
+//                                  quadrature rules respectively.
+//
 //         OUTPUT: no outputs
 //
-//    DESCRIPTION: once the monomial transformation quadrature rule is completed data is
-//                 streamed in output text files located in the application's dir.
-//                 The output data is organised in three separate files:
+//    DESCRIPTION: once the monomial transformation quadrature rule is completed, data is
+//                 streamed in output and written to the appropriate text files. The data
+//                 is organised in three separate files:
 //                    - 'Results.txt' containins recap informations about the monomial
 //                      transformation quadrature rule such as the parameters of the map
 //                      (gamma), number of quadrature samples (n_min), etc...
@@ -1500,8 +1631,8 @@ std::vector<type> castVector(const std::vector<float128>& input_vector, const ty
 //
 //    DESCRIPTION: This method takes two input vectors of the same length n, sorts
 //                 their element-wise multiplication in a new vector with cells
-//                 arranged in ascending order and sums them thereby assuring that no 
-//                 numerical cancellation occurs.
+//                 arranged in ascending order and sums them thereby limiting numerical
+//                 cancellation errors.
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 

@@ -49,6 +49,7 @@ int main()
     In += coeff_sequence[k]*In_mon;
   }
   // PRINT COMPUTED QUADRATURE
-  std::cout << "\n\n ** I_n(p(x)) = " << In << "  [with reloaded parameters in double precision] **" << std::endl;
+  std::cout << "\n\n ** I_n(p(x)) = " << In << "  [with reloaded parameters in double precision] **"
+            << "\n\n ** E_n(p(x)) = " << fabs(In-1.0/(15.0))/fabs(1.0/(15.0)) << "  [with reloaded parameters in double precision] **" << std::endl;
   return 0;
 }

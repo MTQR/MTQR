@@ -69,10 +69,11 @@
             }
 \makeatother
 
-\newtheorem{defn}{Definition}
-\newtheorem{theom}{Theorem}
-\newtheorem{prop}{Proposition}
-\newtheorem{exmp}{Example}
+% Define nested list bullets' style
+\renewcommand{\labelitemi}{\color{poliDarkBlue} $\blacktriangleright $}
+\renewcommand{\labelitemii}{\color{poliDarkBlue} $\blacksquare$}
+\renewcommand{\labelitemiii}{\color{poliDarkBlue} $\bullet$}
+
 % Define listing style for C++ scripts and files
 \lstdefinestyle{CppStyle}{language=C++,
                           backgroundcolor=\color{poliGrayBlue},

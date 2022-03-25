@@ -2,7 +2,7 @@
 // File:      include/Quasimont.h
 //
 // Library:   QUASIMONT-QUAdrature of SIngular polynomials using MONomial Transformations:
-//                      a C++ library for high precision integration of singular 
+//                      a C++ library for high precision integration of generalised 
 //                      polynomials of non-integer degree
 //
 // Authors:   Guido Lombardi, Davide Papapicco
@@ -41,7 +41,10 @@ typedef boomp::float128 float128; // quadruple precision f.p. format
 #define PI boost::math::constants::pi<float128>() // defines pi with 34 decimal digits
 #define E boost::math::constants::e<float128>() // defines e with 34 decimal digits
 
-template<typename type>
-void quasimont(std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence);
+// Loud mode
+template<typename T>
+void quasimont(std::vector<T>& muntz_sequence, std::vector<T>& coeff_sequence);
+// Silent mode
+std::vector<std::vector<double>> quasimont(double lambda_min, double lambda_max);
 
 #endif // QUASIMONT_H
