@@ -41,10 +41,10 @@ typedef boomp::float128 float128; // quadruple precision f.p. format
 #define PI boost::math::constants::pi<float128>() // defines pi with 34 decimal digits
 #define E boost::math::constants::e<float128>() // defines e with 34 decimal digits
 
-// Quasimont's loud mode
+// Loud mode
 template<typename T>
 void quasimont(std::vector<T>& muntz_sequence, std::vector<T>& coeff_sequence);
-// Quasimont's silent mode
+// Silent mode
 std::vector<std::vector<double>> quasimont(double lambda_min, double lambda_max);
 
 #endif // QUASIMONT_H

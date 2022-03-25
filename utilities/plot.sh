@@ -22,12 +22,10 @@ for sub_dir in ./*; do
 		set key font ",28"
 		set key right bottom
 		set datafile separator ","
-		plot "./estimate/EstimateN=$1.csv" u 1:2 with lines title "E_{N=$1}" lw 2 lt rgb "red", "./estimate/Epsilon.csv" u 1:2 with lines title "Machine d.p. espilon" lw 1.5 lt rgb "black"
+		plot "./estimate/EstimateN=$1.csv" u 1:2 with lines title "R_{N=$1}" lw 2 lt rgb "red", "./estimate/Epsilon.csv" u 1:2 with lines title "Machine d.p. espilon" lw 1.5 lt rgb "black"
 
 		EOF
 
 	fi
 	
 done
-	
-	

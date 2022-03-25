@@ -3,10 +3,23 @@
 int main()
 {
   // TEST ON STATIC LIBRARY THIRD-PARTY INTEGRATION
-  std::vector<float128> coeff_sequence = {PI, 3};
-  std::vector<float128> muntz_sequence = {-1/E, 1.0/2.0};
+  int n, counter = 0;
+  float128 input;
+  std::vector<float128> coeff_sequence, muntz_sequence;
+  std::cout << "Insert the number of terms of the input polynomial: ";
+  std::cin >> n;
+  while(counter < n)
+  {
+    std::cout << "\n\nCoefficient: ";
+    std::cin >> input;
+    coeff_sequence.push_back(input);
+    std::cout << "\nExponent: ";
+    std::cin >> input;
+    muntz_sequence.push_back(input);
+    counter++;
+  }
   quasimont(muntz_sequence, coeff_sequence);
-
+  // DEFINE PARAMETERS FOR LOADING PROCEDURE
   std::ifstream nodes_txt, weights_txt;
   std::vector<float128> nodes, weights;
   float128 loaded_value;
@@ -37,13 +50,5 @@ int main()
   }
   // PRINT COMPUTED QUADRATURE
   std::cout << "\n\n ** I_n(p(x)) = " << In << "  [with reloaded parameters in double precision] **" << std::endl;
-
-  // EXECUTE QUASIMONT IN SILENT MODE
-  std::cout << "\n    Executing QUASIMONT's silent mode..." << std::endl;
-  double lambda_min = static_cast<double>(-1/E);
-  double lambda_max = static_cast<double>(1.0/2.0);
-  std::vector<std::vector<double>> array = quasimont(lambda_min, lambda_max);
-  std::cout << "    Done!" << std::endl;
-
   return 0;
 }

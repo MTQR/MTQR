@@ -216,7 +216,7 @@ void printProgressBar(const int& iter, const int& num_iter)
 
 int main(int argc, char** argv)
 {
-  int plot_nodes = 14;
+  int plot_nodes = 52;
 
   system("mkdir -p estimate");
   std::ofstream data("./estimate/TabBetas.csv");
