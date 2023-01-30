@@ -1,2 +1,2 @@
-# QUASIMONT - QUAdrature of SINgular polynomials using MONomial Transformations
+# MTQR - Monomial Transformation Quadrature Rule
 

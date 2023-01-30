@@ -1,9 +1,9 @@
 //---------------------------------------------------------------------------------------
-// File:      src/DatIo.cpp
+// File:      src/data_management.cpp
 //
-// Library:   QUASIMONT-QUAdrature of SIngular polynomials using MONomial Transformations:
-//                      a C++ library for high precision integration of generalised 
-//                      polynomials of non-integer degree
+// Library:   MTQR - Monomial Transformation Quadrature Rule:
+//                   a C++ library for high-precision integration of 
+//                   generalised polynomials of non-integer degree
 //
 // Authors:   Guido Lombardi, Davide Papapicco
 //
@@ -13,7 +13,9 @@
 //            Electromagnetic modelling and applications Research Group
 //---------------------------------------------------------------------------------------
 
-#include "Quasimont.h"
+#include "mtqr.h"
+
+#include "BETAS.h" // Include source data relative to bounded values of minimum and maximum betas in high-precision
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -234,25 +236,18 @@ std::tuple<int, std::vector<float128>> streamMonMapData(const int& comp_num_node
   float128 beta_min, beta_max;
   extern bool loud_mode;
 
-  std::ifstream datafile;
-  datafile.open("../data/TabulatedErrorValues.csv");
-
-  std::string line, column;
-  while(std::getline(datafile, line))
+  int it = 0;
+  while(true)
   {
-    std::stringstream column_string(line);
-    std::vector<std::string> row;
-    while(std::getline(column_string, column, ','))
-    {
-      row.push_back(column);
-    }
-
-    n_min = stoi(row[0]);
+    std::vector<std::string> _betas = BETAS[it];
+    n_min = stoi(_betas[0]);
 
     if(n_min >= comp_num_nodes)
     {
-      beta_min = static_cast<float128>(row[1].substr(0, row[1].size() - 1));
-      beta_max = static_cast<float128>(row[2].substr(0, row[2].size() - 1));
+      std::string _beta_min = _betas[1];
+      beta_min = static_cast<float128>(_beta_min);
+      std::string _beta_max = _betas[2];
+      beta_max = static_cast<float128>(_beta_max);
       if(loud_mode)
       {
         std::cout << std::setprecision(std::numeric_limits<float>::max_digits10)
@@ -264,6 +259,9 @@ std::tuple<int, std::vector<float128>> streamMonMapData(const int& comp_num_node
       }
 
       break;
+    }
+    else {
+        it++;
     }
   }
   std::vector<float128> betas = {beta_min, beta_max};

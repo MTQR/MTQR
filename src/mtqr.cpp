@@ -1,9 +1,9 @@
 //---------------------------------------------------------------------------------------
-// File:      src/Quasimont.cpp
+// File:      src/mtqr.cpp
 //
-// Library:   QUASIMONT-QUAdrature of SIngular polynomials using MONomial Transformations:
-//                      a C++ library for high precision integration of generalised 
-//                      polynomials of non-integer degree
+// Library:   MTQR - Monomial Transformation Quadrature Rule:
+//                   a C++ library for high-precision integration of 
+//                   generalised polynomials of non-integer degree
 //
 // Authors:   Guido Lombardi, Davide Papapicco
 //
@@ -13,14 +13,14 @@
 //            Electromagnetic modelling and applications Research Group
 //---------------------------------------------------------------------------------------
 
-#include "Quasimont.h"
+#include "mtqr.h"
 
 // Global variable controlling the primary module mode of execution
 bool loud_mode = true;
 
 // LOUD MODE
 template<typename T>
-void quasimont(std::vector<T>& muntz_sequence, std::vector<T>& coeff_sequence)
+void mtqr(std::vector<T>& muntz_sequence, std::vector<T>& coeff_sequence)
 {
   // Print initial message and selects user's inputs
   auto input_data = manageData(muntz_sequence, coeff_sequence);
@@ -37,11 +37,11 @@ void quasimont(std::vector<T>& muntz_sequence, std::vector<T>& coeff_sequence)
   // Cast the quadrature parameter in the most optimised f.p. format possible
   optimiseData(quad_data, muntz_sequence, coeff_sequence);
 }
-template void quasimont<float128>(std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence);
-template void quasimont<double>(std::vector<double>& muntz_sequence, std::vector<double>& coeff_sequence);
+template void mtqr<float128>(std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence);
+template void mtqr<double>(std::vector<double>& muntz_sequence, std::vector<double>& coeff_sequence);
 
 // SILENT MODE
-std::vector<std::vector<double>> quasimont(double lambda_min, double lambda_max)
+std::vector<std::vector<double>> mtqr(double lambda_min, double lambda_max)
 {
   // Deactivate terminal's and files' output
   loud_mode = false;

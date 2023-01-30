@@ -1,9 +1,9 @@
 //---------------------------------------------------------------------------------------
-// File:      src/MonMap.cpp
+// File:      src/monomial_transformation.cpp
 //
-// Library:   QUASIMONT-QUAdrature of SIngular polynomials using MONomial Transformations:
-//                      a C++ library for high precision integration of generalised 
-//                      polynomials of non-integer degree
+// Library:   MTQR - Monomial Transformation Quadrature Rule:
+//                   a C++ library for high-precision integration of 
+//                   generalised polynomials of non-integer degree
 //
 // Authors:   Guido Lombardi, Davide Papapicco
 //
@@ -13,7 +13,10 @@
 //            Electromagnetic modelling and applications Research Group
 //---------------------------------------------------------------------------------------
 
-#include "Quasimont.h"
+#include "mtqr.h"
+
+#include "GL_NODES.h"   // Include Gauss-Legendre nodes in (-1,1) with 50 decimal digits
+#include "GL_WEIGHTS.h" // Include Gauss-Legendre weights in (0,1) with 50 decimal digits
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -223,35 +226,22 @@ std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, 
   float128 alpha = 0.5*(b - a), beta = 0.5*(a + b);
   float128 jacobian = alpha;
 
-  // Derive new and old nodes
-  std::ifstream nodes_file;
-  nodes_file.open("../data/TabulatedGlNodes.csv");
-
   std::string line_nodes, column_nodes;
   float128 affine_node;
   int num_nodes;
 
-  // Loop through the rows of TabulatedGlNodes.csv
-  while(std::getline(nodes_file, line_nodes))
+  int it = 0;
+  while(true)
   {
-    std::stringstream column_nodes_string(line_nodes);
-    std::vector<std::string> row_nodes;
-
-    // Loop through the columns of TabulatedGlNodes.csv
-    while(std::getline(column_nodes_string, column_nodes, ','))
-    {
-      row_nodes.push_back(column_nodes);
-    }
-
-    // Extract n as the first column of TabulatedGlNodes.csv
-    num_nodes = stoi(row_nodes[0]);
+    std::vector<std::string> _nodes = GL_NODES[it];
+    num_nodes = stoi(_nodes[0]);
 
     if(n_min == num_nodes)
-    {
+    { 
       for(int k = 1; k <= num_nodes; k++)
       {
         // Map the original G-L node from [-1,1] to [0,1] through affine transformation
-        affine_node = alpha*(static_cast<float128>(row_nodes[k].substr(1, row_nodes[k].size() - 2))) + beta;
+        affine_node = alpha*(static_cast<float128>(_nodes[k])) + beta;
         old_nodes.push_back(affine_node);
         // Compute new node using the monomial transformation
         new_nodes.push_back(pow(affine_node, static_cast<float128>(r)));
@@ -259,31 +249,20 @@ std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, 
 
       break;
     }
+    else {
+        it++;
+    }
   }
-  nodes_file.close();
-
-  // Derive new and old weights
-  std::ifstream weights_file;
-  weights_file.open("../data/TabulatedGlWeights.csv");
 
   std::string line_weights, column_weights;
   float128 affine_weight;
   int num_weights;
 
-  // Loop through the rows of TabulatedGlWeights.csv
-  while(std::getline(weights_file, line_weights))
+  it = 0;
+  while(true)
   {
-    std::stringstream column_weights_string(line_weights);
-    std::vector<std::string> row_weights;
-
-    // Loop through the columns of TabulatedGlWeights.csv
-    while(std::getline(column_weights_string, column_weights, ','))
-    {
-      row_weights.push_back(column_weights);
-    }
-
-    // Extract n as the first column of TabulatedGlNodes.csv
-    num_weights = stoi(row_weights[0].substr(1, row_weights[0].size() - 2));
+    std::vector<std::string> _weights = GL_WEIGHTS[it];
+    num_weights = stoi(_weights[0]);
 
     if(n_min == num_weights)
     {
@@ -291,7 +270,7 @@ std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, 
       for(int k = 1; k <= num_nodes; k++)
       {
         // Map the original G-L weight from [-1,1] in [0,1] through affine transformation
-        affine_weight = jacobian*(static_cast<float128>(row_weights[k].substr(1, row_weights[k].size() - 2)));
+        affine_weight = jacobian*(static_cast<float128>(_weights[k]));
         old_weights.push_back(affine_weight);
         // Compute new weight using the monomial transformation
         new_weights.push_back(static_cast<float128>(r)*pow(old_nodes.at(k-1), static_cast<float128>(r-1))*affine_weight);
@@ -299,12 +278,13 @@ std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, 
 
       break;
     }
+    else {
+        it++;
+    }
   }
-  weights_file.close();
 
   return std::make_tuple(new_nodes, new_weights, old_nodes, old_weights);
 }
-
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //

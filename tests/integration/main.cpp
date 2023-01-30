@@ -1,4 +1,19 @@
-#include "Quasimont.h"
+//---------------------------------------------------------------------------------------
+// File:      tests/integration/main.cpp
+//
+// Library:   MTQR - Monomial Transformation Quadrature Rule:
+//                   a C++ library for high-precision integration of 
+//                   generalised polynomials of non-integer degree
+//
+// Authors:   Guido Lombardi, Davide Papapicco
+//
+// Institute: Politecnico di Torino
+//            C.so Duca degli Abruzzi, 24 - Torino (TO), Italia
+//            Department of Electronics and Telecommunications (DET)
+//            Electromagnetic modelling and applications Research Group
+//---------------------------------------------------------------------------------------
+
+#include "mtqr.h"
 
 int main()
 {
@@ -18,7 +33,7 @@ int main()
     muntz_sequence.push_back(input);
     counter++;
   }
-  quasimont(muntz_sequence, coeff_sequence);
+  mtqr(muntz_sequence, coeff_sequence);
   // DEFINE PARAMETERS FOR LOADING PROCEDURE
   std::ifstream nodes_txt, weights_txt;
   std::vector<float128> nodes, weights;

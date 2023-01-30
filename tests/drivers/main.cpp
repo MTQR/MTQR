@@ -1,9 +1,9 @@
 //---------------------------------------------------------------------------------------
-// File:      test/Main.cpp
+// File:      test/drivers/main.cpp
 //
-// Library:   QUASIMONT-QUAdrature of SIngular polynomials using MONomial Transformations:
-//                      a C++ library for high precision integration of generalised 
-//                      polynomials of non-integer degree
+// Library:   MTQR - Monomial Transformation Quadrature Rule:
+//                   a C++ library for high-precision integration of 
+//                   generalised polynomials of non-integer degree
 //
 // Authors:   Guido Lombardi, Davide Papapicco
 //
@@ -13,7 +13,7 @@
 //            Electromagnetic modelling and applications Research Group
 //---------------------------------------------------------------------------------------
 
-#include "Quasimont.h"
+#include "mtqr.h"
 
 int main(int argc, char** argv)
 {
@@ -21,7 +21,7 @@ int main(int argc, char** argv)
   std::vector<float128> coeff_sequence_bench_1 = {E, 5.0, -1.0, 1.0, 10.0};
   std::vector<float128> muntz_sequence_bench_1 = {E + 0.25, -PI/4, -0.5, 0, 2};
 
-  quasimont(muntz_sequence_bench_1, coeff_sequence_bench_1);
+  mtqr(muntz_sequence_bench_1, coeff_sequence_bench_1);
   
   std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   std::cin.get();
@@ -30,7 +30,7 @@ int main(int argc, char** argv)
   std::vector<float128> coeff_sequence_bench_2 = {1};
   std::vector<float128> muntz_sequence_bench_2 = {-E/3};
 
-  quasimont(muntz_sequence_bench_2, coeff_sequence_bench_2);
+  mtqr(muntz_sequence_bench_2, coeff_sequence_bench_2);
   
   std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   std::cin.get();
@@ -39,7 +39,7 @@ int main(int argc, char** argv)
   std::vector<float128> coeff_sequence_bench_3 = {1,1};
   std::vector<float128> muntz_sequence_bench_3 = {17,35};
 
-  quasimont(muntz_sequence_bench_3, coeff_sequence_bench_3);
+  mtqr(muntz_sequence_bench_3, coeff_sequence_bench_3);
   
   std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   std::cin.get();

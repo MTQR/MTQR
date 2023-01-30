@@ -1,9 +1,9 @@
 //---------------------------------------------------------------------------------------
-// File:      utilities/VecOps.cpp
+// File:      utilities/vector_ops.cpp
 //
-// Library:   QUASIMONT-QUAdrature of SIngular polynomials using MONomial Transformations:
-//                      a C++ library for high precision integration of singular 
-//                      polynomials of non-integer degree
+// Library:   MTQR - Monomial Transformation Quadrature Rule:
+//                   a C++ library for high-precision integration of 
+//                   generalised polynomials of non-integer degree
 //
 // Authors:   Guido Lombardi, Davide Papapicco
 //
@@ -13,7 +13,7 @@
 //            Electromagnetic modelling and applications Research Group
 //---------------------------------------------------------------------------------------
 
-#include "Quasimont.h"
+#include "mtqr.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //

@@ -1,9 +1,9 @@
 //---------------------------------------------------------------------------------------
-// File:      include/Quasimont.h
+// File:      include/mtqr.h
 //
-// Library:   QUASIMONT-QUAdrature of SIngular polynomials using MONomial Transformations:
-//                      a C++ library for high precision integration of generalised 
-//                      polynomials of non-integer degree
+// Library:   MTQR - Monomial Transformation Quadrature Rule:
+//                   a C++ library for high-precision integration of 
+//                   generalised polynomials of non-integer degree
 //
 // Authors:   Guido Lombardi, Davide Papapicco
 //
@@ -13,8 +13,8 @@
 //            Electromagnetic modelling and applications Research Group
 //---------------------------------------------------------------------------------------
 
-#ifndef QUASIMONT_H
-#define QUASIMONT_H
+#ifndef MTQR_H
+#define MTQR_H
 
 #include <iostream>
 #include <algorithm>
@@ -27,15 +27,15 @@
 #include <stdio.h>
 #include <math.h>
 #include <boost/math/constants/constants.hpp>
-#include <boost/multiprecision/float128.hpp>
+#include <boost/multiprecision/cpp_bin_float.hpp>
 #include <gsl/gsl_poly.h>
 
 namespace boomp = boost::multiprecision;
-typedef boomp::float128 float128; // quadruple precision f.p. format
+typedef boomp::cpp_bin_float_quad float128; // quadruple precision f.p. format
 
-#include "Utils.h"  // includes header file for plotting and other utilities
-#include "DatIo.h"  // includes header file for data I/O functions
-#include "MonMap.h" // includes header file for functions computing the monomial map
+#include "vector_operations.h"  // includes header file for vector data structures and operations
+#include "data_management.h"  // includes header file for data handling and management 
+#include "monomial_transformation.h" // includes header file for functions computing the monomial transformation
 
 #define EPS std::numeric_limits<double>::epsilon() // sets double machine-epsilon as treshold
 #define PI boost::math::constants::pi<float128>() // defines pi with 34 decimal digits
@@ -43,8 +43,8 @@ typedef boomp::float128 float128; // quadruple precision f.p. format
 
 // Loud mode
 template<typename T>
-void quasimont(std::vector<T>& muntz_sequence, std::vector<T>& coeff_sequence);
+void mtqr(std::vector<T>& muntz_sequence, std::vector<T>& coeff_sequence);
 // Silent mode
-std::vector<std::vector<double>> quasimont(double lambda_min, double lambda_max);
+std::vector<std::vector<double>> mtqr(double lambda_min, double lambda_max);
 
-#endif // QUASIMONT_H
+#endif // MTQR_H
