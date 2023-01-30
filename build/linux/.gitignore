@@ -1,4 +1,8 @@
 # Ignore everything in this directory
 *
-# Except this file
+# Except this file ...
 !.gitignore
+#  ... the linux installation script...
+!INSTALL
+# ... and the makefile used to build the library
+!makefile 
