@@ -3,6 +3,6 @@
 # Except this file ...
 !.gitignore
 #  ... the linux installation script...
-!INSTALL
+!install
 # ... and the makefile used to build the library
 !makefile 

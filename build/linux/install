@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "Installing mtqr..."
+make -f .
+echo "...done!"
