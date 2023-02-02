@@ -13,25 +13,43 @@
 #            Electromagnetic modelling and applications Research Group
 #---------------------------------------------------------------------------------------
 
-CXX = g++
+-include macros.mk
 
-INCDIR = ../../include
-SRCDIR = ../../src
-OBJDIR = obj
+.PHONY = all install library clean uninstall 
 
-OBJ = $(OBJDIR)/mtqr.o $(OBJDIR)/data_management.o $(OBJDIR)/monomial_transformation.o $(OBJDIR)/vector_operations.o
+default: install library clean
 
-CXXOPTIONS = -g -ansi -std=c++17 #-fext-numeric-literals
-CXXFLAGS = $(CXXOPTIONS) -I $(INCDIR) 
+all: install library tests clean
 
-dafault: $(OBJ)
+install: $(OBJ)
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(INCDIR)/*.h
-	@mkdir obj
-	$(CXX) -c $< -o $@ $(CXXFLAGS)
+library:
+	ar rcs $(LIB) $(OBJ)
+	@echo ""
 
-static: $(OBJ)
-	ar rcs ../static/libmtqr.a $^
+tests:
+	@echo "Compiling tests..."
+	@$(foreach dir, $(wildcard $(TST_DIR)), $(CC) -o $(notdir $(dir)) $(dir)/main.cpp $(INCLUDE) -L$(LIB_DIR) $(LDFLAGS);)
+	@echo "...done!"
+	@echo ""
 
 clean:
-	rm -f $(OBJDIR)
+	@echo "Cleaning object files..."
+	@rm -r $(OBJ_DIR)
+	@echo "...done!"
+
+uninstall:
+	@rm -r $(LIB)
+
+$(OBJ_DIR)/mtqr.o: $(SRC_DIR)/mtqr.cpp
+	@mkdir $(OBJ_DIR)
+	$(CC) -c $^ -o $@ $(CCFLAGS)
+
+$(OBJ_DIR)/data_management.o: $(SRC_DIR)/data_management.cpp
+	$(CC) -c $^ -o $@ $(CCFLAGS)
+
+$(OBJ_DIR)/monomial_transformation.o: $(SRC_DIR)/monomial_transformation.cpp
+	$(CC) -c $^ -o $@ $(CCFLAGS)
+
+$(OBJ_DIR)/vector_operations.o: $(SRC_DIR)/vector_operations.cpp
+	$(CC) -c $^ -o $@ $(CCFLAGS)

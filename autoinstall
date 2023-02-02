@@ -1,0 +1,8 @@
+#!/bin/bash
+
+echo " *** INSTALLING MTQR ***"
+echo ""
+cd build/linux/
+make $1 -f makefile
+echo " "
+echo " *** INSTALLATION COMPLETED ***"

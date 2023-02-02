@@ -5,4 +5,5 @@
 #  ... the linux installation script...
 !install
 # ... and the makefile used to build the library
-!makefile 
+!makefile
+!macros.mk
