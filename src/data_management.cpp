@@ -56,7 +56,7 @@ std::tuple<int, std::vector<float128>> manageData(std::vector<T>& muntz_sequence
     // Print initial message and input polynomial
     std::cout << std::endl;
     std::cout << "    |―――――――――――――――――――――――――――――――――――――――――――――――――|\n"
-              << "    |                 ** QUASIMONT **                 |\n"
+              << "    |                    ** MTQR **                   |\n"
               << "    |  ** MONOMIAL TRANSFORMATION QUADRATURE RULE **  |\n"
               << "    |―――――――――――――――――――――――――――――――――――――――――――――――――|\n";
 

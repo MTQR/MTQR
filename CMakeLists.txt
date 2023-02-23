@@ -45,22 +45,6 @@ add_executable(drivers ${TESTS}/drivers/main.cpp)
 include_directories(drivers ${INCLUDES})
 target_link_libraries(drivers mtqr ${DEPENDENCIES})
 
-add_executable(monomial ${TESTS}/monomial/main.cpp)
-include_directories(monomial ${INCLUDES})
-target_link_libraries(monomial mtqr ${DEPENDENCIES})
-
-add_executable(integration ${TESTS}/integration/main.cpp)
-include_directories(integration ${INCLUDES})
-target_link_libraries(integration mtqr ${DEPENDENCIES})
-
-add_executable(bessel_1 ${TESTS}/bessel/bessel_1/main.cpp)
-include_directories(bessel_1 ${INCLUDES})
-target_link_libraries(bessel_1 mtqr ${DEPENDENCIES})
-
-add_executable(bessel_2 ${TESTS}/bessel/bessel_2/main.cpp)
-include_directories(bessel_2 ${INCLUDES})
-target_link_libraries(bessel_2 mtqr ${DEPENDENCIES})
-
-add_executable(bessel_3 ${TESTS}/bessel/bessel_3/main.cpp)
-include_directories(bessel_3 ${INCLUDES})
-target_link_libraries(bessel_3 mtqr ${DEPENDENCIES})
+add_executable(bessels ${TESTS}/bessels/main.cpp)
+include_directories(bessels ${INCLUDES})
+target_link_libraries(bessels mtqr ${DEPENDENCIES})
