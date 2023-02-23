@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------------------
-// File:      tests/bessel/bessel_1/main.cpp
+// File:      tests/bessels/main.cpp
 //
 // Library:   MTQR - Monomial Transformation Quadrature Rule:
 //                   a C++ library for high-precision integration of 
@@ -17,7 +17,7 @@
 #include "mtqr.h"
 
 int main(int argc, char** argv){
-  int N=8;
+  int N=4;
   double I, In;
   double nu_min, nu_max;
   double J_nu, J_nu_1, J_nu_2;
@@ -28,7 +28,7 @@ int main(int argc, char** argv){
   // Define the value of the exact definite integral obtained through symbolic computations in Wolfram Mathematica
   I = 1.443411848585210;
   // Iterate over the number of terms in the truncated series to be added to the base case
-  for(int k=0; k<=N; k++){
+  for(int k=1; k<=N; k++){
   	// Initialise the quadrature approximation to a null value
   	In = 0.0;
   	// Compute the minimum and maximum monomial order of the Bessel function at iteration k
@@ -57,7 +57,7 @@ int main(int argc, char** argv){
 
   /*  BESSEL TEST 2  */
   I = 2.061676536411596;
-  for(int k=0; k<=N; k++){
+  for(int k=1; k<=N; k++){
     In = 0.0;
     nu_min = -0.5;
     nu_max = 0.333333333333333 + 2*k;
@@ -80,7 +80,7 @@ int main(int argc, char** argv){
 
   /*  BESSEL TEST 3  */
   I = 0.2021793666591346;
-  for(int k=0; k<=N; k++){In = 0.0;
+  for(int k=1; k<=N; k++){In = 0.0;
     nu_min = 0.5;
     nu_max = 0.5 + 4*k;
     

@@ -37,8 +37,6 @@
 \RequirePackage{microtype}
 \RequirePackage[listings]{tcolorbox}
 
-\RequirePackage{lipsum}
-
 % COMMANDS AND DEFINITIONS
 \addbibresource{bibtex.bib}
 
@@ -103,8 +101,8 @@
                           basicstyle=\ttfamily\footnotesize,
                           commentstyle=\color{darkGreen},
                           keywordstyle=\color{darkMagenta},
-                          keywords={$,\(,\),=},
-                          morekeywords={$,\(,\),=},
+                          %keywords={$,\(,\),=},
+                          %morekeywords={$,\(,\),=},
                           emphstyle={\color{poliOrange}},
                           emph={BLDDIR,INCDIR,SRCDIR,UTLDIR,OBJDIR},
                           stringstyle=\color{red},
@@ -127,9 +125,26 @@
                            commentstyle=\color{yellow},
                            stringstyle=\color{magenta},
                            keywordstyle=\color{bashLightBlue},
-                           keywords={sudo,make,g++},
-                           morekeywords={sudo,make,g++},
+                           keywords={sudo,home,g++,MTQR},
+                           morekeywords={sudo,home,g++,MTQR},
                            numberstyle=\tiny\color{white},
+                           numbers=none,
+                           breaklines=true,
+                           postbreak=\mbox{\textcolor{yellow}{$\hookrightarrow$}\space},
+                           breakatwhitespace=false,                
+                           captionpos=b,                    
+                           keepspaces=true,
+                           showspaces=false,                
+                           showstringspaces=false,
+                           showtabs=false,                  
+                           tabsize=2}
+% Define listing style for Windows PowerShell terminal commands
+\lstdefinestyle{PSStyle}{language=bash,
+                           backgroundcolor=\color{black},
+                           basicstyle=\color{white} \ttfamily\footnotesize,
+                           commentstyle=\color{white},
+                           stringstyle=\color{white},
+                           keywordstyle=\color{white},
                            numbers=none,
                            breaklines=true,
                            postbreak=\mbox{\textcolor{yellow}{$\hookrightarrow$}\space},
@@ -178,7 +193,7 @@
 \fancyhead[RO]{\changefont \textbf{\rightmark} \fcolorbox{black}{poliLightBlue}{\makebox[8mm]{\color{black}{\thepage}}}}
 \renewcommand{\headrulewidth}{0.25pt}
 % Set footers
-\fancyfoot[C]{\ttfamily \footnotesize QUASIMONT User Manual}
+\fancyfoot[C]{\ttfamily \footnotesize MTQR User Manual}
 \renewcommand{\footruleskip}{1.25cm}
 % Enable the style
 \pagestyle{fancy}
