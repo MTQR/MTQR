@@ -1,0 +1,67 @@
+README file for the programs besselintc.m and besselintr.m
+
+--------------------------------------------------------------------------
+
+Authors: Joris Van Deun & Ronald Cools
+
+Reference: Integrating products of Bessel functions with an additional
+           exponential or rational factor
+           Comput. Phys. Comm.
+
+Software revision date: July 26, 2007
+
+-------------------------------------------------------------------------
+
+Following files are included:
+
+besselintc.m
+       Matlab function to compute the infinite range integral of an
+       arbitrary product of Bessel functions and an exponential factor.
+       This script does not require special Matlab toolboxes.
+
+besselintr.m
+       Matlab function to compute the infinite range integral of an
+       arbitrary product of Bessel functions and a rational factor.
+       This script does not require special Matlab toolboxes.
+
+igamma.m
+       Implementation of the incomplete Gamma function for arbitrary
+       complex arguments.
+
+perprofc.m
+       Test program which demonstrates the use of besselintc.m for
+       several examples.
+
+perprofr.m
+       Test program which demonstrates the use of besselintr.m for
+       several examples.
+
+README
+       This README file.
+
+-------------------------------------------------------------------------
+
+To run the test programs, start Matlab or Octave and move to the directory
+where you installed the code (or add this directory to the path).
+Then type
+
+> perprofr
+
+or
+
+> perprofc
+
+at the prompt, to test besselintr or besselintc respectively.
+
+In Matlab version 7.2.0.232 (R2006a), on a Dell Latitude laptop with
+Intel CPU T2300 processor (1.62 GHz), under Windows XP pro, timings are
+as follows:
+
+- perprofc:  57 seconds
+- perprofr: 447 seconds
+
+In Octave or older versions of Matlab, or on older computers, this may
+take much longer.
+
+-------------------------------------------------------------------------
+
