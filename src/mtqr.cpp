@@ -32,7 +32,7 @@ void mtqr(std::vector<T>& muntz_sequence, std::vector<T>& coeff_sequence)
   double transf_order = computeMapOrder(std::get<1>(input_data), std::get<1>(monomial_data));
 
   // Compute the new nodes and weights of the Monomial Transformation Quadrature Rule
-  auto quad_data = computeQuadParams(transf_order, std::get<0>(monomial_data));
+  auto quad_data = computeQuadParams(transf_order, std::get<0>(monomial_data), std::get<2>(monomial_data));
 
   // Cast the quadrature parameter in the most optimised f.p. format possible
   optimiseData(quad_data, muntz_sequence, coeff_sequence);
@@ -60,7 +60,7 @@ std::vector<std::vector<double>> mtqr(double lambda_min, double lambda_max)
   double transf_order = computeMapOrder(std::get<1>(input_data), std::get<1>(monomial_data));
 
   // Compute the new nodes and weights of the Monomial Transformation Quadrature Rule
-  auto quad_data = computeQuadParams(transf_order, std::get<0>(monomial_data));
+  auto quad_data = computeQuadParams(transf_order, std::get<0>(monomial_data), std::get<2>(monomial_data));
 
   // Cast the quadrature parameter in the most optimised f.p. format possible
   optimiseData(quad_data, muntz_sequence, coeff_sequence);

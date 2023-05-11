@@ -1,8 +1,0 @@
-# Ignore everything in this directory
-*
-# Except this file ...
-!.gitignore
-#  ... the latex folder for the UM ...
-!latex
-#  ... and the UM itself!
-!UserManual.pdf

@@ -204,7 +204,7 @@ double computeMapOrder(const std::vector<float128>& lambdas, const std::vector<f
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, std::vector<float128>> computeQuadParams(const double& r, const int& n_min)
+std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, std::vector<float128>> computeQuadParams(const double& r, const int& n_min, const int& it)
 {
   extern bool loud_mode;
   if(loud_mode)
@@ -220,67 +220,24 @@ std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, 
   }
 
   std::vector<float128> new_nodes, new_weights, old_nodes, old_weights;
+  float128 transf_order = static_cast<float128>(r);
+  float128 delayed_transf_order = transf_order - 1.0000000000000000000000;
 
-  // Compute affine map [a,b] -> [-1,1] parameters
-  float128 a = 0.0, b = 1.0;
-  float128 alpha = 0.5*(b - a), beta = 0.5*(a + b);
-  float128 jacobian = alpha;
+  // Compute the monomial node in [0,1]
+  std::vector<std::string> _nodes = GL_NODES[it], _weights = GL_WEIGHTS[it];
+  int num_nodes = stoi(_nodes[0]), num_weights = stoi(_weights[0]);
 
-  std::string line_nodes, column_nodes;
-  float128 affine_node;
-  int num_nodes;
-
-  int it = 0;
-  while(true)
+  if(n_min==num_nodes && n_min==num_weights)
   {
-    std::vector<std::string> _nodes = GL_NODES[it];
-    num_nodes = stoi(_nodes[0]);
-
-    if(n_min == num_nodes)
-    { 
-      for(int k = 1; k <= num_nodes; k++)
-      {
-        // Map the original G-L node from [-1,1] to [0,1] through affine transformation
-        affine_node = alpha*(static_cast<float128>(_nodes[k])) + beta;
-        old_nodes.push_back(affine_node);
-        // Compute new node using the monomial transformation
-        new_nodes.push_back(pow(affine_node, static_cast<float128>(r)));
-      }
-
-      break;
-    }
-    else {
-        it++;
-    }
-  }
-
-  std::string line_weights, column_weights;
-  float128 affine_weight;
-  int num_weights;
-
-  it = 0;
-  while(true)
-  {
-    std::vector<std::string> _weights = GL_WEIGHTS[it];
-    num_weights = stoi(_weights[0]);
-
-    if(n_min == num_weights)
-    {
-
-      for(int k = 1; k <= num_nodes; k++)
-      {
-        // Map the original G-L weight from [-1,1] in [0,1] through affine transformation
-        affine_weight = jacobian*(static_cast<float128>(_weights[k]));
-        old_weights.push_back(affine_weight);
-        // Compute new weight using the monomial transformation
-        new_weights.push_back(static_cast<float128>(r)*pow(old_nodes.at(k-1), static_cast<float128>(r-1))*affine_weight);
-      }
-
-      break;
-    }
-    else {
-        it++;
-    }
+  	for(int k=1; k<=num_nodes; k++)
+  	{
+  		// Convert the original G-L samples in [0,1] from string to float128
+  		old_nodes.push_back(static_cast<float128>(_nodes[k]));
+  		old_weights.push_back(static_cast<float128>(_weights[k]));
+  		// Compute the new monomially mapped samples in [0,1]
+  		new_nodes.push_back(pow(old_nodes[k-1], transf_order));
+  		new_weights.push_back(transf_order*pow(old_nodes.at(k-1), delayed_transf_order)*old_weights[k-1]);
+  	}
   }
 
   return std::make_tuple(new_nodes, new_weights, old_nodes, old_weights);

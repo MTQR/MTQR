@@ -230,7 +230,7 @@ template std::tuple<int, std::vector<float128>> manageData<double>(std::vector<d
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-std::tuple<int, std::vector<float128>> streamMonMapData(const int& comp_num_nodes)
+std::tuple<int, std::vector<float128>, int> streamMonMapData(const int& comp_num_nodes)
 {
   int n_min;
   float128 beta_min, beta_max;
@@ -265,7 +265,7 @@ std::tuple<int, std::vector<float128>> streamMonMapData(const int& comp_num_node
     }
   }
   std::vector<float128> betas = {beta_min, beta_max};
-  return std::make_tuple(n_min, betas);
+  return std::make_tuple(n_min, betas, it);
 }
 
 

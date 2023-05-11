@@ -26,7 +26,7 @@ int computeNumNodes(const float128& lambda_min, const float128& lambda_max);
 double computeMapOrder(const std::vector<float128>& lambdas, const std::vector<float128>& betas);
 
 // Computes the new nodes and weights of the monomial transformation quadrature rule
-std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, std::vector<float128>> computeQuadParams(const double& r, const int& n_min);
+std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, std::vector<float128>> computeQuadParams(const double& r, const int& n_min, const int& it);
 
 // Computes the numerical integral for a given quadrature rule
 template<typename type1, typename type2>
