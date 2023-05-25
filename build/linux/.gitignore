@@ -1,9 +1,0 @@
-# Ignore everything in this directory
-*
-# Except this file ...
-!.gitignore
-#  ... the linux installation script...
-!install
-# ... and the makefile used to build the library
-!makefile
-!macros.mk
