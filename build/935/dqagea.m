@@ -59,7 +59,7 @@ if (a>b)
     t=b; b=a; a=t;
 end
 lends(1)=a;rends(1)=b;
-[sums(last),errs(last)]=quadgk(func,a,b ,'RelTol',0);
+[sums(last),errs(last)]=quadgk(func,a,b ,'RelTol',0, 'Trace', true);
 if isnan(sums(last))
     errsum=realmax;
 else
@@ -79,8 +79,8 @@ while ((last < maxlist && errsum>errbnd) || isnan(errsum))
     c1=rends(maxerr);
     
     % re-estimate each of the new partitions with quadgk.
-    [area1,err1]=quadgk(func,a1,b1,'RelTol',0);
-    [area2,err2]=quadgk(func,b1,c1,'RelTol',0);
+    [area1,err1]=quadgk(func,a1,b1,'RelTol',0, 'Trace', true);
+    [area2,err2]=quadgk(func,b1,c1,'RelTol',0, 'Trace', true);
     
     neval=neval+1;
     narea=area1+area2;

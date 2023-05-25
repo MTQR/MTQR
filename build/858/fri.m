@@ -1,5 +1,6 @@
-function [f,err,eflag] = fri(a,nu,m,x0,tol)
+function [f,err,eflag,neval] = fri(a,nu,m,x0,tol)
 %FRI Finite range integration
+neval = 0;
 
 % get rough approximation to number of zeros in integrand
 n = max(ceil(sum(x0*a/pi+1/4-nu/2)),0)+1;
@@ -12,11 +13,13 @@ p = sum(nu) + m; % degree of singularity
 if abs(fix(p)-p) > abs(p)*50*eps, % fractional degree -> extrapolate
     xs = z(2); z = z(2:end);
     rho = 1/4; f1 = 0; i = 0;
-    [f2,err,eflag] = nqf(@fun,[xs/2,xs],tol,a,nu,m);
+    [f2,err,eflag,funceval1] = nqf(@fun,[xs/2,xs],tol,a,nu,m);
+    neval = neval + funceval1;
     I1(1) = f2; xs = xs/2;
     while ~eflag & abs(f2-f1) > tol(1)*abs(f2) & abs(f2-f1) > tol(2),
         i = i + 1;
-        [I2(1),err,eflag] = nqf(@fun,[xs*rho,xs],tol,a,nu,m);
+        [I2(1),err,eflag,funceval2] = nqf(@fun,[xs*rho,xs],tol,a,nu,m);
+        neval = neval + funceval2;
         I2(1) = I1(1) + I2(1);
         for j = 1:i, % extrapolate in sense of Richardson
             I2(j+1) = (I2(j) - rho^(p+j)*I1(j)) / (1 - rho^(p+j));
@@ -35,7 +38,8 @@ z = [z(1:2:end-1) x0]; % take 2 intervals together to save work
 
 % split integrand at equidistant points to integrate
 V = [z(1:end-1)' z(2:end)'];
-[f2,err,eflag] = nqf(@fun,V,tol,a,nu,m);
+[f2,err,eflag,funceval3] = nqf(@fun,V,tol,a,nu,m);
+neval = neval + funceval3;
 f = f + f2;
 err = err + err1;
 
@@ -51,9 +55,9 @@ end
 
 % ----------------------------------------------------------------------
 
-function [I,err,eflag] = nqf(fun,X,tol,varargin)
+function [I,err,eflag,funceval] = nqf(fun,X,tol,varargin)
 %NQF Numerical quadrature formula
-
+funceval = 0;
 % some hard coded Gauss-Legendre rules
 xw5=[0,                         0.28444444444444444444;
      0.53846931010568309104,    0.23931433524968323402;
@@ -121,6 +125,7 @@ for j = k:length(xw),
         L = (X(i,2)-X(i,1))/2; M = (X(i,2)+X(i,1))/2;
         x = L*[-xw{j}(end:-1:2,1);xw{j}(:,1)]' + M; % maps the nodes in the actual interval
         If = If + 2*L*feval(fun,x,varargin{:})*w;
+        funceval = funceval + length(w);
     end
     I2 = I1;
     I1 = If;
