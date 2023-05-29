@@ -3,7 +3,7 @@
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/special_functions/sin_pi.hpp>
 
-// clear && rm -r estimate && g++ error_estimate.cpp -o error_estimate -I../include -lm -lquadmath -lgmp -lmpfr && ./error_estimate
+// clear && rm -r error_estimate && g++ error_estimate.cpp -o error_estimate -I../include -lm -lquadmath -lgmp -lmpfr && ./error_estimate
 
 typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<50>> float50;
 
@@ -98,7 +98,7 @@ void plot(const int& num_nodes, const T& beta_min, const T& beta_max)
     printProgressBar(k, n_samples - 2);
   }
 
-  std::string plot_file = "bash ./Fig2.sh ";
+  std::string plot_file = "bash ./plot.sh ";
   std::string cmd = plot_file + std::to_string(num_nodes) + " " + std::to_string(print_startpoint) + " " + std::to_string(print_endopoint);
   system(cmd.c_str());
 
