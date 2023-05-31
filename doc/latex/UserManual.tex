@@ -49,7 +49,7 @@
 \chapter[Preliminaries]{\Huge \ttfamily PRELIMINARIES}\chaptermark{PRELIMINARIES}
 %\ThisULCornerWallPaper{0.35}{images/TransparentLogo.png}
 
-This user manual provides a detailed description of the functionalities, correct installation and usage of the MTQR, an open-source and cross-platform C++ library for precise numerical integration. Users of the library can refer to the following content for building the static library, as well as integrating it in their own custom applications to generate specialised quadrature rules for integrand functions that can be modelled by sets of singular and generalised polynomials. The principles behind the implementation of the software are discussed in this first chapter, followed by instructions for compiling and linking the library in Windows and Linux (outlined in the second and third chapter) and finally by a concluding chapter that briefly describes the user interface. MTQR offers a high degree of flexibility concerning its usage and interaction, specifically:
+This user manual provides a detailed description of the functionalities, correct installation and usage of MTQR, an open-source and cross-platform C++ library for precise numerical integration. Users of the library can refer to the following content for building the static library, as well as integrating it in their own custom applications to generate specialised quadrature rules for integrand functions that can be modelled by sets of singular and generalised polynomials. The principles behind the implementation of the software are discussed in this first chapter, followed by instructions for compiling and linking the library in Windows and Linux (outlined in the second and third chapter) and finally by a concluding chapter that briefly describes the user interface. MTQR offers a high degree of flexibility concerning its usage and interaction, specifically:
 \begin{itemize}
     \item it provides high-precision quadrature rules (see Section \ref{Sec2.4}) for multiple applications in numerical mathematics and scientific computing whenever functions that can be modelled by singular and generalised polynomials require to be integrated;
     \item it implements two {\itshape modes} of execution (namely the {\itshape loud} and {\itshape silent} modes) providing the options of both limiting the terminal's output information and output results (see Section \ref{Sec3.2}) and accelerating and simplifying the overall workflow (see Section \ref{Sec3.2.bis});
@@ -195,7 +195,7 @@ Such condition satisfies the known \color{poliDarkBlue} \textbf{Müntz theorem} 
 
 \subsection[Integration interval]{\changefont INTEGRATION INTERVAL}\label{SubSec1.2.5}
 
-We consider the problem of the numerically integrating a function that is approximated appropriately with a set of generalised polynomials in the interval $(a,b)$. This problem can always be reformulated in $(0,1)$ with a potential (endpoint) singularity in $x=0$ via affine trasformation, i.e. 
+We consider the problem of numerically integrating a function that is approximated appropriately with a set of generalised polynomials in the interval $(a,b)$. This problem can always be reformulated in $(0,1)$ with a potential (endpoint) singularity in $x=0$ via affine trasformation, i.e. 
 \begin{equation}\label{eq1.11}
     I(f) = \int_0^1 f(\tilde{x}) d\tilde{x},
 \end{equation}
@@ -261,7 +261,7 @@ respectively, where $\tilde{x}_j,\:\tilde{w}_j$ are the classical G-L nodes and 
 \end{equation}
 
 \noindent
-A visual representation of $p(x)$ is reported in Figure \ref{Fig1.2} together with the effect of the ad-hoc designed monomial transformation on the quadrature for double precision integration. The Table \ref{table1.2} below lists the classical G-L nodes and weights alongside their $(\ref{eq1.16})$ and $(\ref{eq1.19})$ respective counterparts used by the proposed monomial transformation quadrature rule. In this case, using the MTQR library returns a numerical approximation that is accurate to ($E_n(p)=\GL{????????????}$) using $n_{min}=14$ quadrature samples and order $r=28.77$ for the monomial transformation.
+A visual representation of $p(x)$ is reported in Figure \ref{Fig1.2} together with the effect of the ad-hoc designed monomial transformation on the quadrature for double precision integration. The Table \ref{table1.2} below lists the classical G-L nodes and weights alongside their $(\ref{eq1.16})$ and $(\ref{eq1.19})$ respective counterparts used by the proposed monomial transformation quadrature rule. In this case, the library only uses $n_{min}=14$ quadrature samples for a monomial transformation order $r=28.77$.
 
 \begin{center}
         \begin{figure}[h]
@@ -372,18 +372,18 @@ user@machine: home> cmake --version
 \vspace{0.3cm}
 
 \noindent
-Notice that in the above lists of terminal commands we installed both \color{poliDarkBlue} \textbf{CMake} and \color{poliDarkBlue} \textbf{make}. This is because, while the preferred and de-facto standard building tools used to compile C++ libraries is \colorbox{poliGrayBlue}{cmake}, on Linux we decide to allow the users to have the additional option of building MTQR also using only \colorbox{poliGrayBlue}{make}. For more information on how MTQR allows using Make for compiling the library we redirect on subsection \ref{SubSec2.3.1}.
+Notice that in the above lists of terminal commands we installed both \color{poliDarkBlue} \textbf{CMake} \color{black} and \color{poliDarkBlue} \textbf{make}\color{black}. This is because, while the preferred and de-facto standard building tools used to compile C++ libraries is \colorbox{poliGrayBlue}{cmake}, on Linux we decide to allow the users to have the additional option of building MTQR also using only \colorbox{poliGrayBlue}{make}. For more information on how MTQR allows using Make for compiling the library we redirect on subsection \ref{SubSec2.3.1}.
 
 \subsection[Windows]{\changefont WINDOWS}\label{SubSec2.1.2}
 
-Installation of the dependencies in Windows is somewhat more cumbersome when compared to Linux; we hereby report the procedure we tested for the simplest and most secure installation of the third-party packages in order to achieve a successful build of MTQR.
+Installation of the dependencies in Windows is somewhat more cumbersome when compared to Linux; we hereby report the procedure we tested for the simplest and most secure installation of the third-party packages in order to achieve a successful build of MTQR:
 
 \begin{itemize}
-    \item GSL can be installed via the \color{poliDarkBlue} \textbf{vcpkg} package manager. The latter is downloaded on the local machine by using \color{poliDarkBlue} \textbf{Windows PowerShell}; we recommend the root directory as installation path for the package manager as this is facilitates the setup for the user since the root directory is searched by default by the vast majority of C++ compilers and build systems available on Windows, including MSBuild, Clang, Ninja and MSVC. A list of terminal commands to perform a correct installation and set up for these dependencies is reported below.
+    \item GSL can be installed via the \color{poliDarkBlue} \textbf{vcpkg} \color{black} package manager. The latter is downloaded on the local machine by using \color{poliDarkBlue} \textbf{Windows PowerShell}\color{black}; we recommend the root directory as installation path for the package manager as this facilitates the setup for the user since the root directory is searched by default by the vast majority of C++ compilers and build systems available on Windows, including MSBuild, Clang, Ninja and MSVC. A list of terminal commands to perform a correct installation and set up for these dependencies is reported below;
 
-    \item one of the most practical features of Boost's libraries is that they are (mostly) made by header files which do not need to be compiled; MTQR's dependency on Boost is restricted to the Multiprecision library. The user shall download the archived \colorbox{poliGrayBlue}{boost\_1\_81\_0.7z} file from the official Boost v1.81.0 release (\cite{boost_release}), decompress it in a folder named \colorbox{poliGrayBlue}{boost} and place it in the \colorbox{poliGrayBlue}{C:\textbackslash} root directory. This way the user is sure that \colorbox{poliGrayBlue}{CMake} can find Boost headers and properly include them in the MTQR's source code.
+    \item one of the most practical features of Boost's libraries is that they are (mostly) made by header files which do not need to be compiled; MTQR's dependency on Boost is restricted to the Multiprecision library. The user shall download the archived \colorbox{poliGrayBlue}{boost\_1\_81\_0.7z}  file from the official Boost v1.81.0 release (\cite{boost_release}), decompress it in a folder named \colorbox{poliGrayBlue}{boost} and place it in the \colorbox{poliGrayBlue}{C:\textbackslash} root directory. This way the user is sure that \colorbox{poliGrayBlue}{CMake} can find Boost headers and properly include them in the MTQR's source code;
 
-    \item on Windows MTQR can only be compiled using \color{poliDarkBlue} \textbf{CMake}. The easiest and safest procedure of installing CMake on Windows is by downloading the binaries from the original webpage \cite{cmake} and running the installer.
+    \item on Windows MTQR can only be compiled using \color{poliDarkBlue} \textbf{CMake}\color{black}. The easiest and safest procedure of installing CMake on Windows is by downloading the binaries from the original webpage \cite{cmake} and running the installer.
 \end{itemize}
 
 \begin{tcblisting}{enhanced,
@@ -431,7 +431,7 @@ In the above header we find the definitions of some important constants that are
  As stated above, the primary module constitutes the access point for the user to the content of MTQR. The library codebase is relatively compact and simply organised in a total of $12$ methods, which are declared in $3$ different header files and whose implementation/definition is found in their respective source files listed below:
 
 \begin{itemize}
-    \item \colorbox{poliGrayBlue}{monomial\_transformation.cpp} contains every method associated with the computation of the monomial transformation quadrature rule, ranging from the monomial map itself (i.e. $\beta_{\text{min/max}}$ and $r$) to the quadrature parameters (i.e. $\tilde{x}_j$, $\tilde{w}_j$, $J_{[a,b]}$, etc...). To provide an easier reference for code debugging and amendment, a naming scheme of these methods is adopted. Every function in this file is in fact named \color{poliDarkBlue} \textbf{compute}$\boldsymbol{<}$\textbf{NameOfFunction$\boldsymbol{>}$} \color{black} as it can be evinced from the corresponding header file containing such functions' declarations.
+    \item \colorbox{poliGrayBlue}{monomial\_transformation.cpp} contains every method associated with the computation of the monomial transformation quadrature rule, ranging from the monomial map itself (i.e. $\beta_{\text{min/max}}$ and $r$) to the quadrature parameters (i.e. $\tilde{x}_j$, $\tilde{w}_j$, $J_{[a,b]}$, etc...). To provide an easier reference for code debugging and amendment, a naming scheme of these methods is adopted. Every function in this file is in fact named \color{poliDarkBlue} \textbf{compute}$\boldsymbol{<}$\textbf{NameOfFunction$\boldsymbol{>}$} \color{black} as it can be evinced from the corresponding header file containing such functions' declarations
     
     \vspace{0.2cm}
     \tcbinputlisting{enhanced,
@@ -444,7 +444,7 @@ In the above header we find the definitions of some important constants that are
                  listing style=CppStyle,
                  listing file=snippets/monomial_transformation.h}
     
-    \item \colorbox{poliGrayBlue}{data\_management.cpp} is the source file defining each method that does not perform raw computations but instead manages the data flow e.g. in I/O operations. Every function follows the naming scheme \color{poliDarkBlue} $\boldsymbol{<}$\textbf{NameOfFunction$\boldsymbol{>}$}\textbf{Data} \color{black} emphasizing its characteristics of data manipulation method. The methods are declared in the header below.
+    \item \colorbox{poliGrayBlue}{data\_management.cpp} is the source file defining each method that does not perform raw computations but instead manages the data flow e.g. in I/O operations. Every function follows the naming scheme \color{poliDarkBlue} $\boldsymbol{<}$\textbf{NameOfFunction$\boldsymbol{>}$}\textbf{Data} \color{black} emphasizing its characteristics of data manipulation method. The methods are declared in the header below;
 
     \newpage
     \vspace{0.2cm}
@@ -477,6 +477,7 @@ In the above header we find the definitions of some important constants that are
 \noindent
 The structure of the source code of the library, as organised in the $3$ source files presented above, is reported in Figure \ref{Fig2.1}. The header files mentioned above are located in the \colorbox{poliGrayBlue}{\textbf{MTQR/include}} subdirectory alongside the primary module's header \colorbox{poliGrayBlue}{mtqr.h}. Furthermore the library features $3$ additional header files, located in \colorbox{poliGrayBlue}{\textbf{MTQR/data}} which contain \color{poliDarkBlue} \textbf{tabulated raw data} \color{black} for the proper construction of the monomial transformation quadrature rule and and thus embedded in the source code at compile time by the C++ preprocessor.
 
+\newpage
 \begin{center}
         \begin{figure}[H]
         \centering
@@ -490,10 +491,10 @@ The structure of the source code of the library, as organised in the $3$ source 
  Those header files are:
 \begin{itemize}
     \item \colorbox{poliGrayBlue}{BETAS.h} collecting the values of $\beta_{\text{min}}(n)$ and $\beta_{\text{max}}(n)$ for each even value of $n\in[10,100]$;
-    \item \colorbox{poliGrayBlue}{GL\_NODES.h} storing the G-L quadrature nodes in $(-1,1)$ for each even value of $n\in[10,100]$;
+    \item \colorbox{poliGrayBlue}{GL\_NODES.h} storing the G-L quadrature nodes in $(0,1)$ for each even value of $n\in[10,100]$;
     \item \colorbox{poliGrayBlue}{GL\_WEIGHTS.h} storing the weights of the G-L quadrature formula for each even value of $n\in[10,100]$.
 \end{itemize}
-The last two header files store the tabulated values of the original G-L nodes and weights in $(-1,1)$ with $50$ decimal digits of precision (only even-valued number of samples have been stored for the sake of simplicity). Their automatic computation is outside the scope of the library and already explored in details and implemented in other works \cite{Gautschi94,Hale13}. The folder \colorbox{poliGrayBlue}{\textbf{MTQR/build}} is used to collect the output files of the build setup instantiated by CMake and the sub-folder \colorbox{poliGrayBlue}{\textbf{MTQR/build/linux}} contains the aforementioned \colorbox{poliGrayBlue}{makefile} that Linux users can exploit as an alternative to CMake in order to build MTQR.
+The last two header files store the tabulated values of the original G-L nodes and weights both mapped in $(0,1)$ with $50$ decimal digits of precision (only even-valued number of samples have been stored for the sake of simplicity). Their automatic computation is outside the scope of the library and already explored in details and implemented in other works \cite{Gautschi94,Hale13}. The folder \colorbox{poliGrayBlue}{\textbf{MTQR/build}} is used to collect the output files of the build setup instantiated by CMake and the sub-folder \colorbox{poliGrayBlue}{\textbf{MTQR/build/linux}} contains the aforementioned \colorbox{poliGrayBlue}{makefile} that Linux users can exploit as an alternative to CMake in order to build MTQR.
 
 \section[Build process]{\changefont BUILD PROCESS}\sectionmark{BUILD PROCESS}\label{Sec2.3}
 
@@ -689,7 +690,7 @@ PS C:\MTQR> cd .\out\build\x64-Debug\
 PS C:\MTQR\out\build\x64-Debug> .\drivers.exe
 
     |*************************************************|
-    |                 ** MTQR **                 |
+    |                 ** MTQR **                      |
     |  ** MONOMIAL TRANSFORMATION QUADRATURE RULE **  |
     |*************************************************|
 
@@ -776,7 +777,7 @@ MTQR allows to integrate such integrals identifying the degree of the monomial a
                    listing only,
                    listing style=PSStyle}
     |*************************************************|
-    |                 ** MTQR **                 |
+    |                 ** MTQR **                      |
     |  ** MONOMIAL TRANSFORMATION QUADRATURE RULE **  |
     |*************************************************|
 
@@ -885,7 +886,7 @@ $j\in\mathbb{N}$ & $x_j\in(0,1)$ & $w_j\in\mathbb{R}^+$ & $j\in\mathbb{N}$ & $x_
                    listing only,
                    listing style=PSStyle}
     |*************************************************|
-    |                 ** MTQR **                 |
+    |                 ** MTQR **                      |
     |  ** MONOMIAL TRANSFORMATION QUADRATURE RULE **  |
     |*************************************************|
     
