@@ -46,11 +46,11 @@ int main(int argc, char** argv){
   		In += weights[j]*J_nu;
   	}
   	// Print out the value of the quadrature at the current iteration of number of truncated terms
-  	std::cout << std::setprecision(std::numeric_limits<double>::max_digits10) << "Iteration n° " << k << ":  In=" << In;
+  	std::cout << std::setprecision(std::numeric_limits<double>::max_digits10) << "Iteration n. " << k << ":  In=" << In;
   	// Print out the value of the relative error
   	std::cout << std::setprecision(std::numeric_limits<double>::max_digits10) << ", En=" << fabs(I-In)/fabs(I);
   	// Print out the number of quadrature samples
-  	std::cout << "   (n°samples=" << nodes.size() << ")" << "\n";
+  	std::cout << "   (n. samples=" << nodes.size() << ")" << "\n";
   }
   std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   std::cin.get();
@@ -71,9 +71,9 @@ int main(int argc, char** argv){
 
       In += weights[j]*(J_nu_1 + J_nu_2);
     }
-    std::cout << std::setprecision(std::numeric_limits<double>::max_digits10) << "Iteration n° " << k << ":  In=" << In;
+    std::cout << std::setprecision(std::numeric_limits<double>::max_digits10) << "Iteration n. " << k << ":  In=" << In;
     std::cout << std::setprecision(std::numeric_limits<double>::max_digits10) << ", En= " << fabs(I-In)/fabs(I);
-    std::cout << "   (n°samples=" << nodes.size() << ")" << "\n";
+    std::cout << "   (n. samples=" << nodes.size() << ")" << "\n";
   }
   std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   std::cin.get();
@@ -93,9 +93,9 @@ int main(int argc, char** argv){
 
       In += weights[j]*J_nu_1*J_nu_2;
     }
-    std::cout << std::setprecision(std::numeric_limits<double>::max_digits10) << "Iteration n° " << k << ":  In=" << In;
+    std::cout << std::setprecision(std::numeric_limits<double>::max_digits10) << "Iteration n. " << k << ":  In=" << In;
     std::cout << std::setprecision(std::numeric_limits<double>::max_digits10) << ", En= " << fabs(I-In)/fabs(I);
-    std::cout << "   (n°samples=" << nodes.size() << ")" << "\n";
+    std::cout << "   (n. samples=" << nodes.size() << ")" << "\n";
   }
   std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   std::cin.get();

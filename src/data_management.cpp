@@ -55,10 +55,10 @@ std::tuple<int, std::vector<float128>> manageData(std::vector<T>& muntz_sequence
   {
     // Print initial message and input polynomial
     std::cout << std::endl;
-    std::cout << "    |―――――――――――――――――――――――――――――――――――――――――――――――――|\n"
+    std::cout << "    |*************************************************|\n"
               << "    |                    ** MTQR **                   |\n"
               << "    |  ** MONOMIAL TRANSFORMATION QUADRATURE RULE **  |\n"
-              << "    |―――――――――――――――――――――――――――――――――――――――――――――――――|\n";
+              << "    |*************************************************|\n";
 
     if(muntz_sequence.size()==coeff_sequence.size())
     {
@@ -251,7 +251,7 @@ std::tuple<int, std::vector<float128>, int> streamMonMapData(const int& comp_num
       if(loud_mode)
       {
         std::cout << std::setprecision(std::numeric_limits<float>::max_digits10)
-                  << " ――――――――――――――――――――――――――――――――――――――――――――――――――"
+                  << " *************************************************"
                   << "\n ** N_min = " << n_min
                   << "\n ** Beta_min = " << beta_min
                   << ", Beta_max = " << beta_max
@@ -313,7 +313,7 @@ void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::
   {// Nodes and weights succefully optimised float128 -> double
     if(loud_mode)
     {
-      std::cout << " ――――――――――――――――――――――――――――――――――――――――――――――――――"
+      std::cout << " *************************************************"
                 << "\n ** Using double f.p. format for nodes and weights **"
                 << std::endl;
       print_primitive = true;
@@ -351,7 +351,7 @@ void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::
   }
   if(loud_mode)
   {
-    std::cout << " ――――――――――――――――――――――――――――――――――――――――――――――――――"
+    std::cout << " *************************************************"
               << "\n ** Using quadruple f.p. format for nodes and weights **"
               << std::endl;
     print_primitive = true;
