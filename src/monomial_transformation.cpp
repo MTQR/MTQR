@@ -136,7 +136,12 @@ double computeMapOrder(const std::vector<float128>& lambdas, const std::vector<f
   if(loud_mode)
   {
     // Create output sub-directory
-    std::string mkdir = "mkdir -p ";
+    #ifdef _MSC_VER
+      // Often necessary for MSVC on Windows OS
+      std::string mkdir = "mkdir ";
+    #else
+      std::string mkdir = "mkdir -p ";
+    #endif
     std::string output_dir = "output";
     std::string results_dir = mkdir + output_dir;
     system(results_dir.c_str());

@@ -6,7 +6,7 @@ template<typename type>
 std::tuple<int, std::vector<float128>> manageData(std::vector<type>& muntz_sequence, std::vector<type>& coeff_sequence);
 
 // Extract the values of beta_min and beta_max according to the computed minimum number of nodes
-std::tuple<int, std::vector<float128>> streamMonMapData(const int& comp_num_nodes);
+std::tuple<int, std::vector<float128>, int> streamMonMapData(const int& comp_num_nodes);
 
 // Degrade the precision of the new nodes and weights to establish minimum data-type for double precision quadrature
 template<typename type>

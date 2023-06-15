@@ -55,10 +55,10 @@ std::tuple<int, std::vector<float128>> manageData(std::vector<T>& muntz_sequence
   {
     // Print initial message and input polynomial
     std::cout << std::endl;
-    std::cout << "    |―――――――――――――――――――――――――――――――――――――――――――――――――|\n"
+    std::cout << "    |*************************************************|\n"
               << "    |                    ** MTQR **                   |\n"
               << "    |  ** MONOMIAL TRANSFORMATION QUADRATURE RULE **  |\n"
-              << "    |―――――――――――――――――――――――――――――――――――――――――――――――――|\n";
+              << "    |*************************************************|\n";
 
     if(muntz_sequence.size()==coeff_sequence.size())
     {
@@ -107,7 +107,7 @@ std::tuple<int, std::vector<float128>> manageData(std::vector<T>& muntz_sequence
 
       std::string input;
       std::cout << "\n ** WARNING ** Your input is a monomial of non-integer degree."
-                << "\n               QUASIMONT needs a binomial for double-precision quadrature."
+                << "\n               MTQR needs a binomial for double-precision quadrature."
                 << "\n               How do you proceed? ['nodes' for n_min ~ 'lambda' for lambda_max]"
                 << "\n               Input: ";
       std::cin >> input;
@@ -251,7 +251,7 @@ std::tuple<int, std::vector<float128>, int> streamMonMapData(const int& comp_num
       if(loud_mode)
       {
         std::cout << std::setprecision(std::numeric_limits<float>::max_digits10)
-                  << " ――――――――――――――――――――――――――――――――――――――――――――――――――"
+                  << " *************************************************"
                   << "\n ** N_min = " << n_min
                   << "\n ** Beta_min = " << beta_min
                   << ", Beta_max = " << beta_max
@@ -313,7 +313,7 @@ void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::
   {// Nodes and weights succefully optimised float128 -> double
     if(loud_mode)
     {
-      std::cout << " ――――――――――――――――――――――――――――――――――――――――――――――――――"
+      std::cout << " *************************************************"
                 << "\n ** Using double f.p. format for nodes and weights **"
                 << std::endl;
       print_primitive = true;
@@ -346,12 +346,12 @@ void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::
     // Export all the results {In, En, I, E} in double
     exportNewData(double_nodes, double_weights, {I16_new, E16_new, I16_old, E16_old});
     // Print closing message and return
-    if(loud_mode){std::cout << "\n\n ** QUASIMONT HAS TERMINATED **\n";}
+    if(loud_mode){std::cout << "\n\n ** MTQR HAS TERMINATED **\n";}
     return;
   }
   if(loud_mode)
   {
-    std::cout << " ――――――――――――――――――――――――――――――――――――――――――――――――――"
+    std::cout << " *************************************************"
               << "\n ** Using quadruple f.p. format for nodes and weights **"
               << std::endl;
     print_primitive = true;
@@ -381,7 +381,7 @@ void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::
   // Export all the results {In, En, I, E} in float128
   exportNewData(std::get<0>(quad_params), std::get<1>(quad_params), {I34_new, E34_new, I34_old, E34_old});
   // Print closing message
-  if(loud_mode){std::cout << "\n\n ** QUASIMONT HAS TERMINATED **\n";}
+  if(loud_mode){std::cout << "\n\n ** MTQR HAS TERMINATED **\n";}
 }
 template void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, std::vector<float128>>& quad_params, std::vector<float128>& muntz_sequence, std::vector<float128>& coeff_sequence); 
 template void optimiseData(std::tuple<std::vector<float128>, std::vector<float128>, std::vector<float128>, std::vector<float128>>& quad_params, std::vector<double>& muntz_sequence, std::vector<double>& coeff_sequence); 

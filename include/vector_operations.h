@@ -24,19 +24,4 @@ std::vector<type> castVector(const std::vector<float128>& input_vector, const ty
 template<typename type>
 float128 doubleDotProduct(const std::vector<float128>& f_values, const std::vector<type>& weights);
 
-// Generates n equispaced points between two input real numbers
-template<typename type>
-std::vector<type> linspacedVector(const type& start_type, const type& end_type, const int& num_steps);
-
-//
-template<typename type>
-type aPrioriAsympEstimate(const type& input_lambda, const int& num_nodes);
-
-//
-template<typename type>
-void plot(const int& num_nodes, const type& beta_min, const type& beta_max);
-
-//
-void printProgressBar(const int& iter, const int& num_iter);
-
 #endif // VEC_OPS_H
