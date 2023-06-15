@@ -55,7 +55,7 @@
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 	<path stroke='black'  d='M78.8,814.0 L87.8,814.0 M1775.0,814.0 L1766.0,814.0  '/>	<g transform="translate(70.5,819.9)" stroke="none" fill="black" font-family="Arial" font-size="18.00"  text-anchor="end">
-		<text><tspan font-family="Arial" > 1x10</tspan><tspan font-family="Arial"  font-size="14.4" dy="-9.00px">-60</tspan><tspan font-size="18.0" dy="9.00"></tspan></text>
+		<text>10^{-60}</text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
@@ -72,7 +72,7 @@
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 	<path stroke='black'  d='M78.8,683.5 L87.8,683.5 M1775.0,683.5 L1766.0,683.5  '/>	<g transform="translate(70.5,689.4)" stroke="none" fill="black" font-family="Arial" font-size="18.00"  text-anchor="end">
-		<text><tspan font-family="Arial" > 1x10</tspan><tspan font-family="Arial"  font-size="14.4" dy="-9.00px">-50</tspan><tspan font-size="18.0" dy="9.00"></tspan></text>
+		<text>10^{-50}</text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
@@ -89,7 +89,7 @@
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 	<path stroke='black'  d='M78.8,553.1 L87.8,553.1 M1775.0,553.1 L1766.0,553.1  '/>	<g transform="translate(70.5,559.0)" stroke="none" fill="black" font-family="Arial" font-size="18.00"  text-anchor="end">
-		<text><tspan font-family="Arial" > 1x10</tspan><tspan font-family="Arial"  font-size="14.4" dy="-9.00px">-40</tspan><tspan font-size="18.0" dy="9.00"></tspan></text>
+		<text>10^{-40}</text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
@@ -106,7 +106,7 @@
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 	<path stroke='black'  d='M78.8,422.6 L87.8,422.6 M1775.0,422.6 L1766.0,422.6  '/>	<g transform="translate(70.5,428.5)" stroke="none" fill="black" font-family="Arial" font-size="18.00"  text-anchor="end">
-		<text><tspan font-family="Arial" > 1x10</tspan><tspan font-family="Arial"  font-size="14.4" dy="-9.00px">-30</tspan><tspan font-size="18.0" dy="9.00"></tspan></text>
+		<text>10^{-30}</text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
@@ -123,7 +123,7 @@
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 	<path stroke='black'  d='M78.8,292.1 L87.8,292.1 M1775.0,292.1 L1766.0,292.1  '/>	<g transform="translate(70.5,298.0)" stroke="none" fill="black" font-family="Arial" font-size="18.00"  text-anchor="end">
-		<text><tspan font-family="Arial" > 1x10</tspan><tspan font-family="Arial"  font-size="14.4" dy="-9.00px">-20</tspan><tspan font-size="18.0" dy="9.00"></tspan></text>
+		<text>10^{-20}</text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
@@ -140,7 +140,7 @@
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 	<path stroke='black'  d='M78.8,161.6 L87.8,161.6 M1775.0,161.6 L1766.0,161.6  '/>	<g transform="translate(70.5,167.5)" stroke="none" fill="black" font-family="Arial" font-size="18.00"  text-anchor="end">
-		<text><tspan font-family="Arial" > 1x10</tspan><tspan font-family="Arial"  font-size="14.4" dy="-9.00px">-10</tspan><tspan font-size="18.0" dy="9.00"></tspan></text>
+		<text>10^{-10}</text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
@@ -231,17 +231,17 @@
 	<path stroke='black'  d='M78.8,18.1 L78.8,918.4 L1775.0,918.4 L1775.0,18.1 L78.8,18.1 Z  '/></g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 	<g transform="translate(926.9,1006.6)" stroke="none" fill="black" font-family="Arial" font-size="22.00"  text-anchor="middle">
-		<text><tspan font-family="Arial" >Lambda</tspan></text>
+		<text><tspan font-family="Arial" >λ</tspan></text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 </g>
-	<g id="gnuplot_plot_1" ><title>En=10(f)</title>
+	<g id="gnuplot_plot_1" ><title>En=10</title>
 <g fill="none" color="white" stroke="currentColor" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
 	<g transform="translate(1606.5,624.1)" stroke="none" fill="black" font-family="Arial" font-size="36.00"  text-anchor="end">
-		<text><tspan font-family="Arial" >E</tspan><tspan font-family="Arial"  font-size="28.8" dy="10.80px">n=10</tspan><tspan font-family="Arial"  font-size="36.0" dy="-10.80px">(f)</tspan></text>
+		<text>E_{n=10}</text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
@@ -1936,10 +1936,10 @@
 		L1773.4,64.2 L1773.5,64.2 L1773.6,64.2 L1773.7,64.2 L1773.9,64.2 L1774.0,64.2 L1774.1,64.2 L1774.2,64.2
 		L1774.4,64.2 L1774.5,64.2 L1774.6,64.2 L1774.7,64.2 L1774.9,64.2  '/></g>
 	</g>
-	<g id="gnuplot_plot_2" ><title>En=18(f)</title>
+	<g id="gnuplot_plot_2" ><title>En=18</title>
 <g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
 	<g transform="translate(1606.5,678.1)" stroke="none" fill="black" font-family="Arial" font-size="36.00"  text-anchor="end">
-		<text><tspan font-family="Arial" >E</tspan><tspan font-family="Arial"  font-size="28.8" dy="10.80px">n=18</tspan><tspan font-family="Arial"  font-size="36.0" dy="-10.80px">(f)</tspan></text>
+		<text>E_{n=18}</text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
@@ -3634,10 +3634,10 @@
 		L1773.4,87.3 L1773.5,87.3 L1773.6,87.3 L1773.7,87.3 L1773.9,87.3 L1774.0,87.3 L1774.1,87.3 L1774.2,87.3
 		L1774.4,87.3 L1774.5,87.3 L1774.6,87.3 L1774.7,87.3 L1774.9,87.3  '/></g>
 	</g>
-	<g id="gnuplot_plot_3" ><title>En=26(f)</title>
+	<g id="gnuplot_plot_3" ><title>En=26</title>
 <g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
 	<g transform="translate(1606.5,732.1)" stroke="none" fill="black" font-family="Arial" font-size="36.00"  text-anchor="end">
-		<text><tspan font-family="Arial" >E</tspan><tspan font-family="Arial"  font-size="28.8" dy="10.80px">n=26</tspan><tspan font-family="Arial"  font-size="36.0" dy="-10.80px">(f)</tspan></text>
+		<text>E_{n=26}</text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
@@ -5332,10 +5332,10 @@
 		L1773.4,126.6 L1773.5,126.6 L1773.6,126.6 L1773.7,126.5 L1773.9,126.5 L1774.0,126.5 L1774.1,126.5 L1774.2,126.5
 		L1774.4,126.5 L1774.5,126.5 L1774.6,126.5 L1774.7,126.5 L1774.9,126.5  '/></g>
 	</g>
-	<g id="gnuplot_plot_4" ><title>En=34(f)</title>
+	<g id="gnuplot_plot_4" ><title>En=34</title>
 <g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
 	<g transform="translate(1606.5,786.1)" stroke="none" fill="black" font-family="Arial" font-size="36.00"  text-anchor="end">
-		<text><tspan font-family="Arial" >E</tspan><tspan font-family="Arial"  font-size="28.8" dy="10.80px">n=34</tspan><tspan font-family="Arial"  font-size="36.0" dy="-10.80px">(f)</tspan></text>
+		<text>E_{n=34}</text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
@@ -7030,10 +7030,10 @@
 		L1773.4,181.8 L1773.5,181.8 L1773.6,181.8 L1773.7,181.8 L1773.9,181.8 L1774.0,181.8 L1774.1,181.8 L1774.2,181.8
 		L1774.4,181.8 L1774.5,181.7 L1774.6,181.7 L1774.7,181.7 L1774.9,181.7  '/></g>
 	</g>
-	<g id="gnuplot_plot_5" ><title>En=42(f)</title>
+	<g id="gnuplot_plot_5" ><title>En=42</title>
 <g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
 	<g transform="translate(1606.5,840.1)" stroke="none" fill="black" font-family="Arial" font-size="36.00"  text-anchor="end">
-		<text><tspan font-family="Arial" >E</tspan><tspan font-family="Arial"  font-size="28.8" dy="10.80px">n=42</tspan><tspan font-family="Arial"  font-size="36.0" dy="-10.80px">(f)</tspan></text>
+		<text>E_{n=42}</text>
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">

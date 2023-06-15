@@ -9,8 +9,4 @@ std::vector<type> castVector(const std::vector<float128>& input_vector, const ty
 template<typename type>
 float128 doubleDotProduct(const std::vector<float128>& f_values, const std::vector<type>& weights);
 
-// Generates n equispaced points between two input real numbers
-template<typename type>
-std::vector<type> linspacedVector(const type& start_type, const type& end_type, const int& num_steps);
-
 #endif // VEC_OPS_H
