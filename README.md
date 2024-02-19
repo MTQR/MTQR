@@ -2,7 +2,7 @@
 
 We endevour to address and overcome some specific limitations with regards to the performances of contemporary adaptive and composite quadrature techniques for the numerical approximation of definite integrals of functions with endpoint singular/irregular behaviour and that can be modelled by generalised polynomials of non-integer-degree.
 
-This repository consists of a cross-platform C++ library implementing the __Monomial Transformation Quadrature Rule__, an innovative algorithm based on a [paper](https://onlinelibrary.wiley.com/doi/abs/10.1002/nme.2684), published in 2009, and it is part of a broader work submitted for peer-review at [Computer Physics Communications](https://www.sciencedirect.com/journal/computer-physics-communications).
+This repository consists of a cross-platform C++ library implementing the __Monomial Transformation Quadrature Rule__, an innovative algorithm based on a [paper](https://onlinelibrary.wiley.com/doi/abs/10.1002/nme.2684), published in 2009, and it is part of a broader work published more recently in [Computer Physics Communications](https://www.sciencedirect.com/science/article/pii/S001046552400047X?via%3Dihub).
 
 The software can run standalone applications or be integrated into larger codebases in scientific computing via links to its static library.
 
